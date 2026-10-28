@@ -106,10 +106,12 @@ Fights happen on the same isometric map the players were exploring: the map lock
 ### Fight sequence
 
 1. **Engage.** A player attacks a monster group, or an aggressive group attacks the player. Other players can join until placement ends (a lock option blocks joins).
-2. **Placement (30 s).** Each team chooses from its coloured start cells. Players can swap cells with allies.
-3. **Turn order.** Units are sorted by Initiative, alternating teams: highest of team A, highest of team B, and so on.
-4. **Turns (30 s each).** At turn start, buffs and poisons tick and durations decrement. The unit casts spells (AP), moves (MP) and ends its turn. Unused AP and MP are lost.
-5. **End.** A team wins when every opponent is dead or has fled. Rewards are rolled and the map unlocks.
+2. **Placement (30 s).** Each unit starts on a random free cell among its team's coloured start cells, then can move to another one. Moving onto an ally's cell swaps the two.
+3. **Turn order.** Units are sorted by Initiative, alternating teams: highest of team A, highest of team B, and so on. The team whose best unit has the higher Initiative opens; when one team runs out of units, the rest of the other team follows. Ties are broken by the fight's seeded RNG. The order is fixed for the whole fight: dead units keep their slot (so they can be revived) and are skipped.
+4. **Turns (30 s each).** At turn start, the unit's AP and MP refill, then buffs and poisons tick and durations decrement. The unit casts spells (AP), moves (MP) and ends its turn. Unused AP and MP are lost. A round ends when the order wraps around.
+5. **End.** A team wins when every opponent is dead or has fled. If both teams are wiped out by the same action, the fight is a draw. Rewards are rolled and the map unlocks.
+
+The fight state lives in [`packages/shared/src/fight.ts`](../packages/shared/src/fight.ts). Each action (join, place, start, move, end turn, flee, take damage) is a pure function that returns either an error code or a new state plus the events it produced, without changing its input, so the AI can try moves freely and the server can validate an intent before committing it. Timers stay with the caller, which ends placement or a turn when they run out.
 
 ### Rules that make positioning matter
 
@@ -167,7 +169,7 @@ Clamped between 10% and 90%. Pushback damage per blocked cell is (casterLevel / 
 
 ### Death, fleeing and rewards
 
-- A unit at 0 HP leaves the board. Players can flee only on their own turn and count as dead.
+- A unit at 0 HP leaves the board; if it was its own turn, play passes to the next unit. Players (not monsters) can flee only on their own turn and count as dead.
 - Losing to monsters sends the player to their saved Waystone and drains **energy**. At 0 energy the character becomes a ghost until it reaches a shrine.
 - XP is shared across the winning team based on each member's level and Wisdom, with a bonus for group size.
 - Drops use **Prospecting**: each item has a base chance multiplied by prospecting / 100. Rare items also need the team's total Prospecting to pass a threshold.
@@ -462,7 +464,7 @@ Grid coordinates are used for range, areas, pathfinding and line of sight; scree
 shardfall/
   docs/         this design document
   packages/
-    shared/     grid math, pathfinding, line of sight, map types (combat engine from M1)
+    shared/     grid math, pathfinding, line of sight, map types, fight state (spell engine next)
     client/     Phaser scenes, HUD, asset loading
     server/     Colyseus rooms, persistence, AI (from M2)
     tools/      map generator and converter, placeholder art
@@ -504,6 +506,7 @@ If the offline combat prototype does not make people want another fight, everyth
 - [x] Set up the monorepo (shared, client, server, tools) with Vite, TypeScript strict mode and Zod content validation
 - [x] Write the Tiled-to-JSON map converter and test maps
 - [x] Render the isometric grid in Phaser with click-to-move and A* pathfinding
-- [ ] Implement the combat engine in `shared`: turn order, AP/MP, line of sight, damage, tackle
+- [x] Fight state in `shared`: placement, initiative order, turns, AP/MP, movement, erosion, end conditions, seeded RNG
+- [ ] Implement the spell engine in `shared`: range shapes, areas, line of sight, cooldowns, damage, tackle, pushback, AP/MP removal
 - [ ] Write full 20-spell kits for the four prototype classes (Vanguard, Longshot, Mender, Warden)
 - [ ] Commission placeholder art: one tileset, four class sprites, three monsters
