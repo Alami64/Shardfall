@@ -1,0 +1,509 @@
+# Shardfall — Game Design Document
+
+Last updated: 2026-10-28
+
+This is the repository copy of the design doc. Change it here, in the same pull request as the code it affects, so the design and the game stay in step.
+
+## Overview
+
+Shardfall is a browser-based, turn-based tactical MMORPG on an isometric grid, built in Phaser + TypeScript. Its systems follow the Dofus model closely (AP/MP combat on the exploration map itself, characteristic points, item sets, harvest-and-craft professions, a player-driven economy), while the world, classes, names and art are entirely original.
+
+**Design pillars**
+
+- **Every fight is a puzzle.** Positioning, line of sight, tackle and initiative matter more than raw stats.
+- **Builds are personal.** Characteristic points, equipment rolls and spell variants let two players of the same class play very differently.
+- **Players make the economy.** Almost every item worth having is harvested, crafted or dropped by players and sold on player marketplaces.
+- **Play together, or alone with friends.** Groups of up to 8 fight together; a single player can control several characters on one account.
+
+**Target audience:** players aged 16+ who like tactics games (Into the Breach, Wakfu, XCOM) and long-term MMO progression; sessions of 20–90 minutes on desktop browsers first, tablets later.
+
+**Core loop:** explore a map → engage a monster group → win the tactical fight → earn XP, currency and resources → level up, craft or buy better gear → take on harder zones and dungeons.
+
+```mermaid
+flowchart LR
+    A["Explore<br/>walk linked isometric maps"] --> B["Engage a group<br/>pick a fight or get ambushed"]
+    B --> C["Win the tactical fight<br/>AP, MP, line of sight"]
+    C --> D["Collect rewards<br/>XP, Gild, drops, resources"]
+    D --> E["Grow the build<br/>level up, craft, trade gear"]
+    E --> F["Push further<br/>harder zones and dungeons"]
+    F --> A
+    style C stroke-width:3px
+```
+
+Each pass through the loop ends with a stronger character facing harder content; the fight is the only step that cannot be skipped.
+
+## World and setting
+
+The Shardlands are an archipelago formed when the Heartcrystal, a world-sized gem, shattered. Its fragments (Shards) now grant power to whoever carries them, and every class draws on one of these fragments. The tone is light, colourful and humorous, with darker stakes in late-game zones.
+
+**Regions (launch set)**
+
+| Region | Level range | Character |
+| --- | --- | --- |
+| Brightmoor Isle | 1–15 | Tutorial island, farm fields, the first village |
+| Gildhaven | 10–60 | Neutral capital: marketplaces, profession workshops, Waystone hub |
+| Thornwild Forest | 20–50 | Dense woods, beast and fungus monsters |
+| Saltreach Coast | 40–80 | Fishing towns, pirate camps, sea caves |
+| Emberveld | 70–120 | Volcanic badlands, mining, fire elementals |
+| Frostmere Peaks | 110–160 | Glacier passes, high-level dungeons |
+| The Fracture | 150–200 | Unstable zone around the Heartcrystal's core, end-game bosses |
+
+**Alignment factions.** Two rival city-states, Dawnspire (order, light) and Gloamhold (ambition, shadow), recruit players at level 10. Alignment unlocks PvP, territory control and faction quests (see Economy and social).
+
+**Lore hooks.** Each region tells part of why the Heartcrystal broke; dungeon bosses guard major Shards; seasonal events reveal new fragments and add a temporary map set.
+
+## Characters
+
+Players pick one of 12 original classes, each built around a role and 2–3 of the four damage elements. Elements map to characteristics: **Earth = Strength, Fire = Intelligence, Water = Chance, Air = Agility**, plus Neutral (scales with Strength).
+
+### Classes
+
+| Class | Role | Main elements | Signature mechanic |
+| --- | --- | --- | --- |
+| Vanguard | Melee damage | Earth, Air | Leaps onto targets; bonus damage after moving |
+| Longshot | Ranged damage | Air, Fire | Long range, damage grows with distance |
+| Mender | Healer | Fire, Water | Heals that also grant AP; resurrects once per fight |
+| Warden | Tank | Earth, Fire | Shields allies, redirects damage to self |
+| Tidecaller | Control mage | Water, Air | Pushback and pull; water puddles slow enemies |
+| Hexweaver | Debuffer | Water, Air | AP/MP removal, curses that spread on death |
+| Shepherd | Summoner | Earth, Water | Up to 4 beast summons with their own turns |
+| Gambit | Luck | All four | Dice rolls pick the element and bonus of each hit |
+| Clockwright | Traps and glyphs | Fire, Air | Places traps and turret glyphs; triggers chain reactions |
+| Bloodsworn | Berserker | Earth, Fire | Spends own HP for damage; stronger below 50% HP |
+| Shiftblade | Positioning | Air, Water | Teleports and swaps places with any unit |
+| Mirelord | Damage over time | Water, Earth | Poisons that tick each turn and stack |
+
+### Characteristics
+
+| Characteristic | Effect |
+| --- | --- |
+| Vitality | +1 max HP per point |
+| Wisdom | +1% XP per 10 points; raises AP/MP parry and removal |
+| Strength | +1% Earth and Neutral damage per point; +5 pods (carry weight) |
+| Intelligence | +1% Fire damage and heals per point |
+| Chance | +1% Water damage per point; +1 Prospecting per 10 points |
+| Agility | +1% Air damage per point; +1 Dodge and Lock per 10 points |
+
+**Derived and secondary stats:** HP (55 + 5 per level + Vitality), AP (base 6, +1 at level 100), MP (base 3), Range, Initiative, Prospecting, Dodge, Lock, AP/MP Parry, AP/MP Removal, Critical %, Critical Damage, Power, flat Damage per element, Heals, Summons, Pushback Damage, and per-element resistances (% and flat).
+
+### Leveling
+
+- Levels 1–200. XP curve is exponential; level 200 takes roughly 6 months of regular play.
+- Each level grants **5 characteristic points**. Cost per point rises with the current value: 1 point each up to 100, 2 up to 200, 3 up to 300, 4 beyond. Vitality always costs 1; Wisdom costs 3.
+- **Scrolls** found in the world add permanent base points (up to 100 per characteristic) without spending level points.
+- Players can reset characteristics for free at level-up milestones (every 50 levels) or with a consumable.
+- Spells unlock by level (see Spells); there are no spell points to spend.
+
+## Tactical combat
+
+Fights happen on the same isometric map the players were exploring: the map locks, obstacles stay, and every unit takes turns spending Action Points (AP) on spells and Movement Points (MP) on steps.
+
+### Grid
+
+- Each map is a staggered isometric grid of **14 cells across × 40 staggered lines (560 cells)**, stored as a 1D array with flags: walkable, line-of-sight blocking, start cell (team A / team B), interactive.
+- Movement is 4-directional along grid axes (diagonal on screen). One cell costs 1 MP. Distance between cells is Manhattan distance in grid coordinates.
+
+### Fight sequence
+
+1. **Engage.** A player attacks a monster group, or an aggressive group attacks the player. Other players can join until placement ends (a lock option blocks joins).
+2. **Placement (30 s).** Each team chooses from its coloured start cells. Players can swap cells with allies.
+3. **Turn order.** Units are sorted by Initiative, alternating teams: highest of team A, highest of team B, and so on.
+4. **Turns (30 s each).** At turn start, buffs and poisons tick and durations decrement. The unit casts spells (AP), moves (MP) and ends its turn. Unused AP and MP are lost.
+5. **End.** A team wins when every opponent is dead or has fled. Rewards are rolled and the map unlocks.
+
+### Rules that make positioning matter
+
+- **Line of sight:** a spell needs a clear ray from caster to target cell. Obstacles and units block it, except on the target cell. Some spells ignore line of sight.
+- **Range shapes:** circle (Manhattan), straight line only, diagonal only; minimum and maximum range; some ranges can be boosted by +Range gear.
+- **Area shapes:** single cell, circle of radius n, cross, line, cone, square, ring.
+- **Tackle:** leaving a cell adjacent to enemies costs a share of MP and AP based on your Dodge versus their total Lock.
+- **Pushback:** units pushed into an obstacle or another unit take pushback damage for each cell they could not travel.
+- **Erosion:** 10% of damage taken also lowers max HP for the rest of the fight, so healing cannot undo everything.
+
+### Formulas
+
+Direct damage, before resistances (characteristic = the spell element's stat):
+
+```math
+\text{dmg} = \left\lfloor \text{base} \times \frac{100 + \text{characteristic} + \text{power}}{100} \right\rfloor + \text{flatDamage}_{\text{element}}
+```
+
+After resistances:
+
+```math
+\text{final} = \max\left(0,\ \left\lfloor \text{dmg} \times \frac{100 - \text{res\%}}{100} \right\rfloor - \text{flatRes}\right)
+```
+
+Critical hits use the spell's critical base values and add Critical Damage. Resistances are capped at 50% for players.
+
+Initiative (order of play):
+
+```math
+\text{initiative} = (\text{bonusInitiative} + \text{Str} + \text{Int} + \text{Cha} + \text{Agi}) \times \frac{\text{currentHP}}{\text{maxHP}}
+```
+
+Tackle escape share (1 or more = no loss):
+
+```math
+\text{escape} = \frac{\text{dodge} + 2}{2 \times (\text{lock} + 2)}
+```
+
+The unit keeps that share of its remaining MP and AP, rounded down.
+
+AP/MP removal chance per point removed:
+
+```math
+P = 0.5 \times \frac{\text{removal}}{\text{parry}} \times \frac{\text{currentPoints}}{\text{maxPoints}}
+```
+
+Clamped between 10% and 90%. Pushback damage per blocked cell is (casterLevel / 2 + 32 + pushbackDamage) / 4.
+
+### Buffs, states and summons
+
+- Every effect has a duration in turns that counts down at the start of its caster's turn, so effects stay predictable.
+- **States** are tags such as Rooted (cannot be moved), Heavy (cannot be carried), Invisible, Weakened. Spells can require or forbid a state.
+- **Summons** act on their own turns right after their summoner and die when the summoner dies. Base limit: 1 summon, raised by gear and passives.
+- **Glyphs** (area effects at turn start) and **traps** (trigger when a unit enters) are placed on cells and visible to allies only.
+
+### Death, fleeing and rewards
+
+- A unit at 0 HP leaves the board. Players can flee only on their own turn and count as dead.
+- Losing to monsters sends the player to their saved Waystone and drains **energy**. At 0 energy the character becomes a ghost until it reaches a shrine.
+- XP is shared across the winning team based on each member's level and Wisdom, with a bonus for group size.
+- Drops use **Prospecting**: each item has a base chance multiplied by prospecting / 100. Rare items also need the team's total Prospecting to pass a threshold.
+- **Challenges:** each fight offers one or two optional goals ("finish in 8 turns", "never stay next to an enemy"). Completing them adds a percentage bonus to XP and drops.
+
+## Spells
+
+Each class has **20 spells arranged as 10 variant pairs**. A pair unlocks at a set level, and the player equips one spell from each pair on their bar, so the build choice is which side of each pair to bring. Each spell has three grades that upgrade automatically: grade 2 at 50 levels after unlock and grade 3 at 100 levels after unlock (capped at level 200).
+
+### Data model
+
+All spells, monster spells and weapon attacks share one data-driven definition, so new content needs no code.
+
+```typescript
+type Element = 'neutral' | 'earth' | 'fire' | 'water' | 'air';
+type Zone = { shape: 'single' | 'circle' | 'cross' | 'line' | 'cone' | 'square' | 'ring'; size: number };
+
+interface SpellGrade {
+  apCost: number;
+  minRange: number;
+  maxRange: number;
+  rangeBoostable: boolean;
+  castInLine: boolean;
+  castInDiagonal: boolean;
+  needsLineOfSight: boolean;
+  needsFreeCell: boolean;
+  castsPerTurn: number;          // 0 = unlimited
+  castsPerTarget: number;
+  cooldown: number;              // turns
+  initialCooldown: number;
+  criticalChance: number;        // %
+  effects: Effect[];
+  criticalEffects: Effect[];
+}
+
+interface Effect {
+  kind: 'damage' | 'steal' | 'heal' | 'buff' | 'debuff' | 'push' | 'pull' | 'teleport'
+      | 'swap' | 'summon' | 'glyph' | 'trap' | 'state' | 'removeAP' | 'removeMP' | 'shield';
+  element?: Element;
+  min?: number; max?: number;    // rolled per cast
+  duration?: number;             // turns, 0 = instant
+  zone: Zone;
+  targets: ('enemies' | 'allies' | 'self' | 'summons' | 'cell')[];
+  requiresState?: string; forbidsState?: string;
+  params?: Record<string, number | string>;
+}
+
+interface Spell { id: string; classId: string; name: string; unlockLevel: number; pairId: string; grades: SpellGrade[] }
+```
+
+### Sample kits (first three pairs per class)
+
+| Class | Pair 1 | Pair 2 | Pair 3 |
+| --- | --- | --- | --- |
+| Vanguard | Cleave (3 AP, Earth, melee) / Gale Cut (3 AP, Air, range 1–2) | Leap (2 AP, jump to a cell 1–4) / Charge (3 AP, dash in line, push 1) | Rally (2 AP, +1 MP to allies in circle 2) / Brace (2 AP, +20% resistances, 1 turn) |
+| Longshot | Piercing Arrow (4 AP, Air, range 3–10, line damage) / Ember Arrow (4 AP, Fire, range 3–8, circle 1) | Eagle Eye (2 AP, +4 Range, 3 turns) / Steady Aim (2 AP, +15% damage, cannot move this turn) | Recoil Shot (3 AP, damage + push self 2) / Pinning Shot (3 AP, -2 MP to target) |
+| Mender | Mending Light (3 AP, heal, range 1–6) / Searing Light (3 AP, Fire damage) | Quickening (2 AP, +2 AP to ally next turn) / Wellspring (4 AP, heal glyph circle 1, 2 turns) | Rebirth (6 AP, revive an ally at 30% HP, once per fight) / Sanctuary (4 AP, shield = 15% max HP) |
+| Warden | Bulwark (3 AP, shield ally) / Shield Bash (4 AP, Earth, push 2) | Taunt (2 AP, pulls enemy 3 cells toward self) / Hold the Line (2 AP, +100 Lock, 1 turn) | Intercept (3 AP, takes 50% of ally's damage, 2 turns) / Fortify (3 AP, Rooted, +30% resistances) |
+
+The remaining eight classes follow the same pattern; their full kits are a content task for milestone M1 (see Roadmap).
+
+## Exploration
+
+The world is a large set of single-screen isometric maps (each one 560 cells) linked edge to edge; walking off an edge cell loads the neighbouring map. Each map has world coordinates (x, y) and belongs to a sub-area and an area, which drive monster spawns, music and resource types.
+
+### Moving around
+
+- **Click to move:** A\* pathfinding on the walkable cells, animated along the path. Out of combat the walker may also take diagonal grid steps (screen-horizontal and screen-vertical moves), never cutting between two blocked cells. Walking costs nothing outside fights.
+- **Map transitions:** edge cells marked as exits in each direction; a cell on the far side receives the player.
+- **Waystones:** a fast-travel network (one per town and major zone). Players discover a Waystone by visiting it, then pay a small fee to teleport between discovered ones. One Waystone is set as the respawn point.
+- **Recall scroll:** a cheap consumable that teleports to the saved Waystone.
+- **Mounts** (level 60+) raise walking speed and carry stats; they are bred by players (see Professions).
+- **World map:** an overview of discovered maps, Waystones, dungeons and party members.
+
+### Monster groups
+
+- Each map spawns 1–4 groups of 1–8 monsters drawn from its sub-area's monster pool, with levels rolled in a range.
+- Groups wander a few cells every 10–30 seconds. A star rating on idle groups raises their XP and drop bonus by +20% per hour uncollected, up to +200%, rewarding players who explore quiet maps.
+- **Aggressive** monsters attack any player within 2 cells whose level is no more than 20 above theirs. Alignment guards attack enemy-faction players.
+- Hovering a group shows its members, levels and total level before engaging.
+
+### Interactive elements
+
+Resources (trees, ore, plants, fishing spots) respawn on a timer after harvesting. Other interactives: doors, workshop stations, NPCs, quest objects, Waystones, house and paddock entrances.
+
+## Monsters, dungeons and quests
+
+Monsters use the same stats and spell system as players, so one combat engine runs everything. Each monster has 1–5 grades (level variants) with their own HP, resistances and spell grades.
+
+### Monster AI
+
+The AI picks actions by **utility scoring** rather than scripted behaviour trees:
+
+1. List every reachable cell this turn (by MP, with tackle cost).
+2. For each cell, list every castable spell and valid target cell.
+3. Score each (move, cast) sequence: expected damage dealt, healing done, kills, damage it will take next round, distance to its preferred range.
+4. Weight the score by the monster's **archetype**, take the best sequence, repeat while AP or MP remain.
+
+| Archetype | Weighting |
+| --- | --- |
+| Brute | Closes distance, maximises melee damage, ignores own safety |
+| Skirmisher | Hits then retreats out of enemy reach |
+| Caster | Keeps preferred range and line of sight |
+| Support | Heals and buffs allies first, attacks only when nothing else helps |
+| Coward | Flees when below 30% HP, summons or blocks |
+| Boss | Scripted phases at HP thresholds on top of utility scoring |
+
+Scoring is capped (top N cells by distance, pruned spells) so a turn resolves in under 50 ms on the server.
+
+### Dungeons
+
+- A dungeon is a chain of 3–6 rooms, each a fixed monster group, ending in a boss room.
+- Entry needs a **key** (crafted from the zone's drops) or a quest completion. Groups stay inside between rooms; dying ends the run.
+- Bosses drop the zone's best set pieces and resources needed for crafting.
+- Each boss has a **mechanic to learn** (a pillar to destroy, a state to remove, a phase that punishes standing in line).
+- Weekly **dungeon challenges** add modifiers (fewer turns, one class per team) for bonus rewards.
+
+### Quests
+
+- Types: talk, deliver, kill N, defeat a specific group, gather N resources, reach a map, win a fight with a challenge completed.
+- Quests are data: a list of steps, each with objectives and rewards, plus prerequisites (level, alignment, previous quests).
+- **Daily bounties** offer a random monster and dungeon to fight for currency and XP.
+- A **bestiary** tracks monsters defeated and rewards completing sub-area entries.
+
+## Items and equipment
+
+Gear is the main source of power after level, and nearly all of it is crafted by players. Every piece has **rolled stats**: the recipe defines a range per stat (for example Vitality 31–40), and each crafted copy rolls a value inside it, so two copies of the same item differ in worth.
+
+### Equipment slots
+
+| Slot | Count | Notes |
+| --- | --- | --- |
+| Weapon | 1 | Has its own attack (AP cost, range, damage lines, critical) usable like a spell |
+| Hat, Cloak, Amulet, Belt, Boots | 1 each | Core stat pieces |
+| Ring | 2 | Two copies of the same ring are not allowed |
+| Shield | 1 | Flat resistances; PvP-focused |
+| Companion | 1 | Pet or mount |
+| Shardstones | 6 | Small stat gems found in dungeons; one of each kind |
+
+Items have a level requirement and, for some, a condition ("Strength > 200", "AP < 12") that keeps builds honest.
+
+### Rarity
+
+Common → Uncommon → Rare → Mythic → Legendary. Rarity reflects recipe source and power budget; Legendary items come from end-game bosses and carry a unique spell-like effect.
+
+### Item sets
+
+Sets group 2–8 pieces from the same zone or dungeon. Wearing more pieces grants stepped bonuses, often an extra AP, MP or Range, which makes mixing sets against single strong items a core build decision.
+
+### Consumables and others
+
+- Food and potions restore HP outside fights (no consumable use inside fights except special event items).
+- Scrolls raise base characteristics permanently.
+- Resources (wood, ore, hides, monster parts) are stackable and weigh pods against the carry limit.
+- **Living items** (cosmetic appearance skins) let players keep a look while changing stats.
+
+### Pets and mounts
+
+- **Pets** gain stats by being fed specific resources or by the owner defeating specific monsters, up to a cap.
+- **Mounts** are bred in player paddocks; offspring inherit colours and capabilities from both parents. Riding a mount gives speed plus a stat bonus that grows with the mount's level.
+
+## Professions
+
+Every character can learn all professions, each levelling 1–200 separately from combat level. Gatherers feed crafters, crafters feed the marketplace, and the marketplace funds everyone.
+
+### Gathering professions
+
+| Profession | Gathers | Feeds |
+| --- | --- | --- |
+| Woodcutter | Wood from trees | Carver, Smith |
+| Miner | Ore and gems | Smith, Jeweler |
+| Farmer | Cereals and crops | Baker, Alchemist |
+| Herbalist | Plants and flowers | Alchemist, Tailor |
+| Angler | Fish | Cook |
+| Trapper | Meat from defeated monsters | Cook |
+
+Higher profession levels unlock new resources and harvest more units per action. Harvesting takes a few seconds and can be interrupted by an aggressive monster group.
+
+### Crafting professions
+
+| Profession | Makes |
+| --- | --- |
+| Smith | Swords, axes, hammers, daggers, shovels |
+| Carver | Bows, staffs, wands |
+| Tailor | Hats, cloaks, bags |
+| Jeweler | Amulets, rings |
+| Cobbler | Boots, belts |
+| Alchemist | Potions, recall scrolls, dyes |
+| Baker and Cook | Food that restores HP |
+| Breeder | Mounts in paddocks |
+
+**Crafting:** at a workshop station, the player places recipe ingredients (up to 8 kinds) and crafts. Recipes are hidden until first crafted or found as a recipe book. Crafting XP scales with item level and number of ingredients.
+
+### Smithmagic (stat runes)
+
+- Any item can be **broken** into stat runes (Vitality rune, Strength rune and so on); the yield depends on the item's level and rolled stats.
+- A **Smithmage** applies runes to an item to raise a stat. Each attempt can succeed (stat raised), partially succeed (stat raised, another stat lowered), or fail (other stats lowered).
+- Lost stat weight goes into the item's hidden **residue pool**, which raises the success chance of later attempts on that item.
+- Rare **exotic runes** can add a stat the item never had (for example +1 AP), the top end-game crafting goal.
+- Every stat has a weight, and each item has a total weight budget it cannot exceed.
+
+## Economy and social
+
+The currency is **Gild**. Money enters the world mainly through monster drops, quests and NPC sales of resources, and leaves through taxes, Waystone fees, marketplace fees and cosmetic NPC goods. Keeping those sinks larger than the faucets is a standing balancing task.
+
+### Trading
+
+- **Marketplaces:** one per category in each city (resources, equipment, consumables, runes). Sellers list in lots of 1, 10 or 100 at a fixed price; a 2% listing fee is charged up front. Buyers see the cheapest lot per item and price history.
+- **Direct trade:** a two-sided window where both players must confirm after the last change.
+- **Merchant mode:** a logged-out character stays on the map as a shop, selling up to 50 listings for a fee based on listing value.
+- **Banks** per account, shared across characters, with a small access fee.
+
+### Groups and guilds
+
+- **Groups:** up to 8 players fight together and see each other on the world map; XP share and loot rules are set by the leader.
+- **Guilds** (up to 300 members): ranks and rights, guild XP fed by a member-chosen share of their own XP, and guild levels that unlock perks.
+- **Tollkeepers:** a guild can place an NPC tax collector on a map; it collects a share of drops and Gild from fights there and can be attacked by other guilds.
+- **Alliances** group guilds to claim territory by holding a **Beacon** in a sub-area. Owning territory grants bonuses (XP, harvest yield) and lets members teleport to it.
+
+### PvP
+
+- **Alignment PvP:** Dawnspire and Gloamhold players can attack each other in the open world when both have PvP enabled. Wins grant Honour, which sets an alignment rank (1–10) with titles and gear.
+- **Arena:** queued 3v3 matches by rating, on dedicated arena maps, with seasonal rewards.
+- **Territory wars:** scheduled fights to attack and defend Beacons, alliance against alliance.
+- **Duels:** consensual 1v1 anywhere with no penalty.
+
+### Housing
+
+Houses and paddocks are bought from NPCs in limited supply and resold between players. Houses hold storage chests; paddocks breed mounts.
+
+## Technical architecture
+
+The server is authoritative for everything: the client sends intents ("move to cell 312", "cast spell X on cell 205"), the server validates them with the same rules code the client uses for previews, and broadcasts the results. Combat rules live in one shared TypeScript package so client previews and server outcomes can never disagree.
+
+```mermaid
+flowchart LR
+    subgraph Client["Browser client"]
+        P["Phaser scenes<br/>map, fight, animations"]
+        U["Preact UI overlay<br/>inventory, chat, shop"]
+    end
+    subgraph Server["Game server (Colyseus)"]
+        MR["MapRoom<br/>move, harvest, spawns"]
+        FR["FightRoom<br/>turns, timers, AI"]
+    end
+    subgraph Data["Services and data"]
+        S["Social services<br/>chat, guilds, market"]
+        R["Redis<br/>sessions, pub/sub"]
+        PG["PostgreSQL<br/>characters, items"]
+    end
+    SH["@shardfall/shared<br/>combat engine, formulas, pathfinding, data types"]
+    Client -- intents --> Server
+    Server -- results --> Client
+    Server --> Data
+    Client -. imports .-> SH
+    Server -. imports .-> SH
+```
+
+The client only sends intents and draws results; the game server persists outcomes, and both import the same rules package.
+
+### Stack
+
+| Layer | Choice | Why |
+| --- | --- | --- |
+| Client rendering | Phaser 3 + TypeScript, built with Vite | Mature 2D WebGL engine, sprite atlases, tweens, input |
+| UI | HTML/CSS overlay (Preact) above the canvas | Inventories, chat and marketplace are easier as DOM than in-canvas |
+| Shared rules | `@shardfall/shared` TypeScript package | Combat engine, formulas, pathfinding, data types used by both sides |
+| Game server | Node.js + Colyseus | Room model fits maps and fights; binary state sync; scales by process |
+| Persistence | PostgreSQL | Characters, items, marketplace listings, guilds |
+| Cache and pub/sub | Redis | Sessions, cross-server chat, map-to-server routing |
+| Map editing | Tiled (staggered isometric) → JSON via a converter | Free editor; converter bakes cell flags and exits |
+| Content data | Typed JSON for spells, items, monsters, quests, validated with Zod at build | Designers add content without code |
+
+### Rooms
+
+- **MapRoom:** one per active map. Holds players, NPCs, monster groups and interactives; handles movement, harvesting and starting fights.
+- **FightRoom:** created on engage, linked to its map. Runs the turn loop, timers and AI, then writes rewards in one database transaction.
+- **Social services** (chat, guilds, marketplace) run as separate processes reachable through Redis.
+
+### Isometric grid
+
+Cells are stored as a 1D array of 560 cells (14 per line, 40 staggered lines, odd lines shifted half a tile right). The implementation and its tests live in [`packages/shared/src/grid.ts`](../packages/shared/src/grid.ts):
+
+- `cellToGrid` / `gridToCell` convert between cell ids and diamond grid coordinates (`+x` = down-right, `+y` = up-right on screen).
+- `cellToScreen` / `screenToCell` convert between cell ids and map pixels (cell centres, mouse picking).
+- `distance` is Manhattan distance in grid coordinates.
+
+Grid coordinates are used for range, areas, pathfinding and line of sight; screen coordinates only for drawing. Sprites are depth-sorted by the y position of their feet, above a flat ground layer.
+
+### Repository layout
+
+```
+shardfall/
+  docs/         this design document
+  packages/
+    shared/     grid math, pathfinding, line of sight, map types (combat engine from M1)
+    client/     Phaser scenes, HUD, asset loading
+    server/     Colyseus rooms, persistence, AI (from M2)
+    tools/      map generator and converter, placeholder art
+  content/      maps today; spells, items, monsters, quests later (JSON)
+  assets/       sprites, atlases, audio
+```
+
+### Key technical risks
+
+- **AI cost:** utility scoring on large groups; mitigated by pruning and a per-turn time budget.
+- **Server load per map:** busy towns may hold hundreds of players; interest management limits updates to visible actors.
+- **Exploits:** all randomness (damage rolls, drops, crafting) is rolled on the server with seeded RNG logged per fight for replays and audits.
+- **Asset volume:** 12 classes × animations × directions is the largest art cost; use 4 drawn directions mirrored to 8.
+
+## Roadmap
+
+Seven milestones over roughly 46 weeks for a team of 3–5, with go/no-go gates after the combat prototype and after the vertical slice. Week counts are planning estimates, not commitments.
+
+```mermaid
+flowchart TB
+    M0["M0 · Foundations — weeks 1–4<br/>Monorepo, isometric renderer, Tiled map converter, A* pathfinding, click-to-move"]
+    M1["M1 · Combat prototype (offline) — weeks 5–10<br/>Local fights vs AI: 4 classes with full kits, line of sight, tackle, AI archetypes"]
+    G1{{"Gate: playtesters ask to replay fights"}}
+    M2["M2 · Online fights — weeks 11–16<br/>Colyseus MapRoom and FightRoom, accounts, PostgreSQL persistence, server-rolled RNG"]
+    M3["M3 · Vertical slice — weeks 17–24<br/>Brightmoor and Gildhaven (about 40 maps), monster groups, levels 1–60, drops, 1 dungeon"]
+    G2{{"Gate: a 30-minute session feels complete"}}
+    M4["M4 · Economy — weeks 25–32<br/>Gathering and crafting professions, marketplace, trading, banks, smithmagic"]
+    M5["M5 · Social and PvP — weeks 33–40<br/>Groups, guilds, alignment, 3v3 arena, the remaining 8 classes"]
+    M6["M6 · Closed alpha — weeks 41–46<br/>Invite-only test, balance passes, monitoring, exploit hunting"]
+    G3{{"Gate: open beta"}}
+    M0 --> M1 --> G1 --> M2 --> M3 --> G2 --> M4 --> M5 --> M6 --> G3
+    style M1 stroke-width:3px
+```
+
+If the offline combat prototype does not make people want another fight, everything after it waits until it does.
+
+### Progress
+
+- [x] Set up the monorepo (shared, client, server, tools) with Vite, TypeScript strict mode and Zod content validation
+- [x] Write the Tiled-to-JSON map converter and test maps
+- [x] Render the isometric grid in Phaser with click-to-move and A* pathfinding
+- [ ] Implement the combat engine in `shared`: turn order, AP/MP, line of sight, damage, tackle
+- [ ] Write full 20-spell kits for the four prototype classes (Vanguard, Longshot, Mender, Warden)
+- [ ] Commission placeholder art: one tileset, four class sprites, three monsters

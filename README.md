@@ -1,6 +1,6 @@
 # Shardfall
 
-A browser-based, turn-based tactical MMORPG on an isometric grid, built with Phaser 3 and TypeScript. The full design lives in the *Shardfall — Game Design Document*.
+A browser-based, turn-based tactical MMORPG on an isometric grid, built with Phaser 3 and TypeScript. The full design lives in [docs/design.md](docs/design.md).
 
 This repository is at **milestone M0 (Foundations)**: the isometric renderer, map pipeline and click-to-move exploration. Combat starts in M1.
 
@@ -30,6 +30,7 @@ npm run build        # one self-contained file: packages/client/dist/index.html
 
 ```
 shardfall/
+  docs/                design document
   packages/
     shared/   grid math, A* pathfinding, line of sight, map types (+ tests)
     client/   Phaser scenes, HUD, Vite single-file build
