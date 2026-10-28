@@ -1,0 +1,26 @@
+{
+  "name": "shardfall",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Shardfall: a turn-based tactical MMORPG on an isometric grid (Phaser + TypeScript).",
+  "type": "module",
+  "workspaces": [
+    "packages/shared",
+    "packages/tools",
+    "packages/client"
+  ],
+  "scripts": {
+    "art": "python3 packages/tools/art/generate_placeholder_art.py",
+    "maps:generate": "npm run generate -w @shardfall/tools",
+    "maps:build": "npm run convert -w @shardfall/tools",
+    "dev": "npm run dev -w @shardfall/client",
+    "build": "npm run maps:build && npm run build -w @shardfall/client",
+    "test": "npm run test -w @shardfall/shared",
+    "typecheck": "tsc -p packages/shared && tsc -p packages/tools && tsc -p packages/client"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.12"
+  }
+}

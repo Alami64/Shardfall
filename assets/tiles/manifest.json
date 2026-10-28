@@ -1,0 +1,107 @@
+{
+  "grass_1": {
+    "kind": "ground",
+    "width": 88,
+    "height": 45,
+    "anchorX": 44.0,
+    "anchorY": 22.5
+  },
+  "grass_2": {
+    "kind": "ground",
+    "width": 88,
+    "height": 45,
+    "anchorX": 44.0,
+    "anchorY": 22.5
+  },
+  "grass_3": {
+    "kind": "ground",
+    "width": 88,
+    "height": 45,
+    "anchorX": 44.0,
+    "anchorY": 22.5
+  },
+  "flowers": {
+    "kind": "ground",
+    "width": 88,
+    "height": 45,
+    "anchorX": 44.0,
+    "anchorY": 22.5
+  },
+  "path": {
+    "kind": "ground",
+    "width": 88,
+    "height": 45,
+    "anchorX": 44.0,
+    "anchorY": 22.5
+  },
+  "water": {
+    "kind": "ground",
+    "width": 88,
+    "height": 45,
+    "anchorX": 44.0,
+    "anchorY": 22.5
+  },
+  "stone": {
+    "kind": "ground",
+    "width": 88,
+    "height": 45,
+    "anchorX": 44.0,
+    "anchorY": 22.5
+  },
+  "tree_oak": {
+    "kind": "object",
+    "width": 104,
+    "height": 146,
+    "anchorX": 52.0,
+    "anchorY": 132
+  },
+  "tree_pine": {
+    "kind": "object",
+    "width": 84,
+    "height": 158,
+    "anchorX": 42.0,
+    "anchorY": 144
+  },
+  "rock": {
+    "kind": "object",
+    "width": 72,
+    "height": 56,
+    "anchorX": 36.0,
+    "anchorY": 42
+  },
+  "bush": {
+    "kind": "object",
+    "width": 72,
+    "height": 54,
+    "anchorX": 36.0,
+    "anchorY": 40
+  },
+  "hero_front_0": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "hero_front_1": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "hero_back_0": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "hero_back_1": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  }
+}

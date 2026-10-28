@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Shardfall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+<style>
+  /* Layout: the map canvas fills the screen; a placard (top left), a tile readout (top right)
+     and a control bar (bottom) float over it like a field guide's margin notes.
+     One deliberate dark look, matched to the canvas, in every theme. */
+  :root {
+    --night: #0f1a14;
+    --panel: rgba(14, 25, 19, 0.82);
+    --line: rgba(239, 230, 207, 0.16);
+    --parchment: #efe6cf;
+    --moss: #a9b89f;
+    --amber: #f2a541;
+    --teal: #3fc1b0;
+    --font-display: "Alegreya SC", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-body: "Alegreya Sans", "Gill Sans", "Trebuchet MS", system-ui, sans-serif;
+    --font-data: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --gap: 12px;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0;
+    background: var(--night);
+    color: var(--parchment);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.4;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  #app { position: relative; height: 100%; overflow: hidden; }
+  #game { position: absolute; inset: 0; }
+  #game canvas { display: block; touch-action: none; }
+
+  .hud {
+    position: absolute;
+    pointer-events: none;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .placard {
+    top: calc(var(--gap) + env(safe-area-inset-top, 0px));
+    left: calc(var(--gap) + env(safe-area-inset-left, 0px));
+    padding: 10px 16px 12px;
+    max-width: min(320px, calc(100% - 2 * var(--gap)));
+  }
+  .eyebrow {
+    margin: 0;
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--moss);
+  }
+  .eyebrow .coords { font-family: var(--font-data); letter-spacing: 0; text-transform: none; color: var(--amber); }
+  .placard h1 {
+    margin: 2px 0 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+  }
+
+  .readout {
+    top: calc(var(--gap) + env(safe-area-inset-top, 0px));
+    right: calc(var(--gap) + env(safe-area-inset-right, 0px));
+    padding: 10px 14px;
+    min-width: 200px;
+    display: grid;
+    gap: 4px;
+  }
+  .readout dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; }
+  .readout dt { font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--moss); }
+  .readout dd { margin: 0; font-family: var(--font-data); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .readout .status { margin: 4px 0 0; font-size: 14px; }
+  .readout .exit { margin: 0; font-size: 14px; color: var(--amber); font-weight: 500; }
+
+  .controls {
+    bottom: calc(var(--gap) + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: calc(100% - 2 * var(--gap));
+  }
+  .controls .hint { margin: 0 8px 0 6px; font-size: 14px; color: var(--moss); }
+  .controls button {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 6px 6px;
+    font: 500 14px/1 var(--font-body);
+    color: var(--parchment);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background-color 120ms ease, border-color 120ms ease;
+  }
+  .controls button:hover { background: rgba(239, 230, 207, 0.07); }
+  .controls button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  .controls button[aria-pressed="true"] { border-color: var(--amber); background: rgba(242, 165, 65, 0.14); }
+  .controls button[aria-pressed="true"] kbd { background: var(--amber); color: var(--night); }
+  kbd {
+    display: inline-grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    font: 500 12px/1 var(--font-data);
+    color: var(--parchment);
+    background: rgba(239, 230, 207, 0.1);
+    border-radius: 5px;
+  }
+  .swatch { width: 10px; height: 10px; border-radius: 2px; transform: rotate(45deg); }
+  .swatch.range { background: var(--teal); }
+
+  @media (max-width: 720px) {
+    .placard h1 { font-size: 21px; }
+    .readout { top: auto; bottom: calc(64px + var(--gap) + env(safe-area-inset-bottom, 0px)); min-width: 0; }
+    .controls .hint { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .controls button { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="game" aria-label="Map view: click or tap a tile to walk there"></div>
+
+  <header class="hud placard">
+    <p class="eyebrow"><span id="map-region">Brightmoor Isle</span><span class="coords" id="map-coords">[0, 0]</span></p>
+    <h1 id="map-name">Brightmoor Meadow</h1>
+  </header>
+
+  <aside class="hud readout" id="cell-info" hidden aria-live="polite">
+    <dl>
+      <dt>Cell</dt><dd id="cell-id">0</dd>
+      <dt>Grid</dt><dd id="cell-grid">0, 0</dd>
+    </dl>
+    <p class="status" id="cell-status">Walkable</p>
+    <p class="exit" id="cell-exit" hidden></p>
+  </aside>
+
+  <nav class="hud controls" aria-label="Map tools">
+    <p class="hint">Click a tile to walk · the amber edge leads to the next map</p>
+    <button type="button" id="btn-range" aria-pressed="false"><kbd>R</kbd>3 MP range</button>
+    <button type="button" id="btn-debug" aria-pressed="false"><kbd>D</kbd>Cell grid</button>
+  </nav>
+</div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
