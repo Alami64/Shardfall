@@ -3,7 +3,7 @@
 Browser-based, turn-based tactical MMORPG on an isometric grid (Dofus-style systems, original world and art). Phaser 3 + TypeScript, npm workspaces.
 
 - Full design: `docs/design.md`. Read the relevant section before building a feature, and update the doc in the same change when the design moves (including the **Progress** checklist at the end).
-- Current status: **M0 (Foundations) done**. Next milestone: **M1, offline combat prototype** (see "Next up" below).
+- Current status: **M0 (Foundations) done**; **M1, offline combat prototype**, in progress (see "Next up" below).
 
 ## Commands
 
@@ -22,7 +22,7 @@ Before finishing any change: `npm test && npm run typecheck && npm run build` mu
 
 ## Layout
 
-- `packages/shared` — game rules with no rendering or I/O: grid math, A* pathfinding, line of sight, map types. The client today and the server from M2 both import it. Tests in `packages/shared/test`.
+- `packages/shared` — game rules with no rendering or I/O: grid math, A* pathfinding, line of sight, map types, seeded RNG (`rng.ts`), fight state (`fight.ts`). The client today and the server from M2 both import it. Tests in `packages/shared/test`.
 - `packages/client` — Phaser scenes (`BootScene`, `MapScene`), DOM HUD (`index.html` + `src/hud.ts`), config in `src/config.ts`.
 - `packages/tools` — map generator, Tiled converter (`src/tiled.ts` holds the zod schema), placeholder art (`art/generate_placeholder_art.py`).
 - `packages/server` — empty until M2 (Colyseus).
@@ -31,7 +31,8 @@ Before finishing any change: `npm test && npm run typecheck && npm run build` mu
 
 ## Rules of the codebase
 
-- **Gameplay logic goes in `shared`**, as pure deterministic functions with Vitest tests. The client only renders and forwards input. Randomness must be injectable (seeded RNG passed in), because the server will roll it from M2 on.
+- **Gameplay logic goes in `shared`**, as pure deterministic functions with Vitest tests. The client only renders and forwards input. Randomness must be injectable (an `Rng` from `createRng(seed)` passed in, never `Math.random`), because the server will roll it from M2 on.
+- **Fight actions** (`fight.ts`) take a `FightState` and return `{ ok: false, error }` or `{ ok: true, state, events }` without mutating the input. New actions (spell casts) follow the same shape.
 - **Grid vs screen coordinates.** A map is 14 cells across × 40 staggered lines = 560 cells. Gameplay (range, areas, distance, pathfinding, LoS) uses diamond grid coordinates from `cellToGrid`; screen pixels (`cellToScreen`) are for drawing only. Never compute gameplay from pixels.
 - **Combat movement is orthogonal only** (`findPath` without `diagonals`, `reachableCells`); diagonal steps are for exploration.
 - **Content is data.** Spells, monsters and items go in typed JSON under `content/`, validated with zod at build time, not hard-coded in TypeScript. Follow the spell data model in `docs/design.md`.
@@ -41,8 +42,8 @@ Before finishing any change: `npm test && npm run typecheck && npm run build` mu
 
 ## Next up: M1 (offline combat prototype)
 
-1. Fight state in `shared`: placement on start cells, initiative order, turns, AP/MP, end conditions.
+1. ~~Fight state in `shared`: placement on start cells, initiative order, turns, AP/MP, end conditions.~~ Done (`fight.ts`). Tackle and buff ticks hook into `moveFighter` and `beginTurn`.
 2. Spell data model and engine: range shapes, areas, line of sight, cooldowns; damage, tackle, pushback and AP/MP-removal formulas exactly as in `docs/design.md`, each with tests.
 3. First kits for Vanguard, Longshot, Mender and Warden (start with the 3 pairs per class in the doc).
 4. Monster AI by utility scoring (Brute and Caster archetypes first).
-5. Client: a fight on Brightmoor Meadow against one monster group, with a turn timeline, spell bar, range and area previews.
+5. Client: a fight on Brightmoor Meadow against one monster group, with a turn timeline, spell bar, range and area previews. The test maps have no start cells flagged yet; add them in the map generator.

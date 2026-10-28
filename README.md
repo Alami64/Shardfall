@@ -2,7 +2,7 @@
 
 A browser-based, turn-based tactical MMORPG on an isometric grid, built with Phaser 3 and TypeScript. The full design lives in [docs/design.md](docs/design.md).
 
-This repository is at **milestone M0 (Foundations)**: the isometric renderer, map pipeline and click-to-move exploration. Combat starts in M1.
+This repository has finished **milestone M0 (Foundations)**: the isometric renderer, map pipeline and click-to-move exploration. **M1 (combat prototype)** is under way: the fight state is in `shared`, with no fight in the client yet.
 
 ## Quick start
 
@@ -32,7 +32,7 @@ npm run build        # one self-contained file: packages/client/dist/index.html
 shardfall/
   docs/                design document
   packages/
-    shared/   grid math, A* pathfinding, line of sight, map types (+ tests)
+    shared/   grid math, A* pathfinding, line of sight, map types, fight state (+ tests)
     client/   Phaser scenes, HUD, Vite single-file build
     tools/    test-map generator, Tiled -> game map converter, placeholder art
     server/   empty until M2 (Colyseus rooms)
@@ -66,7 +66,7 @@ Object sprites in Tiled are aligned approximately (Tiled anchors tiles bottom-le
 
 ## Next: M1, combat prototype
 
-- Fight state machine in `shared`: placement, initiative order, turns, AP/MP.
+- ~~Fight state machine in `shared`: placement, initiative order, turns, AP/MP.~~ Done: `packages/shared/src/fight.ts`.
 - Spell data model and the first kits for Vanguard, Longshot, Mender and Warden.
 - Damage, tackle and line-of-sight rules from the design doc, with tests.
 - Monster AI by utility scoring; one monster group on Brightmoor Meadow to fight.
