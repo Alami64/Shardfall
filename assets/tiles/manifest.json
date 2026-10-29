@@ -103,5 +103,117 @@
     "height": 84,
     "anchorX": 26.0,
     "anchorY": 76
+  },
+  "vanguard_front_0": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "vanguard_front_1": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "vanguard_back_0": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "vanguard_back_1": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "longshot_front_0": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "longshot_front_1": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "longshot_back_0": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "longshot_back_1": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "mender_front_0": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "mender_front_1": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "mender_back_0": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "mender_back_1": {
+    "kind": "character",
+    "width": 52,
+    "height": 84,
+    "anchorX": 26.0,
+    "anchorY": 76
+  },
+  "boar_0": {
+    "kind": "character",
+    "width": 76,
+    "height": 64,
+    "anchorX": 38.0,
+    "anchorY": 54
+  },
+  "wisp_0": {
+    "kind": "character",
+    "width": 48,
+    "height": 72,
+    "anchorX": 24.0,
+    "anchorY": 64
+  },
+  "boar_1": {
+    "kind": "character",
+    "width": 76,
+    "height": 64,
+    "anchorX": 38.0,
+    "anchorY": 54
+  },
+  "wisp_1": {
+    "kind": "character",
+    "width": 48,
+    "height": 72,
+    "anchorX": 24.0,
+    "anchorY": 64
   }
 }

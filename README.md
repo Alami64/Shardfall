@@ -2,7 +2,7 @@
 
 A browser-based, turn-based tactical MMORPG on an isometric grid, built with Phaser 3 and TypeScript. The full design lives in [docs/design.md](docs/design.md).
 
-This repository has finished **milestone M0 (Foundations)**: the isometric renderer, map pipeline and click-to-move exploration. **M1 (combat prototype)** is under way: the fight engine (turns, spells and their effects, tackle) and the monster AI are in `shared`, with no fight in the client yet.
+This repository has finished **milestone M0 (Foundations)** (the isometric renderer, map pipeline and click-to-move exploration) and the build of **M1 (offline combat prototype)**: on Brightmoor Meadow you can attack a group of monsters and fight it turn by turn with a party of three heroes (Vanguard, Longshot, Mender) against the monster AI. Next is the M1 gate: playtesting and balance.
 
 ## Quick start
 
@@ -25,7 +25,23 @@ npm run build        # one self-contained file: packages/client/dist/index.html
 | Click an amber edge tile | Walk off the map into the neighbouring one |
 | `R` | Show the cells reachable with 3 MP (combat movement rules) |
 | `D` | Show the cell grid: ids, unwalkable cells (red), sight blockers (dark outline) |
+| Click the monster group | Walk up to it and start the fight |
 
+In a fight you play all three heroes, one turn each:
+
+| Input | Action |
+| --- | --- |
+| Placement: click a hero, then a blue cell | Move that hero to that start cell (onto an ally: swap) |
+| `Enter` or **Ready** | Start the fight (it also starts when the 30 s placement timer runs out) |
+| Click a green cell | Walk there (path preview on hover; walking away from an adjacent enemy costs tackle) |
+| `1`–`6` or a spell button | Pick a spell: castable cells light up, the area shows under the cursor |
+| Click a lit cell | Cast the spell there |
+| `Esc` or right-click | Put the spell away |
+| `Space` or **End turn** | End the turn (it also ends when the 30 s turn timer runs out) |
+| **Flee** | The active hero leaves the fight; if all three do, the fight is lost |
+| Hover a fighter | Show its HP, AP, MP, buffs and shield in the card |
+
+Add `?seed=N` to the URL to replay the same fight, and `?speed=N` to play its animations and timers N times faster.
 ## Layout
 
 ```
@@ -58,7 +74,7 @@ Gameplay code never uses screen positions. It uses diamond **grid coordinates** 
 1. `npm run maps:generate` writes the two test maps to `content/maps/*.tmj`. Open them in [Tiled](https://www.mapeditor.org/) (staggered, stagger axis Y, odd index) to edit.
 2. `npm run maps:build` validates every `.tmj` and writes `content/maps/built/world.json`. `npm run build` runs this first.
 
-A map needs two tile layers, `ground` and `objects`, and the map properties `id`, `name`, `worldX`, `worldY`. Every tile carries `key`, `walkable` and `blocksLos` properties; a cell is walkable when its ground is and its object (if any) is. Maps are linked by world coordinates: walking off the east edge of `[0, 0]` leads to `[1, 0]`. The converter warns when a neighbour exists but the shared edge has no walkable cell.
+A map needs two tile layers, `ground` and `objects`, and the map properties `id`, `name`, `worldX`, `worldY`. The optional string properties `startA` and `startB` list each team's fight start cells as comma-separated cell ids (walkable, no cell in both); the generator picks six per team near the road. Every tile carries `key`, `walkable` and `blocksLos` properties; a cell is walkable when its ground is and its object (if any) is. Maps are linked by world coordinates: walking off the east edge of `[0, 0]` leads to `[1, 0]`. The converter warns when a neighbour exists but the shared edge has no walkable cell.
 
 Object sprites in Tiled are aligned approximately (Tiled anchors tiles bottom-left); the game places them exactly using the anchors in `assets/tiles/manifest.json`.
 
@@ -70,14 +86,17 @@ Monsters work the same way: `content/monsters/*.json`, checked by `npm run monst
 
 ## Placeholder art
 
-`npm run art` redraws every sprite with Pillow. Replace any PNG with real art under the same key and update its anchor in `manifest.json` (the pixel that sits on the cell centre).
+`npm run art` redraws every sprite with Pillow: ground tiles, map objects, the explorer, one figure per launch class (`vanguard_*`, `longshot_*`, `mender_*`) and the meadow monsters (`boar_*`, `wisp_*`). Replace any PNG with real art under the same key and update its anchor in `manifest.json` (the pixel that sits on the cell centre).
 
-## Next: M1, combat prototype
+## M1, combat prototype
 
-- ~~Fight state machine in `shared`: placement, initiative order, turns, AP/MP.~~ Done: `packages/shared/src/fight.ts`.
-- ~~Spell data model and casting rules (range, line of sight, areas, cooldowns).~~ Done: `spell.ts`, `zone.ts`, `fight.ts`.
-- ~~Spell effects: damage, heals, tackle, push/pull, AP/MP removal, buffs.~~ Done: `formulas.ts`, `engine.ts`.
-- ~~The first kits for the three launch classes: Vanguard, Longshot and Mender.~~ Done: three spell pairs each in `content/spells/`.
-- Launch scope: 3 classes, 3 regions (Brightmoor Isle, Gildhaven, Thornwild Forest), level cap 60; see [docs/design.md](docs/design.md#overview).
-- ~~Monster AI by utility scoring.~~ Done: `ai.ts`, with the Thornback Boar and the Dewdrop Wisp in `content/monsters/`.
-- A fight against one monster group on Brightmoor Meadow, in the client.
+Built:
+
+- Fight engine in `shared`: placement, initiative, turns, AP/MP, spells, effects, tackle (`fight.ts`, `engine.ts`, `formulas.ts`).
+- The first three spell pairs of Vanguard, Longshot and Mender (`content/spells/`), and the Thornback Boar and Dewdrop Wisp (`content/monsters/`).
+- Monster AI by utility scoring (`ai.ts`).
+- The fight in the client: `packages/client/src/scenes/FightScene.ts`.
+
+Launch scope: 3 classes, 3 regions (Brightmoor Isle, Gildhaven, Thornwild Forest), level cap 60; see [docs/design.md](docs/design.md#overview).
+
+Next: the M1 gate (playtest: do people ask to fight again?), balance from those playtests, then M2 (online fights).

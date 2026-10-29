@@ -118,6 +118,8 @@ Fights happen on the same isometric map the players were exploring: the map lock
 4. **Turns (30 s each).** At turn start, the unit's AP and MP refill, then buffs and poisons tick and durations decrement. The unit casts spells (AP), moves (MP) and ends its turn. Unused AP and MP are lost. A round ends when the order wraps around.
 5. **End.** A team wins when every opponent is dead or has fled. If both teams are wiped out by the same action, the fight is a draw. Rewards are rolled and the map unlocks.
 
+**The M1 client fight** ([`packages/client/src/scenes/FightScene.ts`](../packages/client/src/scenes/FightScene.ts)). On Brightmoor Meadow a monster group (two Thornback Boars and a Dewdrop Wisp) stands by the road; hovering it shows its members and total level, clicking it walks the explorer up and starts the fight on the same map. The player controls a party of three level-6 heroes, one of each launch class, each on its own turn. Start cells come from the map (`startA`/`startB` properties set in Tiled). The HUD shows the turn timeline with HP, a card for the active (or hovered) fighter with HP, AP, MP, buffs and shield, the spell bar (greyed with the reason when a spell cannot be cast, turns left on cooldown), End turn, Flee and the 30 s timer, and a fight log. Moving previews the reachable cells and the path (avoiding cells next to enemies when it can, so tackle is not paid by accident); a spell previews its range (castable cells bright, the rest dim) and its area under the cursor. Monsters play with the AI. A won fight removes the group for the session; a lost one leaves it. `?seed=N` replays a fight, `?speed=N` speeds it up for automated runs.
+
 The fight state lives in [`packages/shared/src/fight.ts`](../packages/shared/src/fight.ts). Each action (join, place, start, move, cast, end turn, flee, take damage) is a pure function that returns either an error code or a new state plus the events it produced, without changing its input, so the AI can try moves freely and the server can validate an intent before committing it. Timers stay with the caller, which ends placement or a turn when they run out.
 
 ### Rules that make positioning matter
@@ -603,5 +605,6 @@ If the offline combat prototype does not make people want another fight, everyth
 - [x] First three spell pairs for the three launch classes, played through the engine in tests
 - [x] Monster data and the first two Brightmoor Meadow monsters (Thornback Boar, Dewdrop Wisp), validated at build
 - [x] Monster AI by utility scoring: Brute and Caster archetypes, under 50 ms per turn
+- [x] Client fight on Brightmoor Meadow: placement, turn timeline, spell bar, movement, range and area previews, AI turns, victory and defeat (M1 complete; next is the playtest gate)
 - [ ] Write full 20-spell kits for the three launch classes (Vanguard, Longshot, Mender)
-- [ ] Commission placeholder art: one tileset, three class sprites, three monsters
+- [ ] Commission real art: one tileset, three class sprites, three monsters (generated placeholders exist for all of them)

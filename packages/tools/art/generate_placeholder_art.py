@@ -1,4 +1,5 @@
-"""Generate Shardfall placeholder art: ground tiles, map objects and the hero sprite.
+"""Generate Shardfall placeholder art: ground tiles, map objects, the hero, the class
+fighters and the Brightmoor Meadow monsters.
 
 Everything is drawn at 4x and downsampled for smooth edges. Output goes to
 assets/tiles/*.png plus assets/tiles/manifest.json, which records each sprite's
@@ -221,15 +222,25 @@ def bush() -> None:
 # ---------------------------------------------------------------- hero
 
 
-def hero(view: str, frame: int) -> None:
-    """An original placeholder adventurer: hooded teal cloak, amber scarf."""
+# Cloak, cloak shadow and scarf per figure. "hero" is the explorer; the others are fighters.
+PALETTES = {
+    "hero": ("#2a8c8c", "#1d6666", "#f2a541"),
+    "vanguard": ("#b5532f", "#86391f", "#e8c35a"),  # rust and brass: melee, Earth and Air
+    "longshot": ("#3f7d3a", "#2b5a28", "#d9e4a8"),  # forest green: ranged
+    "mender": ("#e8dcc0", "#bfae8a", "#3fa7c9"),  # cream and sky blue: healer
+}
+
+
+def hero(view: str, frame: int, key: str = "hero") -> None:
+    """An original placeholder adventurer: hooded cloak and scarf, coloured per figure."""
     w, h = 52, 84
     img = Image.new("RGBA", (w * S, h * S), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     fx, fy = w * S / 2, (h - 8) * S
     shadow(d, fx, fy, 15 * S)
-    cloak, cloak_dark = rgb("#2a8c8c"), rgb("#1d6666")
-    skin, scarf = rgb("#f1c9a5"), rgb("#f2a541")
+    cloak_hex, dark_hex, scarf_hex = PALETTES[key]
+    cloak, cloak_dark = rgb(cloak_hex), rgb(dark_hex)
+    skin, scarf = rgb("#f1c9a5"), rgb(scarf_hex)
     step = 3 if frame else -3
     # legs
     d.rounded_rectangle([fx - 8 * S, fy - 20 * S + step * S * 0.3, fx - 2 * S, fy - 1 * S - (step if step > 0 else 0) * S], radius=2 * S, fill=rgb("#3b2f2a"))
@@ -252,7 +263,57 @@ def hero(view: str, frame: int) -> None:
         blob(d, hx, hy, 13 * S, 13 * S, cloak)
         d.polygon([(hx - 3 * S, hy + 8 * S), (hx + 3 * S, hy + 8 * S), (hx, hy + 18 * S)], fill=cloak_dark)
         d.polygon([(fx - 11 * S, fy - 45 * S), (fx + 11 * S, fy - 45 * S), (fx + 9 * S, fy - 41 * S), (fx - 9 * S, fy - 41 * S)], fill=scarf)
-    save(img, f"hero_{view}_{frame}", (w, h), (w / 2, h - 8), "character")
+    save(img, f"{key}_{view}_{frame}", (w, h), (w / 2, h - 8), "character")
+
+
+# ---------------------------------------------------------------- monsters
+
+
+def boar(frame: int) -> None:
+    """Thornback Boar: a stocky boar with a ridge of bramble spines, facing down-right."""
+    w, h = 76, 64
+    img = Image.new("RGBA", (w * S, h * S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    fx, fy = w * S / 2, (h - 10) * S
+    shadow(d, fx, fy, 26 * S)
+    bob = (1 if frame else 0) * S
+    hide, hide_dark = rgb("#7a5236"), rgb("#5a3a25")
+    # legs
+    for lx in (-16, -6, 8, 18):
+        d.rounded_rectangle([fx + (lx - 3) * S, fy - 14 * S, fx + (lx + 3) * S, fy - 1 * S], radius=2 * S, fill=hide_dark)
+    # body and head
+    blob(d, fx - 2 * S, fy - 22 * S - bob, 24 * S, 14 * S, hide)
+    blob(d, fx + 18 * S, fy - 18 * S - bob, 11 * S, 10 * S, hide)
+    blob(d, fx + 26 * S, fy - 14 * S - bob, 5 * S, 4 * S, rgb("#c98f73"))  # snout
+    blob(d, fx + 20 * S, fy - 22 * S - bob, 1.8 * S, 1.8 * S, rgb("#1e1e1e"))  # eye
+    # tusks
+    d.polygon([(fx + 22 * S, fy - 12 * S - bob), (fx + 30 * S, fy - 20 * S - bob), (fx + 25 * S, fy - 11 * S - bob)], fill=rgb("#f3ead2"))
+    # bramble ridge
+    for i, sx in enumerate(range(-20, 14, 6)):
+        top = fy - (38 + (i % 2) * 4) * S - bob
+        d.polygon([(fx + (sx - 3) * S, fy - 31 * S - bob), (fx + sx * S, top), (fx + (sx + 3) * S, fy - 31 * S - bob)], fill=rgb("#3f6b2e"))
+    save(img, f"boar_{frame}", (w, h), (w / 2, h - 10), "character")
+
+
+def wisp(frame: int) -> None:
+    """Dewdrop Wisp: a floating drop of water with a soft glow and two dark eyes."""
+    w, h = 48, 72
+    base = Image.new("RGBA", (w * S, h * S), (0, 0, 0, 0))
+    fx, fy = w * S / 2, (h - 8) * S
+    lift = (4 if frame else 0) * S
+    glow = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    # Small enough that the blur fades out well inside the image (no visible box edge).
+    ImageDraw.Draw(glow).ellipse([fx - 13 * S, fy - 50 * S - lift, fx + 13 * S, fy - 20 * S - lift], fill=(120, 200, 255, 110))
+    base.alpha_composite(glow.filter(ImageFilter.GaussianBlur(3 * S)))
+    d = ImageDraw.Draw(base)
+    shadow(d, fx, fy, 12 * S)
+    cy = fy - 30 * S - lift
+    d.polygon([(fx, cy - 26 * S), (fx - 12 * S, cy - 2 * S), (fx + 12 * S, cy - 2 * S)], fill=rgb("#5fb4e6"))
+    blob(d, fx, cy, 12 * S, 12 * S, rgb("#5fb4e6"))
+    blob(d, fx - 4 * S, cy - 6 * S, 4 * S, 5 * S, rgb("#bfe6ff"))  # highlight
+    blob(d, fx - 4 * S, cy + 2 * S, 1.8 * S, 2.4 * S, rgb("#123048"))
+    blob(d, fx + 4 * S, cy + 2 * S, 1.8 * S, 2.4 * S, rgb("#123048"))
+    save(base, f"wisp_{frame}", (w, h), (w / 2, h - 8), "character")
 
 
 def main() -> None:
@@ -268,9 +329,13 @@ def main() -> None:
     tree_pine()
     rock()
     bush()
-    for view in ("front", "back"):
-        for frame in (0, 1):
-            hero(view, frame)
+    for key in PALETTES:
+        for view in ("front", "back"):
+            for frame in (0, 1):
+                hero(view, frame, key)
+    for frame in (0, 1):
+        boar(frame)
+        wisp(frame)
     (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(f"wrote {len(manifest)} sprites to {OUT}")
 

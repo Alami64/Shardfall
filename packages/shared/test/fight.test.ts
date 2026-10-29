@@ -12,6 +12,7 @@ import {
   initiativeOf,
   joinFight,
   moveFighter,
+  movePath,
   movementRange,
   placeFighter,
   startFight,
@@ -340,5 +341,41 @@ describe('fleeing', () => {
     const r = expectOk(flee(state, 'a'));
     expect(r.state.phase).toBe('fighting');
     expect(activeFighter(r.state)!.id).toBe('b');
+  });
+});
+
+describe('movePath', () => {
+  /** a at (10, 5) with 3 MP; b two cells east at (12, 5), not adjacent (no tackle). */
+  const scene = () => teleport(teleport(started(), 'a', cell(10, 5)), 'b', cell(12, 5));
+
+  it('finds the shortest orthogonal walk within MP, ready for moveFighter', () => {
+    const state = scene();
+    const path = movePath(state, 'a', cell(12, 6))!;
+    expect(path).toHaveLength(3);
+    expect(getFighter(expectOk(moveFighter(state, 'a', path)).state, 'a')!.cell).toBe(cell(12, 6));
+  });
+
+  it('avoids passing next to an enemy when an equally cheap route exists', () => {
+    const path = movePath(scene(), 'a', cell(12, 6))!;
+    expect(path).not.toContain(cell(11, 5)); // next to b: leaving it would cost tackle
+  });
+
+  it('still walks past an enemy when that is the only way in reach', () => {
+    // With b at (12, 6), the only 3-step route to (13, 5) runs along x through (12, 5), next to b.
+    const state = teleport(scene(), 'b', cell(12, 6));
+    expect(movePath(state, 'a', cell(13, 5))).toEqual([cell(11, 5), cell(12, 5), cell(13, 5)]);
+  });
+
+  it('goes around fighters, and gives up when the detour needs more MP', () => {
+    // (13, 5) is 3 cells away in a straight line, but b blocks it and the way round is 5 steps.
+    expect(movePath(scene(), 'a', cell(13, 5))).toBeNull();
+    expect(movePath(scene(), 'a', cell(12, 5))).toBeNull(); // b's own cell
+  });
+
+  it('is empty on its own cell and null out of reach or on an obstacle', () => {
+    const state = scene();
+    expect(movePath(state, 'a', cell(10, 5))).toEqual([]);
+    expect(movePath(state, 'a', cell(10, 9))).toBeNull(); // 4 cells, 3 MP
+    expect(movePath(teleport(state, 'a', cell(15, 2)), 'a', ROCK)).toBeNull();
   });
 });

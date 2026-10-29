@@ -1,6 +1,6 @@
-import { CELL_COUNT } from './grid.js';
+import { CELL_COUNT, neighbors } from './grid.js';
 import { CellFlag, hasFlag, isWalkable, type GameMap } from './map.js';
-import { reachableCells } from './pathfinding.js';
+import { findPath, reachableCells } from './pathfinding.js';
 import { shuffle, type Rng } from './rng.js';
 import type { AiProfile } from './monster.js';
 import type { Element, Spell } from './spell.js';
@@ -298,4 +298,30 @@ export function movementRange(state: FightState, fighterId: string): Map<number,
     (c) => isWalkable(state.map, c),
     (c) => fighterAt(state, c) !== undefined,
   );
+}
+
+/**
+ * The path a fighter can walk to `cell` with its remaining MP, around obstacles
+ * and fighters, ready for moveFighter: [] when it already stands there, null
+ * when the cell is out of reach. It avoids passing next to enemies (where
+ * tackle would bite) when a route that does so fits in its MP; otherwise it is
+ * the shortest orthogonal path.
+ */
+export function movePath(state: FightState, fighterId: string, cell: number): number[] | null {
+  const f = getFighter(state, fighterId);
+  if (!f || f.status !== 'alive' || f.cell === -1) return null;
+  if (cell === f.cell) return [];
+  const walkable = (c: number) => isWalkable(state.map, c);
+  const occupied = (c: number) => fighterAt(state, c) !== undefined;
+  const nearEnemy = (c: number) =>
+    neighbors(c).some((n) => {
+      const o = fighterAt(state, n);
+      return o !== undefined && o.team !== f.team;
+    });
+  // Cells on the way (not the goal) must not touch an enemy, or leaving them costs tackle.
+  const safe = findPath(f.cell, cell, walkable, {
+    isBlocked: (c) => occupied(c) || (c !== cell && nearEnemy(c)),
+    maxSteps: f.mp,
+  });
+  return safe ?? findPath(f.cell, cell, walkable, { isBlocked: occupied, maxSteps: f.mp });
 }

@@ -39,18 +39,18 @@ const longshot = hero('Longshot', { archetype: 'caster', preferredRange: 5 }, { 
 const mender = hero('Mender', { archetype: 'caster', preferredRange: 4 }, { intelligence: 30, chance: 10 });
 const monster = (id: string) => monsters.find((m) => m.id === id)!;
 
-// The test maps have no start cells flagged yet, so each scenario names its own (walkable cells on the meadow).
 const SCENARIOS: Record<string, { setups: S.FighterSetup[]; startCells: Record<S.Team, number[]> }> = {
   meadow: {
     setups: [
       vanguard,
       longshot,
       mender,
-      S.monsterSetup(monster('thornback_boar'), 1, 'Boar1', 'B'),
-      S.monsterSetup(monster('thornback_boar'), 2, 'Boar2', 'B'),
+      // The same group as the client's meadow encounter (packages/client/src/fight/setup.ts).
+      S.monsterSetup(monster('thornback_boar'), 2, 'Boar1', 'B'),
+      S.monsterSetup(monster('thornback_boar'), 3, 'Boar2', 'B'),
       S.monsterSetup(monster('dewdrop_wisp'), 2, 'Wisp', 'B'),
     ],
-    startCells: { A: [339, 325, 353], B: [316, 302, 330] },
+    startCells: S.mapStartCells(map), // flagged on the map since M1 step 5
   },
   duel: {
     setups: [vanguard, { ...longshot, team: 'B' }],

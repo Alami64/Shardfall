@@ -22,6 +22,7 @@ import {
 } from './fightState.js';
 import { shuffle, type Rng } from './rng.js';
 import type { Spell, SpellGrade } from './spell.js';
+import { zoneCells } from './zone.js';
 
 /**
  * Fight actions (design doc, Tactical combat > Fight sequence, and Spells >
@@ -347,6 +348,22 @@ export function spellRangeCells(state: FightState, fighterId: string, spellId: s
     if (isWalkable(state.map, c) && inRange(f.cell, range, c) && fitsLineRule(f.cell, grade, c)) out.push(c);
   }
   return out;
+}
+
+/**
+ * Cells a cast on `cell` would cover: the union of the areas of the grade's
+ * normal effects, centre first. The client shows this under the cursor.
+ */
+export function spellAreaCells(state: FightState, fighterId: string, spellId: string, cell: number): number[] {
+  const f = getFighter(state, fighterId);
+  const grade = f && spellGradeOf(state, f, spellId);
+  if (!f || !grade) return [];
+  const out = new Set<number>();
+  for (const e of grade.effects) {
+    if (e.targets.includes('cell') || e.targets.includes('caster')) out.add(cell);
+    else for (const c of zoneCells(e.zone, cell, f.cell)) out.add(c);
+  }
+  return [...out];
 }
 
 /** Cells the fighter can cast this spell on right now. */

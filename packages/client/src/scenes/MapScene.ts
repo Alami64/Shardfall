@@ -6,6 +6,7 @@ import {
   HALF_H,
   HALF_W,
   OPPOSITE_EDGE,
+  neighbors,
   blocksLineOfSight,
   cellEdges,
   cellToGrid,
@@ -20,15 +21,19 @@ import {
   type Edge,
   type GameMap,
 } from '@shardfall/shared';
-import { sprite, world } from '../assets';
+import { monsters, sprite, world } from '../assets';
 import { DEPTH, ORIGIN_X, ORIGIN_Y, PREVIEW_MP, REGION_NAME, WALK_SPEED } from '../config';
+import { ENCOUNTERS, monsterLook, textureOf, type Encounter } from '../fight/setup';
+import type { FightSceneData } from './FightScene';
 import { hud } from '../hud';
+import { cellPos, diamond, drawMap, placeSprite, updateOccluders, type Occluder } from '../render/mapView';
 
 const COLORS = {
   path: 0xfff6dc,
   target: 0xfff6dc,
   blocked: 0xe0533d,
   exit: 0xf2a541,
+  fight: 0xe8704f,
   range: 0x3fc1b0,
   debugGrid: 0xffffff,
   debugBlocked: 0xe0533d,
@@ -49,35 +54,33 @@ const EDGE_VECTOR: Record<Edge, { x: number; y: number }> = {
   south: { x: 0, y: 1 },
 };
 
-/** Map-pixel centre of a cell, offset into canvas space. */
-function cellPos(cell: number) {
-  const { sx, sy } = cellToScreen(cell);
-  return { x: sx + ORIGIN_X, y: sy + ORIGIN_Y };
-}
+/** Registry key holding the ids of encounters beaten this session. */
+const DEFEATED = 'defeatedEncounters';
 
-function diamond(cx: number, cy: number, inset = 0): Phaser.Math.Vector2[] {
-  const w = HALF_W - inset * 2;
-  const h = HALF_H - inset;
-  return [
-    new Phaser.Math.Vector2(cx, cy - h),
-    new Phaser.Math.Vector2(cx + w, cy),
-    new Phaser.Math.Vector2(cx, cy + h),
-    new Phaser.Math.Vector2(cx - w, cy),
-  ];
+export interface MapSceneData {
+  mapId: string;
+  /** Where the hero stands; defaults to the road. */
+  cell?: number;
+  /** An encounter just beaten: its group stays gone for the session. */
+  defeated?: string;
 }
 
 /**
  * Exploration on one map at a time: draws the map, moves the hero along A*
  * paths (diagonals allowed), previews paths on hover and changes map when the
- * hero walks off an edge that has a neighbour.
+ * hero walks off an edge that has a neighbour. Monster groups stand on the
+ * map; clicking one walks up to it and starts the fight.
  */
 export class MapScene extends Phaser.Scene {
   private byCoord = new Map<string, GameMap>();
   private byId = new Map<string, GameMap>();
   private map!: GameMap;
   private mapObjects: Phaser.GameObjects.GameObject[] = [];
-  private occluders: { img: Phaser.GameObjects.Image; bounds: Phaser.Geom.Rectangle }[] = [];
-  private heroBounds = new Phaser.Geom.Rectangle();
+  private occluders: Occluder[] = [];
+  /** Monster groups standing on this map, by cell. */
+  private groupAt = new Map<number, Encounter>();
+  private groupSprites: Phaser.GameObjects.Image[] = [];
+  private pendingFight: Encounter | null = null;
 
   private player!: Phaser.GameObjects.Image;
   private playerCell = 0;
@@ -102,7 +105,25 @@ export class MapScene extends Phaser.Scene {
     super('map');
   }
 
-  create(data: { mapId: string }) {
+  create(data: MapSceneData) {
+    // Phaser reuses the scene object when a fight hands back: start from a clean slate.
+    this.mapObjects = [];
+    this.occluders = [];
+    this.groupAt = new Map();
+    this.groupSprites = [];
+    this.pendingFight = null;
+    this.queue = [];
+    this.moving = false;
+    this.stepTarget = -1;
+    this.pendingExit = null;
+    this.debugLabels = [];
+    this.hoverCell = -1;
+    this.transitioning = false;
+    const defeated = new Set<string>(this.registry.get(DEFEATED) ?? []);
+    if (data.defeated) defeated.add(data.defeated);
+    this.registry.set(DEFEATED, [...defeated]);
+    hud.showExplore(true);
+
     for (const m of world.maps) {
       this.byCoord.set(mapKey(m.worldX, m.worldY), m);
       this.byId.set(m.id, m);
@@ -128,19 +149,12 @@ export class MapScene extends Phaser.Scene {
     hud.onToggle('btn-debug', () => this.toggleDebug());
     hud.onToggle('btn-range', () => this.toggleRange());
 
-    this.loadMap(first, this.startCell(first));
+    this.loadMap(first, data.cell !== undefined && isWalkable(first, data.cell) ? data.cell : this.startCell(first));
     this.cameras.main.fadeIn(300, 15, 26, 20);
   }
 
   override update() {
-    this.player.getBounds(this.heroBounds);
-    // Shrink to the body so a leaf brushing the hood doesn't fade a whole tree.
-    Phaser.Geom.Rectangle.Inflate(this.heroBounds, -10, -10);
-    for (const { img, bounds } of this.occluders) {
-      const inFront = img.depth > this.player.depth && Phaser.Geom.Intersects.RectangleToRectangle(bounds, this.heroBounds);
-      const alpha = inFront ? 0.5 : 1;
-      if (img.alpha !== alpha) img.setAlpha(alpha);
-    }
+    updateOccluders(this.occluders, [this.player, ...this.groupSprites]);
   }
 
   // ------------------------------------------------------------------ map
@@ -163,27 +177,11 @@ export class MapScene extends Phaser.Scene {
 
   private loadMap(map: GameMap, cell: number) {
     for (const o of this.mapObjects) o.destroy();
-    this.mapObjects = [];
-    this.occluders = [];
     this.map = map;
-
-    for (let c = 0; c < CELL_COUNT; c++) {
-      const { x, y } = cellPos(c);
-      const groundKey = map.tiles[map.ground[c]!]!;
-      const g = sprite(groundKey);
-      this.mapObjects.push(
-        this.add.image(x, y, groundKey).setOrigin(g.anchorX / g.width, g.anchorY / g.height).setDepth(DEPTH.ground),
-      );
-      const objIndex = map.objects[c]!;
-      if (objIndex >= 0) {
-        const key = map.tiles[objIndex]!;
-        const o = sprite(key);
-        const img = this.add.image(x, y, key).setOrigin(o.anchorX / o.width, o.anchorY / o.height).setDepth(DEPTH.sorted + y);
-        this.mapObjects.push(img);
-        // Trees are tall enough to hide the hero; fade them while the hero stands behind.
-        if (key.startsWith('tree_')) this.occluders.push({ img, bounds: img.getBounds() });
-      }
-    }
+    const drawn = drawMap(this, map);
+    this.mapObjects = drawn.objects;
+    this.occluders = drawn.occluders;
+    this.placeGroups();
 
     this.tweens.killTweensOf(this.player);
     this.queue = [];
@@ -244,7 +242,80 @@ export class MapScene extends Phaser.Scene {
 
   // ------------------------------------------------------------------ movement
 
-  private walkable = (c: number) => isWalkable(this.map, c);
+  /** Monsters stand on their group's cells, so those are not walkable while exploring. */
+  private walkable = (c: number) => isWalkable(this.map, c) && !this.groupAt.has(c);
+
+  /** Draws the monster groups of this map that are still around. */
+  private placeGroups() {
+    this.groupAt = new Map();
+    this.groupSprites = [];
+    const defeated = new Set<string>(this.registry.get(DEFEATED) ?? []);
+    for (const e of ENCOUNTERS) {
+      if (e.mapId !== this.map.id || defeated.has(e.id)) continue;
+      e.monsters.forEach((m, i) => {
+        const cell = e.cells[i % e.cells.length]!;
+        const img = placeSprite(this, textureOf(monsterLook(m.id), 'front', 0), cell);
+        img.setFlipX(true); // face the road, towards the west
+        this.mapObjects.push(img);
+        this.groupSprites.push(img);
+        this.groupAt.set(cell, e);
+      });
+    }
+  }
+
+  private describeGroup(e: Encounter): string {
+    const counts = new Map<string, number>();
+    for (const m of e.monsters) {
+      const name = monsters.find((x) => x.id === m.id)?.name ?? m.id;
+      counts.set(name, (counts.get(name) ?? 0) + 1);
+    }
+    const levels = e.monsters.reduce((sum, m) => sum + (monsters.find((x) => x.id === m.id)?.grades[m.grade - 1]?.level ?? 0), 0);
+    const names = [...counts].map(([name, n]) => (n > 1 ? `${n} × ${name}` : name)).join(', ');
+    return `${names} (total level ${levels}) · click to fight`;
+  }
+
+  /** Walks next to a monster group and starts the fight on arrival. */
+  private engage(e: Encounter) {
+    const start = this.stepTarget !== -1 ? this.stepTarget : this.playerCell;
+    if (e.cells.some((c) => neighbors(start, true).includes(c))) {
+      this.startFight(e);
+      return;
+    }
+    let best: number[] | null = null;
+    for (const c of e.cells) {
+      const path = findPath(start, c, this.walkable, { diagonals: true, allowGoalBlocked: true });
+      path?.pop();
+      if (path && (!best || path.length < best.length)) best = path;
+    }
+    if (!best) {
+      this.pulse(e.cells[0]!, COLORS.blocked);
+      return;
+    }
+    this.pulse(e.cells[0]!, COLORS.fight);
+    this.pendingExit = null;
+    this.pendingFight = e;
+    this.queue = best;
+    if (this.moving) return;
+    if (best.length === 0) {
+      this.startFight(e);
+      return;
+    }
+    this.startWalking();
+    this.nextStep();
+  }
+
+  private startFight(e: Encounter) {
+    this.pendingFight = null;
+    this.transitioning = true;
+    this.setHover(-1);
+    const cam = this.cameras.main;
+    cam.flash(160, 242, 165, 65);
+    cam.fadeOut(260, 15, 26, 20);
+    cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+      const data: FightSceneData = { mapId: this.map.id, encounterId: e.id, returnCell: this.playerCell };
+      this.scene.start('fight', data);
+    });
+  }
 
   /** Path from where the hero is (or is stepping into) to a cell; stops beside obstacles. */
   private pathTo(target: number): number[] | null {
@@ -258,6 +329,12 @@ export class MapScene extends Phaser.Scene {
 
   private walkTo(cell: number) {
     if (this.transitioning) return;
+    const group = this.groupAt.get(cell);
+    if (group) {
+      this.engage(group);
+      return;
+    }
+    this.pendingFight = null;
     const path = this.pathTo(cell);
     if (path === null) {
       this.pulse(cell, COLORS.blocked);
@@ -304,6 +381,10 @@ export class MapScene extends Phaser.Scene {
 
   private arrive() {
     this.stopWalking();
+    if (this.pendingFight) {
+      this.startFight(this.pendingFight);
+      return;
+    }
     const exit = this.pendingExit;
     this.pendingExit = null;
     if (exit && this.exitEdge(this.playerCell) === exit) this.changeMap(exit);
@@ -382,6 +463,14 @@ export class MapScene extends Phaser.Scene {
 
     const cell = this.hoverCell;
     if (cell === -1 || this.transitioning) return;
+    const group = this.groupAt.get(cell);
+    if (group) {
+      for (const c of group.cells) {
+        const p = cellPos(c);
+        g.lineStyle(2, COLORS.fight, 0.95).strokePoints(diamond(p.x, p.y, 2), true);
+      }
+      return;
+    }
     const path = this.pathTo(cell);
     const { x, y } = cellPos(cell);
     if (path === null) {
@@ -447,7 +536,9 @@ export class MapScene extends Phaser.Scene {
     const objKey = objIndex >= 0 ? this.map.tiles[objIndex]! : null;
     const groundKey = this.map.tiles[this.map.ground[c]!]!;
     let status: string;
-    if (this.walkable(c)) status = 'Walkable';
+    const group = this.groupAt.get(c);
+    if (group) status = 'Monster group';
+    else if (this.walkable(c)) status = 'Walkable';
     else if (objKey) status = `Blocked by ${OBJECT_LABELS[objKey] ?? objKey}`;
     else if (groundKey === 'water') status = 'Water';
     else status = 'Blocked';
@@ -459,6 +550,7 @@ export class MapScene extends Phaser.Scene {
       y,
       status,
       ...(exit ? { exit: `Exit ${exit} to ${this.neighbourAcross(exit)!.name}` } : {}),
+      ...(group ? { group: this.describeGroup(group) } : {}),
     });
   }
 
