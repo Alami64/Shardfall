@@ -11,7 +11,9 @@ import {
   spellError,
   spellGradeForLevel,
   spellRange,
+  spellAreaCells,
   spellRangeCells,
+  type Effect,
   type FightState,
   type Spell,
   type SpellCatalogue,
@@ -227,6 +229,25 @@ describe('cooldowns and cast limits', () => {
     const bMoved = teleport(state, 'b', cell(10, 7));
     expect(castError(bMoved, 'a', 's', cell(10, 7))).toBe('target-limit');
     expect(castError(nextTurnOfA(state), 'a', 's', B_CELL)).toBeNull();
+  });
+});
+
+describe('area preview', () => {
+  it('covers the union of the effect areas, centre first', () => {
+    const effects: Effect[] = [
+      { kind: 'damage', element: 'fire', min: 1, max: 1, zone: { shape: 'circle', size: 1 }, targets: ['enemies'] },
+      { kind: 'push', zone: { shape: 'line', size: 2 }, targets: ['enemies'], params: { cells: 1 } },
+    ];
+    const state = duel([spell('s', grade({ effects }))]);
+    const cells = spellAreaCells(state, 'a', 's', B_CELL);
+    expect(cells[0]).toBe(B_CELL);
+    expect(new Set(cells)).toEqual(new Set([B_CELL, cell(11, 5), cell(13, 5), cell(12, 4), cell(12, 6), cell(14, 5)]));
+  });
+
+  it('marks only the target cell for effects on the cell or the caster', () => {
+    const jump: Effect = { kind: 'teleport', zone: { shape: 'single', size: 0 }, targets: ['cell'] };
+    const leap = spell('s', grade({ effects: [jump] }));
+    expect(spellAreaCells(duel([leap]), 'a', 's', cell(10, 7))).toEqual([cell(10, 7)]);
   });
 });
 

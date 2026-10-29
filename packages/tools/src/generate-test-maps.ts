@@ -7,6 +7,8 @@
  *   brightmoor_1_0  Brightmoor Crossing  a stone square where the road crosses
  *
  * The road runs east-west across both maps and lines up at their shared edge.
+ * Each map also gets fight start cells: six per team, on open ground around the
+ * road, team A to the west and team B to the east (map properties startA/startB).
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
@@ -48,6 +50,9 @@ const TILE_RULES: Record<string, { walkable: boolean; blocksLos: boolean }> = {
   rock: { walkable: false, blocksLos: false },
   bush: { walkable: false, blocksLos: false },
 };
+
+/** Fight start cells per team. */
+const START_CELLS = 6;
 
 const GROUND_KEYS = ['grass_1', 'grass_2', 'grass_3', 'flowers', 'path', 'stone', 'water'];
 const OBJECT_KEYS = ['tree_oak', 'tree_pine', 'rock', 'bush'];
@@ -138,6 +143,21 @@ function buildMap(spec: MapSpec): TiledMap {
     if (walk(c) && c !== start && findPath(start, c, walk, { diagonals: true }) === null) objects[c] = 'bush';
   }
 
+  // Fight start cells: the open cells nearest two points on the road, west (A) and east (B).
+  const open = (c: number) => walk(c) && ground[c] !== 'water';
+  const nearest = (fx: number, taken: Set<number>) => {
+    const wx = fx * MAP_PIXEL_W;
+    const cy = roadY(wx + spec.worldX * MAP_PIXEL_W);
+    const cells = [...Array(CELL_COUNT).keys()].filter((c) => open(c) && !taken.has(c));
+    const gap = (c: number) => Math.hypot(cellToScreen(c).sx - wx, (cellToScreen(c).sy - cy) * 2);
+    const picked = cells.sort((a, b) => gap(a) - gap(b) || a - b).slice(0, START_CELLS);
+    for (const c of picked) taken.add(c);
+    return picked.sort((a, b) => a - b);
+  };
+  const taken = new Set<number>();
+  const startA = nearest(0.3, taken);
+  const startB = nearest(0.62, taken);
+
   const groundTs = makeTileset('ground', 1, GROUND_KEYS);
   const objectTs = makeTileset('objects', 1 + GROUND_KEYS.length, OBJECT_KEYS);
   const gid = (ts: TiledTileset, keys: string[], key: string) => ts.firstgid + keys.indexOf(key);
@@ -157,6 +177,8 @@ function buildMap(spec: MapSpec): TiledMap {
       { name: 'name', type: 'string', value: spec.name },
       { name: 'worldX', type: 'int', value: spec.worldX },
       { name: 'worldY', type: 'int', value: spec.worldY },
+      { name: 'startA', type: 'string', value: startA.join(',') },
+      { name: 'startB', type: 'string', value: startB.join(',') },
     ],
     layers: [
       { id: 1, name: 'ground', type: 'tilelayer', width: MAP_WIDTH, height: MAP_LINES, x: 0, y: 0, opacity: 1, visible: true, data: ground.map((k) => gid(groundTs, GROUND_KEYS, k)) },

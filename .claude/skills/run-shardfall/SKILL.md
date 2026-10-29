@@ -43,11 +43,34 @@ the map was still fading in.
 | `shot:NAME` | screenshot to `$OUT/NAME.png` |
 | `key:K` | press a key: `r` = 3-MP combat range overlay, `d` = cell grid with ids |
 | `hover:CELL` / `click:CELL` | move to / click a cell by id (0–559); a click walks the hero there |
+| `tap:SELECTOR` | click a page element: `#btn-ready`, `#btn-end-turn`, `#btn-flee`, `#btn-result`, `button.spell >> nth=0` |
 | `wait:MS` | wait |
-| `text:SELECTOR` | print text: `#cell-id`, `#cell-grid`, `#cell-status`, `#map-name`, `#map-coords` |
+| `text:SELECTOR` | print text: `#cell-id`, `#cell-status`, `#cell-group`, `#map-name`, `#fight-round`, `#fight-hint`, `#result-title` |
+| `eval:EXPR` | print a page expression as JSON |
+| `idle` | wait until the fight stops animating (dev server only) |
+| `until:EXPR` | wait up to 5 minutes for an expression to be truthy |
 
 Cell ids: run `key:d shot:grid` and read them off the grid. On Brightmoor Meadow the hero starts on
-cell 339; 251 is an east exit; 426 is open grass.
+cell 339; 251 is an east exit; 426 is open grass; the monster group stands on 330, 344 and 316.
+
+### A fight
+
+`?seed=N` fixes the dice, `?speed=N` speeds up the fight's animations and timers. In dev,
+`window.shardfall` has `fight()` (the live `FightState`), `busy()` and `auto()` (the AI plays the
+heroes too). Start a fight, preview a move and a spell, check the state:
+
+```bash
+URL='http://localhost:5173/?seed=3' npx tsx .claude/skills/run-shardfall/driver.ts click:330 wait:6000 shot:placement tap:#btn-ready idle hover:313 shot:move-preview click:313 idle key:4 hover:316 shot:charge-preview "eval:window.shardfall.fight().fighters.map(f => f.id + ' ' + f.cell + ' ' + f.hp + 'hp')"
+```
+
+Play one to the end with the AI on both sides, then go back to exploring (about 30 s at speed 6):
+
+```bash
+URL='http://localhost:5173/?seed=3&speed=6' npx tsx .claude/skills/run-shardfall/driver.ts click:330 wait:5000 tap:#btn-ready idle "eval:window.shardfall.auto()" "until:window.shardfall.fight().phase === 'ended' && !window.shardfall.busy()" text:#result-title shot:result tap:#btn-result wait:2500 hover:330 text:#cell-status shot:after
+```
+
+Expect `#result-title: Victory` and, back on the map, the group gone (`#cell-status: Walkable`).
+Fleeing three times (`tap:#btn-flee idle`, ×3) gives `Defeat` and leaves the group in place.
 
 ## Run the fight engine
 
@@ -92,8 +115,15 @@ All three must pass before finishing a change (CLAUDE.md).
 - **npm does not forward signals** to Vite, so killing the `npm run dev` pid leaves the server up.
   The driver spawns it detached and kills the process group. To stop a server you started by hand:
   `lsof -ti:5173 -sTCP:LISTEN | xargs -r kill`.
-- **The test maps have no start cells flagged** (`CellFlag.StartTeamA/B`), so `createFight` needs
-  `startCells` passed in; each fight-smoke scenario names its own (walkable meadow cells such as
-  339, 325, 353 against 316, 302, 330). Check a cell with `(map.flags[c] & 1) !== 0` before using it.
+- **Headless Chromium renders at about 6–7 fps** (software WebGL), on the map and in fights alike.
+  Phaser keeps animations near real time, so an AI turn takes about 2 s and a whole AI-vs-AI fight
+  about 2 minutes at normal speed. Use `?speed=6` for full fights, and `idle` / `until:` rather
+  than fixed waits: a screenshot taken mid-animation shows floating numbers and no move preview.
+- **`window.shardfall` exists only on the dev server** (`import.meta.env.DEV`). The production build
+  (`npm run build`, then `npm run preview -w @shardfall/client -- --port 4173`, then
+  `URL=http://localhost:4173/`) plays the same, but `idle`, `until:` on it and `eval` of it do not work there.
+- **Start cells come from the map** (`startA`/`startB` properties, six per team): on the meadow, A is
+  297, 311, 312, 325, 326, 340 and B is 302, 316, 317, 329, 330, 344. The fight smoke reads them
+  with `mapStartCells`.
 - **tsx runs the scripts without type-checking.** To check them:
   `npx tsc --noEmit --strict --noUncheckedIndexedAccess --target ES2022 --module ESNext --moduleResolution Bundler --allowImportingTsExtensions --resolveJsonModule --skipLibCheck --types node .claude/skills/run-shardfall/driver.ts .claude/skills/run-shardfall/fight-smoke.ts`

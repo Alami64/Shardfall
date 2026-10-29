@@ -11,8 +11,13 @@
  *   key:K            press a key (r = range overlay, d = cell grid)
  *   hover:CELL       move the mouse over a cell (fills the cell readout)
  *   click:CELL       click a cell (the hero walks there)
+ *   tap:SELECTOR     click a page element, e.g. tap:#btn-ready or tap:button.spell >> nth=0
  *   wait:MS          wait
  *   text:SELECTOR    print an element's text, e.g. text:#cell-id or text:#map-name
+ *   eval:EXPR        print a page expression as JSON; in a fight (dev server only),
+ *                    window.shardfall.fight() is the FightState and .busy() is true while animating
+ *   idle             wait until a fight is not animating (dev server only)
+ *   until:EXPR       wait (up to 5 minutes) until a page expression is truthy
  */
 import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
@@ -68,7 +73,7 @@ async function main() {
     };
 
     for (const step of steps) {
-      const [cmd, arg = ''] = step.split(/:(.*)/s);
+      const [cmd = '', arg = ''] = step.split(/:(.*)/s);
       switch (cmd) {
         case 'shot': {
           const path = join(OUT, `${arg || 'shot'}.png`);
@@ -88,8 +93,26 @@ async function main() {
           await page.waitForTimeout(300);
           break;
         }
+        case 'tap':
+          await page.locator(arg).first().click();
+          await page.waitForTimeout(300);
+          break;
         case 'wait':
           await page.waitForTimeout(Number(arg));
+          break;
+        case 'eval':
+          console.log(`${arg} = ${JSON.stringify(await page.evaluate(arg))}`);
+          break;
+        case 'idle':
+          await page.waitForFunction(
+            () => !(window as unknown as { shardfall?: { busy(): boolean } }).shardfall?.busy(),
+            undefined,
+            { timeout: 60_000 },
+          );
+          await page.waitForTimeout(300);
+          break;
+        case 'until':
+          await page.waitForFunction(arg, undefined, { timeout: 300_000, polling: 250 });
           break;
         case 'text':
           console.log(`${arg}: ${(await page.locator(arg).textContent())?.trim()}`);

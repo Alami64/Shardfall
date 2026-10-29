@@ -1,6 +1,8 @@
-import type { WorldData } from '@shardfall/shared';
+import type { MonsterCatalogue, SpellCatalogue, WorldData } from '@shardfall/shared';
 import manifestJson from '../../../assets/tiles/manifest.json';
 import worldJson from '../../../content/maps/built/world.json';
+import monstersJson from '../../../content/monsters/built/monsters.json';
+import spellsJson from '../../../content/spells/built/spells.json';
 
 export interface SpriteInfo {
   kind: 'ground' | 'object' | 'character';
@@ -13,6 +15,8 @@ export interface SpriteInfo {
 
 export const manifest = manifestJson as Record<string, SpriteInfo>;
 export const world = worldJson as unknown as WorldData;
+export const { spells } = spellsJson as unknown as SpellCatalogue;
+export const { monsters } = monstersJson as unknown as MonsterCatalogue;
 
 // Vite turns each PNG into a URL (inlined as a data URI in the single-file build).
 const urls = import.meta.glob('../../../assets/tiles/*.png', {

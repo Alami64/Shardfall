@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_H, GAME_W } from './config';
 import { BootScene } from './scenes/BootScene';
+import { FightScene } from './scenes/FightScene';
 import { MapScene } from './scenes/MapScene';
 
 new Phaser.Game({
@@ -15,5 +16,5 @@ new Phaser.Game({
   },
   render: { antialias: true },
   input: { activePointers: 1 },
-  scene: [BootScene, MapScene],
+  scene: [BootScene, MapScene, FightScene],
 });

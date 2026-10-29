@@ -6,6 +6,8 @@
  * optional object on top. Tile properties decide the cell flags:
  *   walkable  = ground is walkable AND (no object OR object is walkable)
  *   blocksLos = ground blocks OR object blocks
+ * The optional map properties `startA` and `startB` list the fight start cells
+ * of each team as comma-separated cell ids; they must be walkable and distinct.
  */
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
@@ -104,6 +106,24 @@ export function convert(raw: unknown, file: string): GameMap {
     if (typeof v !== 'string' || !v) throw new Error(`${file}: map property "${name}" must be a string`);
     return v;
   };
+
+  // Fight start cells, one list per team.
+  const startCells = (name: string, flag: number, taken: Set<number>) => {
+    const v = prop(map.properties, name);
+    if (v === undefined) return;
+    if (typeof v !== 'string') throw new Error(`${file}: map property "${name}" must be a string of cell ids`);
+    for (const part of v.split(',')) {
+      const c = Number(part.trim());
+      if (!Number.isInteger(c) || c < 0 || c >= CELL_COUNT) throw new Error(`${file}: ${name}: "${part}" is not a cell id`);
+      if (!(flags[c]! & CellFlag.Walkable)) throw new Error(`${file}: ${name}: cell ${c} is not walkable`);
+      if (taken.has(c)) throw new Error(`${file}: ${name}: cell ${c} is listed twice`);
+      taken.add(c);
+      flags[c]! |= flag;
+    }
+  };
+  const taken = new Set<number>();
+  startCells('startA', CellFlag.StartTeamA, taken);
+  startCells('startB', CellFlag.StartTeamB, taken);
 
   const out: GameMap = {
     id: str('id'),

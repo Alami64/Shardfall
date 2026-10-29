@@ -13,14 +13,14 @@
  */
 import { neighbors, distance } from './grid.js';
 import { hasLineOfSight } from './lineOfSight.js';
-import { blocksLineOfSight, isWalkable } from './map.js';
-import { findPath } from './pathfinding.js';
+import { blocksLineOfSight } from './map.js';
 import { castError, castSpell, endTurn, moveFighter, spellError } from './fight.js';
 import {
   activeFighter,
   effectiveStats,
   fighterAt,
   getFighter,
+  movePath,
   movementRange,
   type FightEvent,
   type FightResult,
@@ -176,11 +176,9 @@ function bestFollowUp(state: FightState, id: string, w: AiWeights): number {
 function origins(state: FightState, id: string): { path: number[]; state: FightState }[] {
   const f = getFighter(state, id)!;
   const byCell = new Map<number, { path: number[]; state: FightState }>([[f.cell, { path: [], state }]]);
-  const walkable = (c: number) => isWalkable(state.map, c);
-  const occupied = (c: number) => fighterAt(state, c) !== undefined;
   const reach = [...movementRange(state, id).keys()].sort((a, b) => a - b);
   for (const cell of reach) {
-    const path = findPath(f.cell, cell, walkable, { isBlocked: occupied, maxSteps: f.mp });
+    const path = movePath(state, id, cell);
     if (!path || path.length === 0) continue;
     const r = moveFighter(state, id, path);
     if (!r.ok) continue;

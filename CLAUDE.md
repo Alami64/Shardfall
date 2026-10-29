@@ -3,7 +3,7 @@
 Browser-based, turn-based tactical MMORPG on an isometric grid (Dofus-style systems, original world and art). Phaser 3 + TypeScript, npm workspaces.
 
 - Full design: `docs/design.md`. Read the relevant section before building a feature, and update the doc in the same change when the design moves (including the **Progress** checklist at the end).
-- Current status: **M0 (Foundations) done**; **M1, offline combat prototype**, in progress (see "Next up" below).
+- Current status: **M0 (Foundations) done**; **M1, offline combat prototype, built**: a playable fight on Brightmoor Meadow. Next is the M1 gate (playtests and balance), then M2 (see "Next up" below).
 - **Launch scope is small on purpose**: 3 classes (Vanguard, Longshot, Mender), 3 regions (Brightmoor Isle, Gildhaven, Thornwild Forest), level cap 60, no erosion, no pushback damage. Don't build for content outside it; `docs/design.md` marks the rest as *later*.
 
 ## Commands
@@ -28,7 +28,7 @@ To see a change running, use the `run-shardfall` skill (`.claude/skills/run-shar
 ## Layout
 
 - `packages/shared` — game rules with no rendering or I/O: grid math, A* pathfinding, line of sight, map types, seeded RNG (`rng.ts`), stats (`stats.ts`), formulas (`formulas.ts`), spell types (`spell.ts`), areas (`zone.ts`), fight types and queries (`fightState.ts`), fight actions (`fight.ts`) on top of the internal `engine.ts`, monsters (`monster.ts`), monster AI (`ai.ts`). The client today and the server from M2 both import it. Tests in `packages/shared/test`.
-- `packages/client` — Phaser scenes (`BootScene`, `MapScene`), DOM HUD (`index.html` + `src/hud.ts`), config in `src/config.ts`.
+- `packages/client` — Phaser scenes (`BootScene`, `MapScene` for exploring, `FightScene` for fights), map drawing shared by both (`src/render/mapView.ts`), DOM HUD (`index.html`, `src/hud.ts`, `src/fight/fightHud.ts`), the prototype party and encounter (`src/fight/setup.ts`), event wording (`src/fight/describe.ts`), config in `src/config.ts`. In dev, `window.shardfall` exposes the live fight (`fight()`, `busy()`, `auto()`).
 - `packages/tools` — map generator, Tiled converter (`src/tiled.ts` holds the zod schema), spell and monster validation (`src/spells.ts`, `src/monsters.ts`), placeholder art (`art/generate_placeholder_art.py`).
 - `packages/server` — empty until M2 (Colyseus).
 - `content/maps` — Tiled maps and the generated `built/world.json` (committed; `npm run build` regenerates it).
@@ -47,10 +47,16 @@ To see a change running, use the `run-shardfall` skill (`.claude/skills/run-shar
 - Original IP only: no names, characters, art or text copied from Dofus or any other game.
 - Keep `README.md` accurate when commands or controls change.
 
-## Next up: M1 (offline combat prototype)
+## M1 (offline combat prototype): built
 
 1. ~~Fight state in `shared`: placement on start cells, initiative order, turns, AP/MP, end conditions.~~ Done (`fight.ts`). Tackle and buff ticks hook into `moveFighter` and `beginTurn`.
 2. ~~Spell data model and engine.~~ Done: cast rules (`fight.ts`), effects (`engine.ts`, rules in `docs/design.md` > Spells > Effects), formulas (`formulas.ts`), tackle in `moveFighter`. Summons, glyphs, traps and damage over time are not supported yet; the content check rejects them.
 3. ~~First kits for Vanguard, Longshot and Mender.~~ Done: 3 pairs per class in `content/spells/`, each spell pinned by `test/kits.test.ts`. Numbers are first-pass; balance comes from playtests in step 5. The other 7 pairs per class come later.
 4. ~~Monster AI by utility scoring (Brute and Caster archetypes first).~~ Done: `ai.ts` (`playAiTurn`, `planAiStep`), monsters in `content/monsters/` (Thornback Boar, Dewdrop Wisp). Rules in `docs/design.md` > Monster AI.
-5. Client: a fight on Brightmoor Meadow against one monster group (boars and a wisp; `fight-smoke.ts meadow` is the same fight without the client), with a turn timeline, spell bar, range and area previews. The test maps have no start cells flagged yet; add them in the map generator.
+5. ~~Client fight on Brightmoor Meadow.~~ Done: `FightScene` (placement, timeline, spell bar, previews, AI turns, result), start cells as map properties `startA`/`startB`, class and monster placeholder sprites. `fight-smoke.ts meadow` is the same fight without the client.
+
+## Next up
+
+1. **M1 gate**: playtests. Balance spells and monsters from what players say; the numbers in `content/` are first-pass.
+2. The other seven spell pairs per launch class (pairs 4–10), as content.
+3. **M2, online fights** (see `docs/design.md` > Roadmap): Colyseus rooms in `packages/server`, server-rolled RNG, accounts and persistence.
