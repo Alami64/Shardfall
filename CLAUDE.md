@@ -47,6 +47,6 @@ Before finishing any change: `npm test && npm run typecheck && npm run build` mu
 
 1. ~~Fight state in `shared`: placement on start cells, initiative order, turns, AP/MP, end conditions.~~ Done (`fight.ts`). Tackle and buff ticks hook into `moveFighter` and `beginTurn`.
 2. ~~Spell data model and engine.~~ Done: cast rules (`fight.ts`), effects (`engine.ts`, rules in `docs/design.md` > Spells > Effects), formulas (`formulas.ts`), tackle in `moveFighter`. Summons, glyphs, traps and damage over time are not supported yet; the content check rejects them.
-3. First kits for Vanguard, Longshot and Mender (start with the 3 pairs per class in the doc). Pair 1 of Vanguard and Longshot is already in `content/spells/`, with provisional numbers.
+3. ~~First kits for Vanguard, Longshot and Mender.~~ Done: 3 pairs per class in `content/spells/`, each spell pinned by `test/kits.test.ts`. Numbers are first-pass; balance comes from playtests in step 5. The other 7 pairs per class come later.
 4. Monster AI by utility scoring (Brute and Caster archetypes first).
 5. Client: a fight on Brightmoor Meadow against one monster group, with a turn timeline, spell bar, range and area previews. The test maps have no start cells flagged yet; add them in the map generator.

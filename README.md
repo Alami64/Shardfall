@@ -74,6 +74,6 @@ Spells are data: `content/spells/<class>.json` holds a list of spells in the for
 - ~~Fight state machine in `shared`: placement, initiative order, turns, AP/MP.~~ Done: `packages/shared/src/fight.ts`.
 - ~~Spell data model and casting rules (range, line of sight, areas, cooldowns).~~ Done: `spell.ts`, `zone.ts`, `fight.ts`.
 - ~~Spell effects: damage, heals, tackle, push/pull, AP/MP removal, buffs.~~ Done: `formulas.ts`, `engine.ts`.
-- The first kits for the three launch classes: Vanguard, Longshot and Mender.
+- ~~The first kits for the three launch classes: Vanguard, Longshot and Mender.~~ Done: three spell pairs each in `content/spells/`.
 - Launch scope: 3 classes, 3 regions (Brightmoor Isle, Gildhaven, Thornwild Forest), level cap 60; see [docs/design.md](docs/design.md#overview).
 - Monster AI by utility scoring; one monster group on Brightmoor Meadow to fight.

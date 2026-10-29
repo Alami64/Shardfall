@@ -302,6 +302,69 @@ describe('push and pull', () => {
   });
 });
 
+describe('effects on the caster', () => {
+  it('pulls the caster towards the target cell: a dash that stops next to whoever is there', () => {
+    const state = teleport(scene([fx('pull', { targets: ['caster'], params: { cells: 4 } })]), 'b', cell(14, 5));
+    const r = cast(state, cell(14, 5));
+    expect(getFighter(r.state, 'a')!.cell).toBe(cell(13, 5));
+    expect(getFighter(r.state, 'b')!.cell).toBe(cell(14, 5));
+    expect(r.events).toContainEqual({
+      type: 'displaced',
+      fighterId: 'a',
+      path: [cell(11, 5), cell(12, 5), cell(13, 5)],
+      reason: 'pull',
+    });
+  });
+
+  it('pushes the caster away from the target cell: a recoil', () => {
+    const recoil = fx('push', { targets: ['caster'], params: { cells: 2 } });
+    const state = scene([fx('damage', { element: 'air', min: 5, max: 5 }), recoil]);
+    const r = cast(state, B_CELL);
+    expect(getFighter(r.state, 'a')!.cell).toBe(cell(8, 5));
+    expect(hp(r.state, 'b')).toBe(95);
+  });
+
+  it('applies to the caster wherever the area is, only once', () => {
+    const buff = fx('buff', { min: 1, max: 1, duration: 1, targets: ['caster', 'self'], params: { stat: 'lock' } });
+    const far = cast(scene([buff]), B_CELL).state; // the area is b's cell
+    expect(getFighter(far, 'a')!.buffs).toHaveLength(1);
+    const near = cast(scene([buff]), A_CELL).state; // the area holds a as well
+    expect(getFighter(near, 'a')!.buffs).toHaveLength(1);
+  });
+});
+
+describe('revive', () => {
+  const revive = [fx('revive', { targets: ['cell'], params: { hpPercent: 30 } })];
+  /** a (A) plays first; a2 and a3 are its allies, b the enemy; a2 and a3 are dead, a3 last. */
+  function withFallen() {
+    const others = [fighter('a2', 'A', 10), fighter('a3', 'A', 5), fighter('b2', 'B', 1)];
+    let state = scene(revive, { grade: { needsFreeCell: true }, others });
+    state = expectOk(applyDamage(state, 'a2', 1000)).state;
+    state = expectOk(applyDamage(state, 'b2', 1000)).state;
+    return expectOk(applyDamage(state, 'a3', 1000)).state;
+  }
+
+  it('brings back the ally who fell last, on the target cell, with a share of its HP', () => {
+    const r = cast(withFallen(), cell(10, 7));
+    expect(r.events).toContainEqual({ type: 'revived', fighterId: 'a3', cell: cell(10, 7), hp: 30 });
+    expect(getFighter(r.state, 'a3')).toMatchObject({ status: 'alive', cell: cell(10, 7), hp: 30 });
+    expect(getFighter(r.state, 'b2')!.status).toBe('dead'); // never an enemy
+    expect(r.state.fallen).toEqual(['a2', 'b2']);
+  });
+
+  it('gives the revived ally its turns back', () => {
+    let state = cast(withFallen(), cell(10, 7)).state;
+    expect(state.turnOrder).toEqual(['a', 'b', 'a2', 'b2', 'a3']);
+    state = pass(state, 'a', 'b');
+    expect(activeFighter(state)!.id).toBe('a3'); // a2 and b2 are still dead and skipped
+  });
+
+  it('does nothing when no ally has fallen', () => {
+    const state = scene(revive, { grade: { needsFreeCell: true } });
+    expect(types(cast(state, cell(10, 7)).events)).toEqual(['spellCast']);
+  });
+});
+
 describe('AP and MP removal', () => {
   const removeMp = [fx('removeMP', { min: 2, max: 2, duration: 1 })];
 

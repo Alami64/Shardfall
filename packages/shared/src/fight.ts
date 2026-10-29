@@ -65,6 +65,7 @@ export function createFight(
     turnIndex: 0,
     round: 0,
     winner: null,
+    fallen: [],
   };
   const events: FightEvent[] = [];
   for (const setup of setups) {

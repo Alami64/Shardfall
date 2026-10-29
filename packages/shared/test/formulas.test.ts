@@ -97,6 +97,8 @@ describe('removalChance', () => {
     expect(removalChance(100, 10, 6, 6)).toBe(0.9);
     expect(removalChance(0, 10, 6, 6)).toBe(0.1);
     expect(removalChance(10, 0, 6, 6)).toBe(0.9); // parry below 1 counts as 1
+    expect(removalChance(0, 0, 6, 6)).toBe(0.5); // removal below 1 too: no stats on either side is 50%
+    expect(removalChance(0, 0, 3, 6)).toBe(0.25);
   });
 
   it('is 0 with no points left', () => {

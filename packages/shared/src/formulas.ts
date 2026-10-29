@@ -74,10 +74,11 @@ export function pointsAfterTackle(points: number, escape: number): number {
 /**
  * Chance that one AP or MP point is removed:
  * 0.5 × removal / parry × current / max, clamped to 10%–90%.
- * Parry below 1 counts as 1; with no points left, nothing can be removed.
+ * Removal and parry below 1 count as 1, so two fighters without either stat
+ * start at 50%; with no points left, nothing can be removed.
  */
 export function removalChance(removal: number, parry: number, current: number, max: number): number {
   if (current <= 0 || max <= 0) return 0;
-  const p = (0.5 * Math.max(0, removal) * (current / max)) / Math.max(1, parry);
+  const p = (0.5 * Math.max(1, removal) * (current / max)) / Math.max(1, parry);
   return Math.min(REMOVAL_MAX_CHANCE, Math.max(REMOVAL_MIN_CHANCE, p));
 }

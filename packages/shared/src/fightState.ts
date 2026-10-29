@@ -112,6 +112,8 @@ export interface FightState {
   round: number;
   /** Set when the fight ends; null is a draw (both teams wiped out at once). */
   winner: Team | null;
+  /** Ids of dead fighters, in order of death; revive brings back the latest of the caster's team. */
+  fallen: string[];
 }
 
 export type DisplacementReason = 'push' | 'pull' | 'teleport' | 'swap';
@@ -135,6 +137,7 @@ export type FightEvent =
   | { type: 'turnEnded'; fighterId: string }
   | { type: 'died'; fighterId: string; cell: number }
   | { type: 'fled'; fighterId: string; cell: number }
+  | { type: 'revived'; fighterId: string; cell: number; hp: number }
   | { type: 'fightEnded'; winner: Team | null };
 
 export type FightError =
@@ -178,6 +181,7 @@ export function cloneFight(state: FightState): FightState {
       buffs: f.buffs.map((b) => ({ ...b })),
     })),
     turnOrder: [...state.turnOrder],
+    fallen: [...state.fallen],
   };
 }
 

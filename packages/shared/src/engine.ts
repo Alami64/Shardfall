@@ -99,6 +99,7 @@ export function settle(state: FightState, events: FightEvent[]): void {
 
 /** Takes a fighter off the board. Its buffs, and the buffs it cast on others, end without events. */
 export function leaveBoard(state: FightState, f: Fighter, status: 'dead' | 'fled'): void {
+  if (status === 'dead') state.fallen.push(f.id);
   f.status = status;
   f.cell = -1;
   f.buffs = [];
@@ -228,17 +229,21 @@ function displaced(f: Fighter, path: number[], reason: DisplacementReason, event
 
 const roll = (rng: Rng, e: Effect) => randomInt(rng, e.min ?? 0, e.max ?? e.min ?? 0);
 
-/** Fighters in an effect's area that it applies to, in area order. */
+/** Fighters an effect applies to: the caster first if it targets `caster`, then those in its area, in area order. */
 function effectTargets(state: FightState, caster: Fighter, e: Effect, center: number): Fighter[] {
   const out: Fighter[] = [];
+  const add = (f: Fighter) => {
+    if (out.includes(f)) return;
+    if (e.requiresState && !hasState(f, e.requiresState)) return;
+    if (e.forbidsState && hasState(f, e.forbidsState)) return;
+    out.push(f);
+  };
+  if (e.targets.includes('caster')) add(caster);
   for (const c of zoneCells(e.zone, center, caster.cell)) {
     const f = fighterAt(state, c);
     if (!f) continue;
     const role = f === caster ? 'self' : f.team === caster.team ? 'allies' : 'enemies';
-    if (!e.targets.includes(role)) continue;
-    if (e.requiresState && !hasState(f, e.requiresState)) continue;
-    if (e.forbidsState && hasState(f, e.forbidsState)) continue;
-    out.push(f);
+    if (e.targets.includes(role)) add(f);
   }
   return out;
 }
@@ -336,8 +341,11 @@ function applyEffect(
     case 'pull': {
       const cells = Number(e.params?.cells ?? 0);
       for (const t of effectTargets(state, caster, e, cell)) {
-        if (t.status !== 'alive' || t === caster || hasState(t, STATE_ROOTED)) continue;
-        const away = castDirection(caster.cell, t.cell);
+        if (t.status !== 'alive' || hasState(t, STATE_ROOTED)) continue;
+        if (t === caster && cell === caster.cell) continue; // no direction to move in
+        // Others move relative to the caster; the caster itself moves relative to the
+        // target cell, so a pull on the caster is a dash and a push is a recoil.
+        const away = t === caster ? castDirection(cell, caster.cell) : castDirection(caster.cell, t.cell);
         const dir = e.kind === 'push' ? away : { x: -away.x, y: -away.y };
         // An obstacle, a fighter or the map edge just stops the slide: no collision damage.
         displaced(t, slide(state, t, dir, cells), e.kind, events);
@@ -365,6 +373,19 @@ function applyEffect(
       [caster.cell, other.cell] = [other.cell, caster.cell];
       displaced(caster, [caster.cell], 'swap', events);
       displaced(other, [other.cell], 'swap', events);
+      return;
+    }
+    case 'revive': {
+      if (!isFree(state, cell)) return;
+      const id = [...state.fallen].reverse().find((fid) => getFighter(state, fid)?.team === caster.team);
+      const ally = id === undefined ? undefined : getFighter(state, id);
+      if (!ally) return;
+      const percent = Number(e.params?.hpPercent ?? 0);
+      state.fallen.splice(state.fallen.lastIndexOf(ally.id), 1);
+      ally.status = 'alive';
+      ally.cell = cell;
+      ally.hp = Math.max(1, Math.floor((ally.stats.maxHp * percent) / 100));
+      events.push({ type: 'revived', fighterId: ally.id, cell, hp: ally.hp });
       return;
     }
     case 'summon':
