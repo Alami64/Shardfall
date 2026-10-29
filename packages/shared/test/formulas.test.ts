@@ -6,7 +6,6 @@ import {
   healAmount,
   perElement,
   pointsAfterTackle,
-  pushbackDamage,
   removalChance,
   resistedDamage,
   tackleEscape,
@@ -102,14 +101,5 @@ describe('removalChance', () => {
 
   it('is 0 with no points left', () => {
     expect(removalChance(10, 10, 0, 6)).toBe(0);
-  });
-});
-
-describe('pushbackDamage', () => {
-  it('deals (casterLevel / 2 + 32 + pushbackDamage) / 4 per blocked cell, rounded down', () => {
-    expect(pushbackDamage(1, 0, 2)).toBe(16); // floor(2 × 32.5 / 4)
-    expect(pushbackDamage(100, 10, 1)).toBe(23); // (50 + 32 + 10) / 4
-    expect(pushbackDamage(100, 0, 3)).toBe(61); // floor(3 × 82 / 4)
-    expect(pushbackDamage(100, 0, 0)).toBe(0);
   });
 });

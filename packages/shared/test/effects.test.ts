@@ -65,15 +65,14 @@ const pass = (state: FightState, ...ids: string[]) =>
   ids.reduce((s, id) => expectOk(endTurn(s, id)).state, state);
 
 describe('damage', () => {
-  it('applies the damage formula, then resistances, then erosion', () => {
+  it('applies the damage formula, then resistances', () => {
     const state = scene([fx('damage', { element: 'earth', min: 20, max: 20 })], {
       a: { strength: 50, power: 10, damage: { ...perElement(), earth: 5 } },
       b: { resistPercent: { ...perElement(), earth: 30 }, resistFlat: { ...perElement(), earth: 5 } },
     });
     const r = cast(state, B_CELL);
     // floor(20 × 160 / 100) + 5 = 37; floor(37 × 70 / 100) - 5 = 20
-    expect(r.events).toContainEqual({ type: 'damaged', fighterId: 'b', amount: 20, erosion: 2, hp: 80 });
-    expect(getFighter(r.state, 'b')!.maxHp).toBe(98);
+    expect(r.events).toContainEqual({ type: 'damaged', fighterId: 'b', amount: 20, hp: 80 });
   });
 
   it('rolls once per cast between min and max', () => {
@@ -143,15 +142,15 @@ describe('critical hits', () => {
 });
 
 describe('heals and shields', () => {
-  it('heals by the formula, up to the eroded max HP', () => {
+  it('heals by the formula, up to max HP', () => {
     const state = scene([fx('heal', { min: 30, max: 30, targets: ['allies'] })], {
       a: { intelligence: 100 },
       others: [fighter('a2', 'A', 10)],
     });
     const hurtAlly = teleport(expectOk(applyDamage(state, 'a2', 50)).state, 'a2', cell(10, 7));
     const r = cast(hurtAlly, cell(10, 7));
-    // 60 healed would overshoot: max HP is 95 after erosion.
-    expect(r.events).toContainEqual({ type: 'healed', fighterId: 'a2', amount: 45, hp: 95 });
+    // floor(30 × 200 / 100) = 60 would overshoot: only the 50 missing HP come back.
+    expect(r.events).toContainEqual({ type: 'healed', fighterId: 'a2', amount: 50, hp: 100 });
   });
 
   it('absorbs damage with a shield before HP', () => {
@@ -161,7 +160,7 @@ describe('heals and shields', () => {
     const r = expectOk(applyDamage(shielded, 'a', 50));
     expect(r.events).toEqual([
       { type: 'shieldHit', fighterId: 'a', absorbed: 30, remaining: 0 },
-      { type: 'damaged', fighterId: 'a', amount: 20, erosion: 2, hp: 80 },
+      { type: 'damaged', fighterId: 'a', amount: 20, hp: 80 },
     ]);
     expect(getFighter(r.state, 'a')!.buffs).toEqual([]);
   });
@@ -269,22 +268,23 @@ describe('push and pull', () => {
     expect(hp(r.state, 'b')).toBe(100);
   });
 
-  it('deals pushback damage per cell it could not travel', () => {
-    // a at (15, 5) pushes b at (15, 3) towards the rock at (15, 1): one cell travelled, one blocked.
+  it('stops at an obstacle, without damage', () => {
+    // a at (15, 5) pushes b at (15, 3) towards the rock at (15, 1): one cell travelled, then blocked.
     const state = teleport(teleport(scene(push(2)), 'a', cell(15, 5)), 'b', cell(15, 3));
     expect(ROCK).toBe(cell(15, 1));
     const r = cast(state, cell(15, 3));
     expect(getFighter(r.state, 'b')!.cell).toBe(cell(15, 2));
-    expect(hp(r.state, 'b')).toBe(100 - 8); // floor((1 / 2 + 32) / 4)
+    expect(hp(r.state, 'b')).toBe(100);
+    expect(types(r.events)).toEqual(['spellCast', 'displaced']);
   });
 
-  it('counts other fighters and the map edge as blocking', () => {
+  it('stops at another fighter, without damage to either', () => {
     const blocker = fighter('b2', 'B', 40);
     const state = teleport(scene(push(3), { others: [blocker] }), 'b2', cell(13, 5));
     const r = cast(state, B_CELL);
     expect(getFighter(r.state, 'b')!.cell).toBe(B_CELL);
-    expect(hp(r.state, 'b')).toBe(100 - 24); // floor(3 × 32.5 / 4)
-    expect(hp(r.state, 'b2')).toBe(100);
+    expect([hp(r.state, 'b'), hp(r.state, 'b2')]).toEqual([100, 100]);
+    expect(types(r.events)).toEqual(['spellCast']);
   });
 
   it('pulls towards the caster without damage, stopping next to it', () => {

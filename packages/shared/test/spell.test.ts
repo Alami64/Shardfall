@@ -48,21 +48,21 @@ describe('spell grades by level', () => {
     unlockLevel,
   });
 
-  it('upgrades 50 and 100 levels after unlock', () => {
+  it('upgrades 20 and 40 levels after unlock', () => {
     expect(spellGradeForLevel(s(1), 1)).toBe(1);
-    expect(spellGradeForLevel(s(1), 50)).toBe(1);
-    expect(spellGradeForLevel(s(1), 51)).toBe(2);
-    expect(spellGradeForLevel(s(1), 101)).toBe(3);
+    expect(spellGradeForLevel(s(1), 20)).toBe(1);
+    expect(spellGradeForLevel(s(1), 21)).toBe(2);
+    expect(spellGradeForLevel(s(1), 41)).toBe(3);
   });
 
-  it('is locked below the unlock level and caps upgrades at level 200', () => {
-    expect(spellGradeForLevel(s(150), 149)).toBe(0);
-    expect(spellGradeForLevel(s(150), 199)).toBe(1);
-    expect(spellGradeForLevel(s(150), 200)).toBe(3);
+  it('is locked below the unlock level and caps upgrades at level 60', () => {
+    expect(spellGradeForLevel(s(50), 49)).toBe(0);
+    expect(spellGradeForLevel(s(50), 59)).toBe(1);
+    expect(spellGradeForLevel(s(50), 60)).toBe(3);
   });
 
   it('never goes past the grades a spell has', () => {
-    expect(spellGradeForLevel(s(1, 2), 200)).toBe(2);
+    expect(spellGradeForLevel(s(1, 2), 60)).toBe(2);
   });
 });
 

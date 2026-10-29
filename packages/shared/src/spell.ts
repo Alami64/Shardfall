@@ -97,13 +97,14 @@ export interface SpellCatalogue {
 }
 
 /** Levels after unlock at which grades 2 and 3 arrive. */
-export const GRADE_STEP_LEVELS = 50;
-export const MAX_LEVEL = 200;
+export const GRADE_STEP_LEVELS = 20;
+/** The level cap while the world is three regions (design doc, Characters > Leveling). */
+export const MAX_LEVEL = 60;
 
 /**
  * The grade (1-based) a character of `level` has for a spell, or 0 while the
- * spell is still locked. Grade 2 comes 50 levels after unlock and grade 3 100
- * levels after, both reached by level 200 at the latest.
+ * spell is still locked. Grade 2 comes 20 levels after unlock and grade 3 40
+ * levels after, both reached by the level cap at the latest.
  */
 export function spellGradeForLevel(spell: Spell, level: number): number {
   if (level < spell.unlockLevel) return 0;

@@ -60,7 +60,7 @@ describe('placement', () => {
 
   it('starts fighters at full HP, AP and MP unless told otherwise', () => {
     const state = create([fighter('a', 'A', 0), fighter('w', 'A', 0, { hp: 40 }), fighter('z', 'B', 0, { hp: -5 })]);
-    expect(getFighter(state, 'a')).toMatchObject({ hp: 100, maxHp: 100, ap: 6, mp: 3, status: 'alive' });
+    expect(getFighter(state, 'a')).toMatchObject({ hp: 100, ap: 6, mp: 3, status: 'alive' });
     expect(getFighter(state, 'w')!.hp).toBe(40);
     expect(getFighter(state, 'z')!.hp).toBe(1); // clamped: nobody enters a fight dead
   });
@@ -277,16 +277,16 @@ describe('movement', () => {
 });
 
 describe('damage, death and end of fight', () => {
-  it('lowers HP and erodes 10% of it from max HP', () => {
+  it('lowers HP and leaves max HP alone', () => {
     const r = expectOk(applyDamage(started(), 'b', 25));
-    expect(getFighter(r.state, 'b')).toMatchObject({ hp: 75, maxHp: 98 });
-    expect(r.events).toEqual([{ type: 'damaged', fighterId: 'b', amount: 25, erosion: 2, hp: 75 }]);
+    expect(getFighter(r.state, 'b')).toMatchObject({ hp: 75, stats: { maxHp: 100 } });
+    expect(r.events).toEqual([{ type: 'damaged', fighterId: 'b', amount: 25, hp: 75 }]);
   });
 
   it('caps damage at the HP left', () => {
     let state = started([fighter('a', 'A', 100), fighter('b', 'B', 50), fighter('b2', 'B', 40)]);
     const r = expectOk(applyDamage(state, 'b', 500));
-    expect(r.events[0]).toEqual({ type: 'damaged', fighterId: 'b', amount: 100, erosion: 10, hp: 0 });
+    expect(r.events[0]).toEqual({ type: 'damaged', fighterId: 'b', amount: 100, hp: 0 });
     state = r.state;
     expect(applyDamage(state, 'b', 5)).toEqual({ ok: false, error: 'not-alive' });
   });

@@ -13,7 +13,6 @@ import {
   hasState,
   STATE_ROOTED,
   TEAMS,
-  EROSION_RATE,
   type Buff,
   type BuffKind,
   type DisplacementReason,
@@ -26,7 +25,6 @@ import {
   directDamage,
   healAmount,
   pointsAfterTackle,
-  pushbackDamage,
   removalChance,
   resistedDamage,
   tackleEscape,
@@ -112,8 +110,7 @@ export function leaveBoard(state: FightState, f: Fighter, status: 'dead' | 'fled
 
 /**
  * Takes `amount` HP (already after resistances). Shields absorb first, oldest
- * first; erosion takes 10% of the HP actually lost off max HP. At 0 HP the
- * fighter dies. Returns the HP lost.
+ * first. At 0 HP the fighter dies. Returns the HP lost.
  */
 export function hurt(state: FightState, f: Fighter, amount: number, events: FightEvent[]): number {
   let left = Math.max(0, Math.floor(amount));
@@ -127,10 +124,8 @@ export function hurt(state: FightState, f: Fighter, amount: number, events: Figh
   f.buffs = f.buffs.filter((b) => b.kind !== 'shield' || b.value > 0);
 
   const lost = Math.min(f.hp, left);
-  const erosion = Math.floor(lost * EROSION_RATE);
   f.hp -= lost;
-  f.maxHp -= erosion;
-  events.push({ type: 'damaged', fighterId: f.id, amount: lost, erosion, hp: f.hp });
+  events.push({ type: 'damaged', fighterId: f.id, amount: lost, hp: f.hp });
   if (f.hp === 0) {
     events.push({ type: 'died', fighterId: f.id, cell: f.cell });
     leaveBoard(state, f, 'dead');
@@ -138,9 +133,9 @@ export function hurt(state: FightState, f: Fighter, amount: number, events: Figh
   return lost;
 }
 
-/** Restores HP up to the (eroded) max. */
+/** Restores HP up to max HP. */
 function heal(f: Fighter, amount: number, events: FightEvent[]): void {
-  const healed = Math.min(f.maxHp - f.hp, Math.max(0, amount));
+  const healed = Math.min(f.stats.maxHp - f.hp, Math.max(0, amount));
   f.hp += healed;
   events.push({ type: 'healed', fighterId: f.id, amount: healed, hp: f.hp });
 }
@@ -306,7 +301,7 @@ function applyEffect(
       const percent = Number(e.params?.maxHpPercent ?? 0);
       const rolled = percent > 0 ? 0 : roll(rng, e);
       for (const t of effectTargets(state, caster, e, cell)) {
-        const value = percent > 0 ? Math.floor((t.maxHp * percent) / 100) : rolled;
+        const value = percent > 0 ? Math.floor((t.stats.maxHp * percent) / 100) : rolled;
         if (value <= 0) continue;
         const buff: Buff = { kind: 'shield', casterId: caster.id, spellId, value, remaining: Math.max(1, duration) };
         addBuff(state, t, buff, events);
@@ -344,13 +339,8 @@ function applyEffect(
         if (t.status !== 'alive' || t === caster || hasState(t, STATE_ROOTED)) continue;
         const away = castDirection(caster.cell, t.cell);
         const dir = e.kind === 'push' ? away : { x: -away.x, y: -away.y };
-        const path = slide(state, t, dir, cells);
-        displaced(t, path, e.kind, events);
-        const blocked = cells - path.length;
-        if (e.kind === 'push' && blocked > 0) {
-          const s = effectiveStats(caster);
-          hurt(state, t, pushbackDamage(s.level, s.pushbackDamage, blocked), events);
-        }
+        // An obstacle, a fighter or the map edge just stops the slide: no collision damage.
+        displaced(t, slide(state, t, dir, cells), e.kind, events);
       }
       return;
     }

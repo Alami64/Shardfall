@@ -100,7 +100,6 @@ export function joinFight(state: FightState, setup: FighterSetup, rng: Rng): Fig
     controller: setup.controller,
     stats: structuredStats(setup),
     hp: Math.min(maxHp, Math.max(1, Math.floor(setup.hp ?? maxHp))),
-    maxHp,
     ap: setup.stats.ap,
     mp: setup.stats.mp,
     cell,
@@ -240,8 +239,8 @@ export function flee(state: FightState, fighterId: string): FightResult {
 
 /**
  * Takes `amount` HP from a fighter, as a final value (no resistances): shields
- * absorb first, then erosion takes 10% of the HP lost off max HP. At 0 HP the
- * fighter dies and leaves the board; if it was its own turn, play passes on.
+ * absorb first. At 0 HP the fighter dies and leaves the board; if it was its
+ * own turn, play passes on.
  * Spells deal damage through castSpell; this is for everything else.
  */
 export function applyDamage(state: FightState, fighterId: string, amount: number): FightResult {

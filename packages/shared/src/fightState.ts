@@ -18,8 +18,6 @@ export const otherTeam = (team: Team): Team => (team === 'A' ? 'B' : 'A');
 
 export const PLACEMENT_SECONDS = 30;
 export const TURN_SECONDS = 30;
-/** Share of damage taken that also lowers max HP for the rest of the fight. */
-export const EROSION_RATE = 0.1;
 /** The state the engine knows about: a rooted fighter cannot be pushed, pulled or swapped. */
 export const STATE_ROOTED = 'rooted';
 
@@ -79,9 +77,8 @@ export interface Fighter {
   controller: 'player' | 'ai';
   /** Stats on entering the fight. Use effectiveStats for the values with buffs. */
   readonly stats: Readonly<FighterStats>;
+  /** Between 0 and stats.maxHp. */
   hp: number;
-  /** Starts at stats.maxHp; erosion lowers it during the fight. */
-  maxHp: number;
   /** Points left this turn. Refilled at the start of the fighter's turn, lost at its end. */
   ap: number;
   mp: number;
@@ -127,7 +124,7 @@ export type FightEvent =
   | { type: 'moved'; fighterId: string; path: number[] }
   | { type: 'tackled'; fighterId: string; cell: number; apLost: number; mpLost: number }
   | { type: 'spellCast'; fighterId: string; spellId: string; grade: number; cell: number; critical: boolean }
-  | { type: 'damaged'; fighterId: string; amount: number; erosion: number; hp: number }
+  | { type: 'damaged'; fighterId: string; amount: number; hp: number }
   | { type: 'shieldHit'; fighterId: string; absorbed: number; remaining: number }
   | { type: 'healed'; fighterId: string; amount: number; hp: number }
   | { type: 'displaced'; fighterId: string; path: number[]; reason: DisplacementReason }
@@ -251,7 +248,7 @@ export function mapStartCells(map: GameMap): Record<Team, number[]> {
 export function initiativeOf(fighter: Fighter): number {
   const s = fighter.stats;
   const total = s.initiative + s.strength + s.intelligence + s.chance + s.agility;
-  return Math.floor((total * fighter.hp) / fighter.maxHp);
+  return Math.floor((total * fighter.hp) / s.maxHp);
 }
 
 /**

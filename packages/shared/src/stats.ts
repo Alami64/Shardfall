@@ -48,7 +48,6 @@ export interface FighterStats {
   criticalDamage: number;
   /** Added to every heal. */
   heals: number;
-  pushbackDamage: number;
   dodge: number;
   lock: number;
   apParry: number;
@@ -75,7 +74,6 @@ export const SCALAR_STATS = [
   'criticalChance',
   'criticalDamage',
   'heals',
-  'pushbackDamage',
   'dodge',
   'lock',
   'apParry',
@@ -109,7 +107,6 @@ export function fighterStats(overrides: Partial<FighterStats> = {}): FighterStat
     criticalChance: 0,
     criticalDamage: 0,
     heals: 0,
-    pushbackDamage: 0,
     dodge: 0,
     lock: 0,
     apParry: 0,

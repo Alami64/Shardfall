@@ -81,9 +81,3 @@ export function removalChance(removal: number, parry: number, current: number, m
   const p = (0.5 * Math.max(0, removal) * (current / max)) / Math.max(1, parry);
   return Math.min(REMOVAL_MAX_CHANCE, Math.max(REMOVAL_MIN_CHANCE, p));
 }
-
-/** Pushback damage: (casterLevel / 2 + 32 + pushbackDamage) / 4 per cell the unit could not travel, rounded down. */
-export function pushbackDamage(casterLevel: number, bonus: number, blockedCells: number): number {
-  if (blockedCells <= 0) return 0;
-  return Math.max(0, Math.floor((blockedCells * (casterLevel / 2 + 32 + bonus)) / 4));
-}
