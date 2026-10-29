@@ -165,7 +165,7 @@ AP/MP removal chance per point removed:
 P = 0.5 \times \frac{\text{removal}}{\text{parry}} \times \frac{\text{currentPoints}}{\text{maxPoints}}
 ```
 
-Clamped between 10% and 90%; a parry below 1 counts as 1.
+Clamped between 10% and 90%. Removal and parry below 1 count as 1, so two fighters with neither stat start at 50% per point.
 
 Heals (Intelligence = the healer's stat, Heals = flat heal bonus):
 
@@ -222,12 +222,12 @@ interface SpellGrade {
 
 interface Effect {
   kind: 'damage' | 'steal' | 'heal' | 'buff' | 'debuff' | 'push' | 'pull' | 'teleport'
-      | 'swap' | 'summon' | 'glyph' | 'trap' | 'state' | 'removeAP' | 'removeMP' | 'shield';
+      | 'swap' | 'summon' | 'glyph' | 'trap' | 'state' | 'removeAP' | 'removeMP' | 'shield' | 'revive';
   element?: Element;
   min?: number; max?: number;    // rolled per cast
   duration?: number;             // turns, 0 = instant
   zone: Zone;
-  targets: ('enemies' | 'allies' | 'self' | 'summons' | 'cell')[];
+  targets: ('enemies' | 'allies' | 'self' | 'caster' | 'summons' | 'cell')[];
   requiresState?: string; forbidsState?: string;
   params?: Record<string, number | string>;
 }
@@ -256,7 +256,7 @@ Casting spends the AP and records the cooldown and counts; per-turn counts reset
 
 ### Effects
 
-Casting rolls the critical hit first, then applies the grade's effects (or its critical effects) in the order listed. Each effect hits the fighters in its area that its `targets` allow (`self` = the caster, `allies` = the caster's team, `enemies` = the other team), from the centre outwards, skipping those that fail `requiresState` / `forbidsState`. Once a team has nobody standing, the remaining effects do not run. The engine is in [`packages/shared/src/engine.ts`](../packages/shared/src/engine.ts).
+Casting rolls the critical hit first, then applies the grade's effects (or its critical effects) in the order listed. Each effect hits the fighters in its area that its `targets` allow (`self` = the caster, `allies` = the caster's team, `enemies` = the other team), from the centre outwards, skipping those that fail `requiresState` / `forbidsState`. `caster` is the caster wherever the area is (first, and only once); `cell` is the target cell itself. Once a team has nobody standing, the remaining effects do not run. The engine is in [`packages/shared/src/engine.ts`](../packages/shared/src/engine.ts).
 
 - **Critical hits:** rolled once per cast, only on spells that have critical effects, with chance = the grade's critical chance + the caster's Critical %. A critical hit uses the critical effects and adds Critical Damage to each damage effect.
 - **damage:** rolled once per effect (min–max), shared by every target, through the damage formula, then each target's resistances (players capped at 50%). Shields absorb first.
@@ -265,10 +265,13 @@ Casting rolls the critical hit first, then applies the grade's effects (or its c
 - **shield:** absorbs damage before HP, for `duration` turns: min–max points, or `params.maxHpPercent` of the target's max HP.
 - **buff / debuff:** `params.stat` names the stat (AP, MP, Range, Lock, a characteristic, ...); per-element stats (`damage`, `resistPercent`, `resistFlat`) take the effect's `element`, or all elements when it has none. A debuff subtracts. AP and MP changes on the fighter whose turn it is apply to its points at once. Only AP and MP may be instant (`duration` 0): that changes the points left this turn.
 - **state:** adds the tag in `params.state` for `duration` turns. The engine knows **rooted**: a rooted fighter cannot be pushed, pulled or swapped.
-- **push / pull:** `params.cells` cells along the grid axis from the caster to the target (the larger gap; the x axis on a diagonal). An obstacle, a fighter or the map edge stops the movement, with no damage; a pull stops next to whatever is in the way, the caster included.
+- **push / pull:** `params.cells` cells along the grid axis from the caster to the target (the larger gap; the x axis on a diagonal). An obstacle, a fighter or the map edge stops the movement, with no damage; a pull stops next to whatever is in the way, the caster included. On the `caster` the direction is taken from the target cell instead: a pull is a **dash** towards the target (stopping next to whoever stands there) and a push is a **recoil** away from it.
 - **removeAP / removeMP:** each point removed (min–max) is rolled with the removal formula. On the target's own turn the points come off what it has left; otherwise they come off its next turn, as a debuff lasting `duration` turns (at least 1). "Current points" is what the target would start its turn with.
 - **teleport:** moves the caster to the target cell if it is free. **swap:** the caster and the fighter on the target cell trade places.
+- **revive:** on a free target cell, brings back the caster's ally who died most recently (never one who fled) with `params.hpPercent` of its max HP. It keeps its place in the turn order.
 - Not supported yet, and rejected by the content check: **summon**, **glyph**, **trap**, and damage over time (damage with a duration).
+
+A spell that should be cast only once per fight uses a cooldown longer than any fight (99).
 
 **Durations** count down at the start of the caster's turns: a 1-turn buff lasts until the caster's next turn starts, so a buff cast on an ally covers the ally's next turn. When a fighter leaves the board, its buffs and the buffs it cast end. At the start of a turn, expired buffs go first, then AP and MP refill with the remaining buffs counted.
 
@@ -278,11 +281,15 @@ Casting rolls the critical hit first, then applies the grade's effects (or its c
 
 ### Sample kits (first three pairs per class)
 
-| Class | Pair 1 | Pair 2 | Pair 3 |
+Pairs unlock at levels 1, 3 and 6. The numbers below are grade 1; grades 2 and 3 raise damage and heals by about 25% each, or improve range and cooldowns. All of it lives in `content/spells/<class>.json`, and `packages/shared/test/kits.test.ts` plays each spell through the engine.
+
+| Class | Pair 1 (level 1) | Pair 2 (level 3) | Pair 3 (level 6) |
 | --- | --- | --- | --- |
-| Vanguard | Cleave (3 AP, Earth, melee) / Gale Cut (3 AP, Air, range 1–2) | Leap (2 AP, jump to a cell 1–4) / Charge (3 AP, dash in line, push 1) | Rally (2 AP, +1 MP to allies in circle 2) / Brace (2 AP, +20% resistances, 1 turn) |
-| Longshot | Piercing Arrow (4 AP, Air, range 3–10, line damage) / Ember Arrow (4 AP, Fire, range 3–8, circle 1) | Eagle Eye (2 AP, +4 Range, 3 turns) / Steady Aim (2 AP, +15% damage, cannot move this turn) | Recoil Shot (3 AP, damage + push self 2) / Pinning Shot (3 AP, -2 MP to target) |
-| Mender | Mending Light (3 AP, heal, range 1–6) / Searing Light (3 AP, Fire damage) | Quickening (2 AP, +2 AP to ally next turn) / Wellspring (4 AP, heal glyph circle 1, 2 turns) | Rebirth (6 AP, revive an ally at 30% HP, once per fight) / Sanctuary (4 AP, shield = 15% max HP) |
+| Vanguard | **Cleave**: 3 AP, Earth 12–15, melee, twice per target / **Gale Cut**: 3 AP, Air 10–13, range 1–2, three per turn | **Leap**: 2 AP, jump to a free cell 1–4, every 3 turns / **Charge**: 3 AP, in line 2–4, dash next to the target and push it 1, every 2 turns | **Rally**: 2 AP, +1 MP to self (now) and allies in circle 2 (their turn), every 4 turns / **Brace**: 2 AP, +20% all resistances until its next turn, every 3 turns |
+| Longshot | **Piercing Arrow**: 4 AP, Air 12–15 on the target and 2 cells behind it, in line 3–10 / **Ember Arrow**: 4 AP, Fire 10–13 in circle 1, range 3–8 (both boostable) | **Eagle Eye**: 2 AP, +4 Range for 3 turns, every 5 turns / **Steady Aim**: 2 AP, +15 power until its next turn, no more MP this turn, every 3 turns | **Recoil Shot**: 3 AP, Air 8–11, range 1–5, then recoil 2 cells, once per turn / **Pinning Shot**: 3 AP, remove 1–2 MP, range 2–6, once per target |
+| Mender | **Mending Light**: 3 AP, heal 10–13, range 1–6 (allies only) / **Searing Light**: 3 AP, Fire 9–12, range 1–6 | **Quickening**: 2 AP, +2 AP to an ally on its next turn, range 1–4, every 3 turns / **Wellspring**: 4 AP, heal 8–10 to self and allies in circle 1, range 0–5, every 2 turns | **Rebirth**: 6 AP, revive the last fallen ally at 30% HP on a free cell 1–3, once per fight / **Sanctuary**: 4 AP, shield of 15% max HP on self or an ally, range 0–4, 2 turns |
+
+Wellspring is an instant area heal until glyphs exist; the healing glyph version (heals at the start of each of the Mender's turns) is *later*.
 
 Full 20-spell kits for the three launch classes are a content task for milestone M1 (see Roadmap); later classes follow the same pattern.
 
@@ -314,6 +321,15 @@ Resources (trees, ore, plants, fishing spots) respawn on a timer after harvestin
 
 Monsters use the same stats and spell system as players, so one combat engine runs everything. Each monster has 1–5 grades (level variants) with their own HP, resistances and spell grades.
 
+**Data.** A monster is an id, a name, an AI profile (archetype and preferred range) and its grades; each grade sets a level, the stats that differ from the level-1 defaults (max HP is required) and its spells at a spell grade. Monster spells are ordinary spells with `classId` `monster`, in `content/spells/monsters.json`. Monsters live in `content/monsters/*.json`; `npm run monsters:build` (part of `npm run build`, after the spells) validates them against the spell catalogue and writes `content/monsters/built/monsters.json`. `monsterSetup` in [`packages/shared/src/monster.ts`](../packages/shared/src/monster.ts) turns a grade into a fighter.
+
+**Launch monsters (Brightmoor Meadow)**, grades at levels 2, 3 and 4:
+
+| Monster | Archetype | Spells | Notes |
+| --- | --- | --- | --- |
+| Thornback Boar | Brute | Gore (4 AP, Earth 10–13, melee, once per turn), Headbutt (2 AP, Neutral 3–5, melee) | 70–94 HP; resists Earth, weak to Fire |
+| Dewdrop Wisp | Caster, range 5 | Dew Bolt (3 AP, Water 6–8, range 2–6, twice per turn), Soothing Dew (2 AP, heal an ally 8–10, range 1–5) | 48–64 HP; resists Water, weak to Air; plays early (high initiative) |
+
 ### Monster AI
 
 The AI picks actions by **utility scoring** rather than scripted behaviour trees:
@@ -333,6 +349,24 @@ The AI picks actions by **utility scoring** rather than scripted behaviour trees
 | Boss | Scripted phases at HP thresholds on top of utility scoring |
 
 Scoring is capped (top N cells by distance, pruned spells) so a turn resolves in under 50 ms on the server.
+
+**How it is built** ([`packages/shared/src/ai.ts`](../packages/shared/src/ai.ts); Brute and Caster so far):
+
+- Options are tried with the real actions on copies of the fight: each reachable cell is reached with `moveFighter` (so tackle counts, and a walk tackle cuts short ends where it really ends), and each cast is `castSpell` with "average" rolls (the middle of every range, no critical hit, removals that are likelier than not succeed). Targets tried: every fighter's cell, the cells next to them, and the caster's own.
+- A cast is scored from its events: damage to enemies, kills, heals and shields on allies, AP/MP removed from enemies, buffs on allies and debuffs or states on enemies; damage to its own side counts against it (×1.5), a winning cast is worth everything. Then the position it leaves the caster in is added: distance from its preferred range to the nearest enemy, line of sight to that enemy, and how many enemies could walk up to it next turn.
+- The six best casts also get the value of the best cast that could follow from the same cell, so a buff is cast before the hit it improves.
+- It casts the best option while any cast is worth something, then spends leftover MP on a better position, then ends its turn. The same state always gives the same plan; only the real casts roll dice.
+
+| Weight | Brute | Caster |
+| --- | --- | --- |
+| Damage, heals (per HP) | 1 | 1 |
+| Kill | 40 | 40 |
+| Control (per AP/MP removed, per buff or debuff) | 4 | 4 |
+| Per cell away from preferred range | 3 | 3 |
+| Nearest enemy out of sight | 0 | 6 |
+| Per enemy that can reach it next turn | 0 | 4 |
+
+A turn takes about 5–20 ms with six fighters on the meadow. The same AI can stand in for players (give a fighter an `ai` profile), which is how fights are simulated before the client plays them: `.claude/skills/run-shardfall/fight-smoke.ts`.
 
 ### Dungeons
 
@@ -519,11 +553,11 @@ Grid coordinates are used for range, areas, pathfinding and line of sight; scree
 shardfall/
   docs/         this design document
   packages/
-    shared/     grid math, pathfinding, line of sight, map types, fight engine (turns, spells, effects)
+    shared/     grid math, pathfinding, line of sight, map types, fight engine (turns, spells, effects), monster AI
     client/     Phaser scenes, HUD, asset loading
     server/     Colyseus rooms, persistence, AI (from M2)
     tools/      map generator and converter, placeholder art
-  content/      maps and spells today; items, monsters, quests later (JSON)
+  content/      maps, spells and monsters today; items, quests later (JSON)
   assets/       sprites, atlases, audio
 ```
 
@@ -566,5 +600,8 @@ If the offline combat prototype does not make people want another fight, everyth
 - [x] Spell effects in `shared`: damage and criticals, steal, heals, shields, buffs and states, push/pull, AP/MP removal, teleport, swap; tackle on movement
 - [ ] Summons, glyphs, traps and damage over time
 - [x] Cut the launch scope: 3 classes, 3 regions, level cap 60, no erosion, no pushback damage
+- [x] First three spell pairs for the three launch classes, played through the engine in tests
+- [x] Monster data and the first two Brightmoor Meadow monsters (Thornback Boar, Dewdrop Wisp), validated at build
+- [x] Monster AI by utility scoring: Brute and Caster archetypes, under 50 ms per turn
 - [ ] Write full 20-spell kits for the three launch classes (Vanguard, Longshot, Mender)
 - [ ] Commission placeholder art: one tileset, three class sprites, three monsters

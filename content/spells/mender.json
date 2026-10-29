@@ -1,0 +1,707 @@
+[
+  {
+    "id": "mending_light",
+    "classId": "mender",
+    "name": "Mending Light",
+    "unlockLevel": 1,
+    "pairId": "mender_1",
+    "grades": [
+      {
+        "apCost": 3,
+        "minRange": 1,
+        "maxRange": 6,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 2,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 10,
+        "effects": [
+          {
+            "kind": "heal",
+            "min": 10,
+            "max": 13,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "heal",
+            "min": 13,
+            "max": 16,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ]
+          }
+        ]
+      },
+      {
+        "apCost": 3,
+        "minRange": 1,
+        "maxRange": 6,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 2,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 10,
+        "effects": [
+          {
+            "kind": "heal",
+            "min": 13,
+            "max": 16,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "heal",
+            "min": 16,
+            "max": 19,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ]
+          }
+        ]
+      },
+      {
+        "apCost": 3,
+        "minRange": 1,
+        "maxRange": 6,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 2,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 10,
+        "effects": [
+          {
+            "kind": "heal",
+            "min": 16,
+            "max": 20,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "heal",
+            "min": 19,
+            "max": 23,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "searing_light",
+    "classId": "mender",
+    "name": "Searing Light",
+    "unlockLevel": 1,
+    "pairId": "mender_1",
+    "grades": [
+      {
+        "apCost": 3,
+        "minRange": 1,
+        "maxRange": 6,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 2,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 5,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "fire",
+            "min": 9,
+            "max": 12,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "damage",
+            "element": "fire",
+            "min": 12,
+            "max": 15,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ]
+      },
+      {
+        "apCost": 3,
+        "minRange": 1,
+        "maxRange": 6,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 2,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 5,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "fire",
+            "min": 12,
+            "max": 15,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "damage",
+            "element": "fire",
+            "min": 15,
+            "max": 18,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ]
+      },
+      {
+        "apCost": 3,
+        "minRange": 1,
+        "maxRange": 6,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 2,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 5,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "fire",
+            "min": 15,
+            "max": 19,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "damage",
+            "element": "fire",
+            "min": 18,
+            "max": 22,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "quickening",
+    "classId": "mender",
+    "name": "Quickening",
+    "unlockLevel": 3,
+    "pairId": "mender_2",
+    "grades": [
+      {
+        "apCost": 2,
+        "minRange": 1,
+        "maxRange": 4,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 1,
+        "cooldown": 3,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "buff",
+            "min": 2,
+            "max": 2,
+            "duration": 1,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ],
+            "params": {
+              "stat": "ap"
+            }
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 2,
+        "minRange": 1,
+        "maxRange": 4,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 1,
+        "cooldown": 3,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "buff",
+            "min": 2,
+            "max": 2,
+            "duration": 1,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ],
+            "params": {
+              "stat": "ap"
+            }
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 2,
+        "minRange": 1,
+        "maxRange": 5,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 1,
+        "cooldown": 2,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "buff",
+            "min": 2,
+            "max": 2,
+            "duration": 1,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ],
+            "params": {
+              "stat": "ap"
+            }
+          }
+        ],
+        "criticalEffects": []
+      }
+    ]
+  },
+  {
+    "id": "wellspring",
+    "classId": "mender",
+    "name": "Wellspring",
+    "unlockLevel": 3,
+    "pairId": "mender_2",
+    "grades": [
+      {
+        "apCost": 4,
+        "minRange": 0,
+        "maxRange": 5,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 2,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "heal",
+            "min": 8,
+            "max": 10,
+            "zone": {
+              "shape": "circle",
+              "size": 1
+            },
+            "targets": [
+              "self",
+              "allies"
+            ]
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 4,
+        "minRange": 0,
+        "maxRange": 5,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 2,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "heal",
+            "min": 10,
+            "max": 13,
+            "zone": {
+              "shape": "circle",
+              "size": 1
+            },
+            "targets": [
+              "self",
+              "allies"
+            ]
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 4,
+        "minRange": 0,
+        "maxRange": 5,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 2,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "heal",
+            "min": 13,
+            "max": 16,
+            "zone": {
+              "shape": "circle",
+              "size": 1
+            },
+            "targets": [
+              "self",
+              "allies"
+            ]
+          }
+        ],
+        "criticalEffects": []
+      }
+    ]
+  },
+  {
+    "id": "rebirth",
+    "classId": "mender",
+    "name": "Rebirth",
+    "unlockLevel": 6,
+    "pairId": "mender_3",
+    "grades": [
+      {
+        "apCost": 6,
+        "minRange": 1,
+        "maxRange": 3,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": true,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 99,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "revive",
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "cell"
+            ],
+            "params": {
+              "hpPercent": 30
+            }
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 6,
+        "minRange": 1,
+        "maxRange": 3,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": true,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 99,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "revive",
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "cell"
+            ],
+            "params": {
+              "hpPercent": 35
+            }
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 6,
+        "minRange": 1,
+        "maxRange": 3,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": true,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 99,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "revive",
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "cell"
+            ],
+            "params": {
+              "hpPercent": 40
+            }
+          }
+        ],
+        "criticalEffects": []
+      }
+    ]
+  },
+  {
+    "id": "sanctuary",
+    "classId": "mender",
+    "name": "Sanctuary",
+    "unlockLevel": 6,
+    "pairId": "mender_3",
+    "grades": [
+      {
+        "apCost": 4,
+        "minRange": 0,
+        "maxRange": 4,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 3,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "shield",
+            "duration": 2,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "self",
+              "allies"
+            ],
+            "params": {
+              "maxHpPercent": 15
+            }
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 4,
+        "minRange": 0,
+        "maxRange": 4,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 3,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "shield",
+            "duration": 2,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "self",
+              "allies"
+            ],
+            "params": {
+              "maxHpPercent": 18
+            }
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 4,
+        "minRange": 0,
+        "maxRange": 4,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 2,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "shield",
+            "duration": 2,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "self",
+              "allies"
+            ],
+            "params": {
+              "maxHpPercent": 21
+            }
+          }
+        ],
+        "criticalEffects": []
+      }
+    ]
+  }
+]

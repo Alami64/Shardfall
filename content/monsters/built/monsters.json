@@ -1,0 +1,159 @@
+{
+  "monsters": [
+    {
+      "id": "thornback_boar",
+      "name": "Thornback Boar",
+      "ai": {
+        "archetype": "brute",
+        "preferredRange": 1
+      },
+      "grades": [
+        {
+          "level": 2,
+          "stats": {
+            "maxHp": 70,
+            "initiative": 5,
+            "strength": 15,
+            "resistPercent": {
+              "earth": 10,
+              "fire": -10
+            }
+          },
+          "spells": [
+            {
+              "spellId": "boar_gore",
+              "grade": 1
+            },
+            {
+              "spellId": "boar_headbutt",
+              "grade": 1
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "stats": {
+            "maxHp": 82,
+            "initiative": 8,
+            "strength": 20,
+            "resistPercent": {
+              "earth": 12,
+              "fire": -10
+            }
+          },
+          "spells": [
+            {
+              "spellId": "boar_gore",
+              "grade": 2
+            },
+            {
+              "spellId": "boar_headbutt",
+              "grade": 2
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "stats": {
+            "maxHp": 94,
+            "initiative": 10,
+            "strength": 25,
+            "resistPercent": {
+              "earth": 15,
+              "fire": -10
+            }
+          },
+          "spells": [
+            {
+              "spellId": "boar_gore",
+              "grade": 3
+            },
+            {
+              "spellId": "boar_headbutt",
+              "grade": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dewdrop_wisp",
+      "name": "Dewdrop Wisp",
+      "ai": {
+        "archetype": "caster",
+        "preferredRange": 5
+      },
+      "grades": [
+        {
+          "level": 2,
+          "stats": {
+            "maxHp": 48,
+            "initiative": 20,
+            "intelligence": 10,
+            "chance": 15,
+            "resistPercent": {
+              "water": 20,
+              "air": -10
+            }
+          },
+          "spells": [
+            {
+              "spellId": "wisp_dew_bolt",
+              "grade": 1
+            },
+            {
+              "spellId": "wisp_soothing_dew",
+              "grade": 1
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "stats": {
+            "maxHp": 56,
+            "initiative": 25,
+            "intelligence": 12,
+            "chance": 20,
+            "resistPercent": {
+              "water": 22,
+              "air": -10
+            }
+          },
+          "spells": [
+            {
+              "spellId": "wisp_dew_bolt",
+              "grade": 2
+            },
+            {
+              "spellId": "wisp_soothing_dew",
+              "grade": 2
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "stats": {
+            "maxHp": 64,
+            "initiative": 30,
+            "intelligence": 15,
+            "chance": 25,
+            "resistPercent": {
+              "water": 25,
+              "air": -10
+            }
+          },
+          "spells": [
+            {
+              "spellId": "wisp_dew_bolt",
+              "grade": 3
+            },
+            {
+              "spellId": "wisp_soothing_dew",
+              "grade": 3
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

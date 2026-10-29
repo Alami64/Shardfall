@@ -125,6 +125,12 @@ function checkEffect(e: Effect, where: string): string[] {
     case 'teleport':
       if (!e.targets.includes('cell')) errors.push(`${where}: teleport targets the cell`);
       break;
+    case 'revive':
+      if (!e.targets.includes('cell')) errors.push(`${where}: revive targets the cell`);
+      if (!positiveInt(p.hpPercent) || Number(p.hpPercent) > 100) {
+        errors.push(`${where}: revive needs params.hpPercent, 1 to 100`);
+      }
+      break;
   }
   return errors;
 }

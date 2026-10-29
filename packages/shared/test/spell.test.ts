@@ -266,10 +266,11 @@ describe('content spells', () => {
 
   it('can cast every built spell at its minimum range', () => {
     for (const s of spells) {
-      const { minRange } = s.grades[0]!;
+      const { minRange, needsFreeCell } = s.grades[0]!;
       // A target down the x axis suits every content spell so far (none is diagonal-only); range 0 is the caster.
+      // b stands on the target unless the spell needs a free cell.
       const target = minRange === 0 ? A_CELL : cell(10 + minRange, 5);
-      const state = minRange === 0 ? duel([s]) : teleport(duel([s]), 'b', target);
+      const state = minRange === 0 || needsFreeCell ? duel([s]) : teleport(duel([s]), 'b', target);
       expect(castError(state, 'a', s.id, target), s.id).toBeNull();
     }
   });

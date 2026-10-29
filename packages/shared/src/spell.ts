@@ -33,10 +33,16 @@ export const EFFECT_KINDS = [
   'removeAP',
   'removeMP',
   'shield',
+  'revive',
 ] as const;
 export type EffectKind = (typeof EFFECT_KINDS)[number];
 
-export const EFFECT_TARGETS = ['enemies', 'allies', 'self', 'summons', 'cell'] as const;
+/**
+ * Who an effect applies to. `self`, `allies` and `enemies` are fighters inside
+ * the effect's area; `caster` is the caster wherever the area is (a recoil, a
+ * dash); `cell` is the target cell itself (teleport, revive).
+ */
+export const EFFECT_TARGETS = ['enemies', 'allies', 'self', 'caster', 'summons', 'cell'] as const;
 export type EffectTarget = (typeof EFFECT_TARGETS)[number];
 
 export interface Effect {

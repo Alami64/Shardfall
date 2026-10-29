@@ -2,12 +2,13 @@
   "name": "@shardfall/tools",
   "private": true,
   "version": "0.1.0",
-  "description": "Content pipeline: test map generator, Tiled-to-game map converter, spell validation.",
+  "description": "Content pipeline: test map generator, Tiled-to-game map converter, spell and monster validation.",
   "type": "module",
   "scripts": {
     "generate": "tsx src/generate-test-maps.ts",
     "convert": "tsx src/convert-maps.ts",
-    "spells": "tsx src/build-spells.ts"
+    "spells": "tsx src/build-spells.ts",
+    "monsters": "tsx src/build-monsters.ts"
   },
   "dependencies": {
     "@shardfall/shared": "*",
