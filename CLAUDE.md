@@ -22,6 +22,8 @@ npm run art            # redraw placeholder sprites (needs Python 3 + Pillow)
 
 Before finishing any change: `npm test && npm run typecheck && npm run build` must pass.
 
+To see a change running, use the `run-shardfall` skill (`.claude/skills/run-shardfall/`): `driver.ts` drives the client in headless Chromium and takes screenshots, `fight-smoke.ts` plays fights through the engine and prints the log.
+
 ## Layout
 
 - `packages/shared` — game rules with no rendering or I/O: grid math, A* pathfinding, line of sight, map types, seeded RNG (`rng.ts`), stats (`stats.ts`), formulas (`formulas.ts`), spell types (`spell.ts`), areas (`zone.ts`), fight types and queries (`fightState.ts`), fight actions (`fight.ts`) on top of the internal `engine.ts`. The client today and the server from M2 both import it. Tests in `packages/shared/test`.
