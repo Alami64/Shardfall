@@ -17,6 +17,8 @@ Shardfall is a browser-based, turn-based tactical MMORPG on an isometric grid, b
 
 **Target audience:** players aged 16+ who like tactics games (Into the Breach, Wakfu, XCOM) and long-term MMO progression; sessions of 20–90 minutes on desktop browsers first, tablets later.
 
+**Launch scope.** The first release is deliberately small: **3 classes, 3 regions, level cap 60**, and a lean combat ruleset in the spirit of the 2005–2009 era (no erosion, no pushback damage). Everything else in this document that sits outside that scope is marked *later*; the systems are built so classes, regions and levels can be added as data.
+
 **Core loop:** explore a map → engage a monster group → win the tactical fight → earn XP, currency and resources → level up, craft or buy better gear → take on harder zones and dungeons.
 
 ```mermaid
@@ -42,11 +44,9 @@ The Shardlands are an archipelago formed when the Heartcrystal, a world-sized ge
 | --- | --- | --- |
 | Brightmoor Isle | 1–15 | Tutorial island, farm fields, the first village |
 | Gildhaven | 10–60 | Neutral capital: marketplaces, profession workshops, Waystone hub |
-| Thornwild Forest | 20–50 | Dense woods, beast and fungus monsters |
-| Saltreach Coast | 40–80 | Fishing towns, pirate camps, sea caves |
-| Emberveld | 70–120 | Volcanic badlands, mining, fire elementals |
-| Frostmere Peaks | 110–160 | Glacier passes, high-level dungeons |
-| The Fracture | 150–200 | Unstable zone around the Heartcrystal's core, end-game bosses |
+| Thornwild Forest | 20–60 | Dense woods, beast and fungus monsters |
+
+**Later regions**, each raising the level cap when it arrives: Saltreach Coast (fishing towns, pirate camps, sea caves), Emberveld (volcanic badlands, mining, fire elementals), Frostmere Peaks (glacier passes, high-level dungeons) and The Fracture (the unstable zone around the Heartcrystal's core, end-game bosses).
 
 **Alignment factions.** Two rival city-states, Dawnspire (order, light) and Gloamhold (ambition, shadow), recruit players at level 10. Alignment unlocks PvP, territory control and faction quests (see Economy and social).
 
@@ -54,17 +54,24 @@ The Shardlands are an archipelago formed when the Heartcrystal, a world-sized ge
 
 ## Characters
 
-Players pick one of 12 original classes, each built around a role and 2–3 of the four damage elements. Elements map to characteristics: **Earth = Strength, Fire = Intelligence, Water = Chance, Air = Agility**, plus Neutral (scales with Strength).
+Players pick one of 3 original classes at launch, each built around a role and 2–3 of the four damage elements; more classes come later. Elements map to characteristics: **Earth = Strength, Fire = Intelligence, Water = Chance, Air = Agility**, plus Neutral (scales with Strength).
 
 ### Classes
+
+**Launch classes**
 
 | Class | Role | Main elements | Signature mechanic |
 | --- | --- | --- | --- |
 | Vanguard | Melee damage | Earth, Air | Leaps onto targets; bonus damage after moving |
 | Longshot | Ranged damage | Air, Fire | Long range, damage grows with distance |
 | Mender | Healer | Fire, Water | Heals that also grant AP; resurrects once per fight |
+
+**Later classes** (ideas to keep, not in the launch scope):
+
+| Class | Role | Main elements | Signature mechanic |
+| --- | --- | --- | --- |
 | Warden | Tank | Earth, Fire | Shields allies, redirects damage to self |
-| Tidecaller | Control mage | Water, Air | Pushback and pull; water puddles slow enemies |
+| Tidecaller | Control mage | Water, Air | Push and pull; water puddles slow enemies |
 | Hexweaver | Debuffer | Water, Air | AP/MP removal, curses that spread on death |
 | Shepherd | Summoner | Earth, Water | Up to 4 beast summons with their own turns |
 | Gambit | Luck | All four | Dice rolls pick the element and bonus of each hit |
@@ -84,14 +91,14 @@ Players pick one of 12 original classes, each built around a role and 2–3 of t
 | Chance | +1% Water damage per point; +1 Prospecting per 10 points |
 | Agility | +1% Air damage per point; +1 Dodge and Lock per 10 points |
 
-**Derived and secondary stats:** HP (55 + 5 per level + Vitality), AP (base 6, +1 at level 100), MP (base 3), Range, Initiative, Prospecting, Dodge, Lock, AP/MP Parry, AP/MP Removal, Critical %, Critical Damage, Power, flat Damage per element, Heals, Summons, Pushback Damage, and per-element resistances (% and flat).
+**Derived and secondary stats:** HP (55 + 5 per level + Vitality), AP (base 6; a 7th at level 100 once the cap allows it), MP (base 3), Range, Initiative, Prospecting, Dodge, Lock, AP/MP Parry, AP/MP Removal, Critical %, Critical Damage, Power, flat Damage per element, Heals, Summons, and per-element resistances (% and flat).
 
 ### Leveling
 
-- Levels 1–200. XP curve is exponential; level 200 takes roughly 6 months of regular play.
+- Levels 1–60 at launch; each later region raises the cap. The XP curve is exponential.
 - Each level grants **5 characteristic points**. Cost per point rises with the current value: 1 point each up to 100, 2 up to 200, 3 up to 300, 4 beyond. Vitality always costs 1; Wisdom costs 3.
 - **Scrolls** found in the world add permanent base points (up to 100 per characteristic) without spending level points.
-- Players can reset characteristics for free at level-up milestones (every 50 levels) or with a consumable.
+- Players can reset characteristics for free at level-up milestones (levels 20, 40 and 60) or with a consumable.
 - Spells unlock by level (see Spells); there are no spell points to spend.
 
 ## Tactical combat
@@ -111,7 +118,7 @@ Fights happen on the same isometric map the players were exploring: the map lock
 4. **Turns (30 s each).** At turn start, the unit's AP and MP refill, then buffs and poisons tick and durations decrement. The unit casts spells (AP), moves (MP) and ends its turn. Unused AP and MP are lost. A round ends when the order wraps around.
 5. **End.** A team wins when every opponent is dead or has fled. If both teams are wiped out by the same action, the fight is a draw. Rewards are rolled and the map unlocks.
 
-The fight state lives in [`packages/shared/src/fight.ts`](../packages/shared/src/fight.ts). Each action (join, place, start, move, end turn, flee, take damage) is a pure function that returns either an error code or a new state plus the events it produced, without changing its input, so the AI can try moves freely and the server can validate an intent before committing it. Timers stay with the caller, which ends placement or a turn when they run out.
+The fight state lives in [`packages/shared/src/fight.ts`](../packages/shared/src/fight.ts). Each action (join, place, start, move, cast, end turn, flee, take damage) is a pure function that returns either an error code or a new state plus the events it produced, without changing its input, so the AI can try moves freely and the server can validate an intent before committing it. Timers stay with the caller, which ends placement or a turn when they run out.
 
 ### Rules that make positioning matter
 
@@ -119,8 +126,8 @@ The fight state lives in [`packages/shared/src/fight.ts`](../packages/shared/src
 - **Range shapes:** circle (Manhattan), straight line only, diagonal only; minimum and maximum range; some ranges can be boosted by +Range gear.
 - **Area shapes:** single cell, circle of radius n, cross, line, cone, square, ring.
 - **Tackle:** leaving a cell adjacent to enemies costs a share of MP and AP based on your Dodge versus their total Lock.
-- **Pushback:** units pushed into an obstacle or another unit take pushback damage for each cell they could not travel.
-- **Erosion:** 10% of damage taken also lowers max HP for the rest of the fight, so healing cannot undo everything.
+- **Push and pull:** some spells move units a few cells; an obstacle, another unit or the map edge simply stops them, with no collision damage.
+- **No erosion:** damage never lowers max HP, so heals can bring a unit all the way back.
 
 ### Formulas
 
@@ -158,7 +165,15 @@ AP/MP removal chance per point removed:
 P = 0.5 \times \frac{\text{removal}}{\text{parry}} \times \frac{\text{currentPoints}}{\text{maxPoints}}
 ```
 
-Clamped between 10% and 90%. Pushback damage per blocked cell is (casterLevel / 2 + 32 + pushbackDamage) / 4.
+Clamped between 10% and 90%; a parry below 1 counts as 1.
+
+Heals (Intelligence = the healer's stat, Heals = flat heal bonus):
+
+```math
+\text{heal} = \left\lfloor \text{base} \times \frac{100 + \text{Intelligence}}{100} \right\rfloor + \text{Heals}
+```
+
+The formulas are pure functions in [`packages/shared/src/formulas.ts`](../packages/shared/src/formulas.ts), each tested against hand-computed values.
 
 ### Buffs, states and summons
 
@@ -177,7 +192,7 @@ Clamped between 10% and 90%. Pushback damage per blocked cell is (casterLevel / 
 
 ## Spells
 
-Each class has **20 spells arranged as 10 variant pairs**. A pair unlocks at a set level, and the player equips one spell from each pair on their bar, so the build choice is which side of each pair to bring. Each spell has three grades that upgrade automatically: grade 2 at 50 levels after unlock and grade 3 at 100 levels after unlock (capped at level 200).
+Each class has **20 spells arranged as 10 variant pairs**. A pair unlocks at a set level, and the player equips one spell from each pair on their bar, so the build choice is which side of each pair to bring. Each spell has three grades that upgrade automatically: grade 2 at 20 levels after unlock and grade 3 at 40 levels after unlock (both reached by the level cap at the latest).
 
 ### Data model
 
@@ -220,6 +235,47 @@ interface Effect {
 interface Spell { id: string; classId: string; name: string; unlockLevel: number; pairId: string; grades: SpellGrade[] }
 ```
 
+The types live in [`packages/shared/src/spell.ts`](../packages/shared/src/spell.ts). Spell content is one JSON file per class in `content/spells/`; `npm run spells:build` (part of `npm run build`) validates it with a zod schema typed against those types, checks the cross-field rules (min range ≤ max range, min roll ≤ max roll, damage has an element, at most two spells per pair, both with the same class and unlock level) and writes `content/spells/built/spells.json`.
+
+### Casting rules
+
+A cast is checked in this order; the first failure is the error the player sees. The checks are in [`packages/shared/src/fight.ts`](../packages/shared/src/fight.ts) (`spellError`, `castError`, `castSpell`).
+
+1. It is the caster's turn, and the spell is on its bar.
+2. **AP:** the caster has at least the grade's AP cost.
+3. **Cooldown:** cast on the caster's own turn *t*, the spell is castable again from its turn *t* + cooldown, so cooldown 1 means once per turn. Initial cooldown delays the first cast to the caster's turn 1 + initialCooldown.
+4. **Casts per turn:** 0 means unlimited.
+5. **Target cell:** a walkable cell of the map (obstacles and holes cannot be targeted).
+6. **Range:** Manhattan distance in grid coordinates between minRange and maxRange. +Range (gear, buffs) extends maxRange only on boostable spells and can never bring it below minRange. Range 0 is the caster's own cell.
+7. **Line rules:** castInLine needs the target on one of the caster's grid axes; castInDiagonal needs it on an exact grid diagonal; with both, either works.
+8. **Free cell:** a spell that needs one cannot target a fighter.
+9. **Casts per target:** counted per fighter on the target cell, per turn; 0 means unlimited.
+10. **Line of sight:** map obstacles and fighters block it; the caster's and target's own cells never do.
+
+Casting spends the AP and records the cooldown and counts; per-turn counts reset at the start of the caster's next turn. A character's grade follows its level: grade 2 at unlock level + 20 and grade 3 at unlock level + 40, both reached by the level cap (60) at the latest.
+
+### Effects
+
+Casting rolls the critical hit first, then applies the grade's effects (or its critical effects) in the order listed. Each effect hits the fighters in its area that its `targets` allow (`self` = the caster, `allies` = the caster's team, `enemies` = the other team), from the centre outwards, skipping those that fail `requiresState` / `forbidsState`. Once a team has nobody standing, the remaining effects do not run. The engine is in [`packages/shared/src/engine.ts`](../packages/shared/src/engine.ts).
+
+- **Critical hits:** rolled once per cast, only on spells that have critical effects, with chance = the grade's critical chance + the caster's Critical %. A critical hit uses the critical effects and adds Critical Damage to each damage effect.
+- **damage:** rolled once per effect (min–max), shared by every target, through the damage formula, then each target's resistances (players capped at 50%). Shields absorb first.
+- **steal:** damage that heals the caster for half the HP it took.
+- **heal:** the heal formula, up to the target's max HP.
+- **shield:** absorbs damage before HP, for `duration` turns: min–max points, or `params.maxHpPercent` of the target's max HP.
+- **buff / debuff:** `params.stat` names the stat (AP, MP, Range, Lock, a characteristic, ...); per-element stats (`damage`, `resistPercent`, `resistFlat`) take the effect's `element`, or all elements when it has none. A debuff subtracts. AP and MP changes on the fighter whose turn it is apply to its points at once. Only AP and MP may be instant (`duration` 0): that changes the points left this turn.
+- **state:** adds the tag in `params.state` for `duration` turns. The engine knows **rooted**: a rooted fighter cannot be pushed, pulled or swapped.
+- **push / pull:** `params.cells` cells along the grid axis from the caster to the target (the larger gap; the x axis on a diagonal). An obstacle, a fighter or the map edge stops the movement, with no damage; a pull stops next to whatever is in the way, the caster included.
+- **removeAP / removeMP:** each point removed (min–max) is rolled with the removal formula. On the target's own turn the points come off what it has left; otherwise they come off its next turn, as a debuff lasting `duration` turns (at least 1). "Current points" is what the target would start its turn with.
+- **teleport:** moves the caster to the target cell if it is free. **swap:** the caster and the fighter on the target cell trade places.
+- Not supported yet, and rejected by the content check: **summon**, **glyph**, **trap**, and damage over time (damage with a duration).
+
+**Durations** count down at the start of the caster's turns: a 1-turn buff lasts until the caster's next turn starts, so a buff cast on an ally covers the ally's next turn. When a fighter leaves the board, its buffs and the buffs it cast end. At the start of a turn, expired buffs go first, then AP and MP refill with the remaining buffs counted.
+
+**Tackle** applies each time a moving fighter leaves a cell orthogonally next to enemies, against their total Lock. If it leaves the fighter no MP for the next step, the walk stops there. The movement preview ignores tackle.
+
+**Areas.** A zone's size counts cells beyond its centre, so size 0 is always the centre alone. Circle is Manhattan distance ≤ size, ring exactly size, square both axis gaps ≤ size, cross the centre plus size cells along each grid axis. Line and cone point away from the caster, along the grid axis with the larger gap between caster and target (the x axis on an exact diagonal or a self-cast): a line is the centre plus size cells further on, a cone widens by one cell per side for each step. Cells off the map are dropped, and effects resolve from the centre outwards. Area previews come from `zoneCells` in [`packages/shared/src/zone.ts`](../packages/shared/src/zone.ts).
+
 ### Sample kits (first three pairs per class)
 
 | Class | Pair 1 | Pair 2 | Pair 3 |
@@ -227,9 +283,8 @@ interface Spell { id: string; classId: string; name: string; unlockLevel: number
 | Vanguard | Cleave (3 AP, Earth, melee) / Gale Cut (3 AP, Air, range 1–2) | Leap (2 AP, jump to a cell 1–4) / Charge (3 AP, dash in line, push 1) | Rally (2 AP, +1 MP to allies in circle 2) / Brace (2 AP, +20% resistances, 1 turn) |
 | Longshot | Piercing Arrow (4 AP, Air, range 3–10, line damage) / Ember Arrow (4 AP, Fire, range 3–8, circle 1) | Eagle Eye (2 AP, +4 Range, 3 turns) / Steady Aim (2 AP, +15% damage, cannot move this turn) | Recoil Shot (3 AP, damage + push self 2) / Pinning Shot (3 AP, -2 MP to target) |
 | Mender | Mending Light (3 AP, heal, range 1–6) / Searing Light (3 AP, Fire damage) | Quickening (2 AP, +2 AP to ally next turn) / Wellspring (4 AP, heal glyph circle 1, 2 turns) | Rebirth (6 AP, revive an ally at 30% HP, once per fight) / Sanctuary (4 AP, shield = 15% max HP) |
-| Warden | Bulwark (3 AP, shield ally) / Shield Bash (4 AP, Earth, push 2) | Taunt (2 AP, pulls enemy 3 cells toward self) / Hold the Line (2 AP, +100 Lock, 1 turn) | Intercept (3 AP, takes 50% of ally's damage, 2 turns) / Fortify (3 AP, Rooted, +30% resistances) |
 
-The remaining eight classes follow the same pattern; their full kits are a content task for milestone M1 (see Roadmap).
+Full 20-spell kits for the three launch classes are a content task for milestone M1 (see Roadmap); later classes follow the same pattern.
 
 ## Exploration
 
@@ -464,11 +519,11 @@ Grid coordinates are used for range, areas, pathfinding and line of sight; scree
 shardfall/
   docs/         this design document
   packages/
-    shared/     grid math, pathfinding, line of sight, map types, fight state (spell engine next)
+    shared/     grid math, pathfinding, line of sight, map types, fight engine (turns, spells, effects)
     client/     Phaser scenes, HUD, asset loading
     server/     Colyseus rooms, persistence, AI (from M2)
     tools/      map generator and converter, placeholder art
-  content/      maps today; spells, items, monsters, quests later (JSON)
+  content/      maps and spells today; items, monsters, quests later (JSON)
   assets/       sprites, atlases, audio
 ```
 
@@ -477,7 +532,7 @@ shardfall/
 - **AI cost:** utility scoring on large groups; mitigated by pruning and a per-turn time budget.
 - **Server load per map:** busy towns may hold hundreds of players; interest management limits updates to visible actors.
 - **Exploits:** all randomness (damage rolls, drops, crafting) is rolled on the server with seeded RNG logged per fight for replays and audits.
-- **Asset volume:** 12 classes × animations × directions is the largest art cost; use 4 drawn directions mirrored to 8.
+- **Asset volume:** classes × animations × directions is the largest art cost (3 classes at launch); use 4 drawn directions mirrored to 8.
 
 ## Roadmap
 
@@ -486,13 +541,13 @@ Seven milestones over roughly 46 weeks for a team of 3–5, with go/no-go gates 
 ```mermaid
 flowchart TB
     M0["M0 · Foundations — weeks 1–4<br/>Monorepo, isometric renderer, Tiled map converter, A* pathfinding, click-to-move"]
-    M1["M1 · Combat prototype (offline) — weeks 5–10<br/>Local fights vs AI: 4 classes with full kits, line of sight, tackle, AI archetypes"]
+    M1["M1 · Combat prototype (offline) — weeks 5–10<br/>Local fights vs AI: 3 classes with full kits, line of sight, tackle, AI archetypes"]
     G1{{"Gate: playtesters ask to replay fights"}}
     M2["M2 · Online fights — weeks 11–16<br/>Colyseus MapRoom and FightRoom, accounts, PostgreSQL persistence, server-rolled RNG"]
     M3["M3 · Vertical slice — weeks 17–24<br/>Brightmoor and Gildhaven (about 40 maps), monster groups, levels 1–60, drops, 1 dungeon"]
     G2{{"Gate: a 30-minute session feels complete"}}
     M4["M4 · Economy — weeks 25–32<br/>Gathering and crafting professions, marketplace, trading, banks, smithmagic"]
-    M5["M5 · Social and PvP — weeks 33–40<br/>Groups, guilds, alignment, 3v3 arena, the remaining 8 classes"]
+    M5["M5 · Social and PvP — weeks 33–40<br/>Thornwild Forest, groups, guilds, alignment, 3v3 arena"]
     M6["M6 · Closed alpha — weeks 41–46<br/>Invite-only test, balance passes, monitoring, exploit hunting"]
     G3{{"Gate: open beta"}}
     M0 --> M1 --> G1 --> M2 --> M3 --> G2 --> M4 --> M5 --> M6 --> G3
@@ -506,7 +561,10 @@ If the offline combat prototype does not make people want another fight, everyth
 - [x] Set up the monorepo (shared, client, server, tools) with Vite, TypeScript strict mode and Zod content validation
 - [x] Write the Tiled-to-JSON map converter and test maps
 - [x] Render the isometric grid in Phaser with click-to-move and A* pathfinding
-- [x] Fight state in `shared`: placement, initiative order, turns, AP/MP, movement, erosion, end conditions, seeded RNG
-- [ ] Implement the spell engine in `shared`: range shapes, areas, line of sight, cooldowns, damage, tackle, pushback, AP/MP removal
-- [ ] Write full 20-spell kits for the four prototype classes (Vanguard, Longshot, Mender, Warden)
-- [ ] Commission placeholder art: one tileset, four class sprites, three monsters
+- [x] Fight state in `shared`: placement, initiative order, turns, AP/MP, movement, end conditions, seeded RNG
+- [x] Spell data model and casting in `shared`: range shapes, line rules, areas, line of sight, cooldowns, cast limits; spell content validated at build
+- [x] Spell effects in `shared`: damage and criticals, steal, heals, shields, buffs and states, push/pull, AP/MP removal, teleport, swap; tackle on movement
+- [ ] Summons, glyphs, traps and damage over time
+- [x] Cut the launch scope: 3 classes, 3 regions, level cap 60, no erosion, no pushback damage
+- [ ] Write full 20-spell kits for the three launch classes (Vanguard, Longshot, Mender)
+- [ ] Commission placeholder art: one tileset, three class sprites, three monsters
