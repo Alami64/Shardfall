@@ -111,7 +111,7 @@ Fights happen on the same isometric map the players were exploring: the map lock
 4. **Turns (30 s each).** At turn start, the unit's AP and MP refill, then buffs and poisons tick and durations decrement. The unit casts spells (AP), moves (MP) and ends its turn. Unused AP and MP are lost. A round ends when the order wraps around.
 5. **End.** A team wins when every opponent is dead or has fled. If both teams are wiped out by the same action, the fight is a draw. Rewards are rolled and the map unlocks.
 
-The fight state lives in [`packages/shared/src/fight.ts`](../packages/shared/src/fight.ts). Each action (join, place, start, move, end turn, flee, take damage) is a pure function that returns either an error code or a new state plus the events it produced, without changing its input, so the AI can try moves freely and the server can validate an intent before committing it. Timers stay with the caller, which ends placement or a turn when they run out.
+The fight state lives in [`packages/shared/src/fight.ts`](../packages/shared/src/fight.ts). Each action (join, place, start, move, cast, end turn, flee, take damage) is a pure function that returns either an error code or a new state plus the events it produced, without changing its input, so the AI can try moves freely and the server can validate an intent before committing it. Timers stay with the caller, which ends placement or a turn when they run out.
 
 ### Rules that make positioning matter
 
@@ -158,7 +158,15 @@ AP/MP removal chance per point removed:
 P = 0.5 \times \frac{\text{removal}}{\text{parry}} \times \frac{\text{currentPoints}}{\text{maxPoints}}
 ```
 
-Clamped between 10% and 90%. Pushback damage per blocked cell is (casterLevel / 2 + 32 + pushbackDamage) / 4.
+Clamped between 10% and 90%; a parry below 1 counts as 1. Pushback damage per blocked cell is (casterLevel / 2 + 32 + pushbackDamage) / 4, rounded down over all blocked cells.
+
+Heals (Intelligence = the healer's stat, Heals = flat heal bonus):
+
+```math
+\text{heal} = \left\lfloor \text{base} \times \frac{100 + \text{Intelligence}}{100} \right\rfloor + \text{Heals}
+```
+
+The formulas are pure functions in [`packages/shared/src/formulas.ts`](../packages/shared/src/formulas.ts), each tested against hand-computed values.
 
 ### Buffs, states and summons
 
@@ -238,6 +246,26 @@ A cast is checked in this order; the first failure is the error the player sees.
 10. **Line of sight:** map obstacles and fighters block it; the caster's and target's own cells never do.
 
 Casting spends the AP and records the cooldown and counts; per-turn counts reset at the start of the caster's next turn. A character's grade follows its level: grade 2 at unlock level + 50 and grade 3 at unlock level + 100, both reached by level 200 at the latest.
+
+### Effects
+
+Casting rolls the critical hit first, then applies the grade's effects (or its critical effects) in the order listed. Each effect hits the fighters in its area that its `targets` allow (`self` = the caster, `allies` = the caster's team, `enemies` = the other team), from the centre outwards, skipping those that fail `requiresState` / `forbidsState`. Once a team has nobody standing, the remaining effects do not run. The engine is in [`packages/shared/src/engine.ts`](../packages/shared/src/engine.ts).
+
+- **Critical hits:** rolled once per cast, only on spells that have critical effects, with chance = the grade's critical chance + the caster's Critical %. A critical hit uses the critical effects and adds Critical Damage to each damage effect.
+- **damage:** rolled once per effect (min–max), shared by every target, through the damage formula, then each target's resistances (players capped at 50%). Shields absorb first; erosion takes 10% of the HP actually lost.
+- **steal:** damage that heals the caster for half the HP it took.
+- **heal:** the heal formula, up to the target's eroded max HP.
+- **shield:** absorbs damage before HP, for `duration` turns: min–max points, or `params.maxHpPercent` of the target's max HP.
+- **buff / debuff:** `params.stat` names the stat (AP, MP, Range, Lock, a characteristic, ...); per-element stats (`damage`, `resistPercent`, `resistFlat`) take the effect's `element`, or all elements when it has none. A debuff subtracts. AP and MP changes on the fighter whose turn it is apply to its points at once. Only AP and MP may be instant (`duration` 0): that changes the points left this turn.
+- **state:** adds the tag in `params.state` for `duration` turns. The engine knows **rooted**: a rooted fighter cannot be pushed, pulled or swapped.
+- **push / pull:** `params.cells` cells along the grid axis from the caster to the target (the larger gap; the x axis on a diagonal). A push that hits an obstacle, a fighter or the map edge deals pushback damage for each cell left, not reduced by resistances (shields still absorb). A pull stops next to whatever is in the way, the caster included, without damage.
+- **removeAP / removeMP:** each point removed (min–max) is rolled with the removal formula. On the target's own turn the points come off what it has left; otherwise they come off its next turn, as a debuff lasting `duration` turns (at least 1). "Current points" is what the target would start its turn with.
+- **teleport:** moves the caster to the target cell if it is free. **swap:** the caster and the fighter on the target cell trade places.
+- Not supported yet, and rejected by the content check: **summon**, **glyph**, **trap**, and damage over time (damage with a duration).
+
+**Durations** count down at the start of the caster's turns: a 1-turn buff lasts until the caster's next turn starts, so a buff cast on an ally covers the ally's next turn. When a fighter leaves the board, its buffs and the buffs it cast end. At the start of a turn, expired buffs go first, then AP and MP refill with the remaining buffs counted.
+
+**Tackle** applies each time a moving fighter leaves a cell orthogonally next to enemies, against their total Lock. If it leaves the fighter no MP for the next step, the walk stops there. The movement preview ignores tackle.
 
 **Areas.** A zone's size counts cells beyond its centre, so size 0 is always the centre alone. Circle is Manhattan distance ≤ size, ring exactly size, square both axis gaps ≤ size, cross the centre plus size cells along each grid axis. Line and cone point away from the caster, along the grid axis with the larger gap between caster and target (the x axis on an exact diagonal or a self-cast): a line is the centre plus size cells further on, a cone widens by one cell per side for each step. Cells off the map are dropped, and effects resolve from the centre outwards. Area previews come from `zoneCells` in [`packages/shared/src/zone.ts`](../packages/shared/src/zone.ts).
 
@@ -485,7 +513,7 @@ Grid coordinates are used for range, areas, pathfinding and line of sight; scree
 shardfall/
   docs/         this design document
   packages/
-    shared/     grid math, pathfinding, line of sight, map types, fight state, spell casting
+    shared/     grid math, pathfinding, line of sight, map types, fight engine (turns, spells, effects)
     client/     Phaser scenes, HUD, asset loading
     server/     Colyseus rooms, persistence, AI (from M2)
     tools/      map generator and converter, placeholder art
@@ -529,6 +557,7 @@ If the offline combat prototype does not make people want another fight, everyth
 - [x] Render the isometric grid in Phaser with click-to-move and A* pathfinding
 - [x] Fight state in `shared`: placement, initiative order, turns, AP/MP, movement, erosion, end conditions, seeded RNG
 - [x] Spell data model and casting in `shared`: range shapes, line rules, areas, line of sight, cooldowns, cast limits; spell content validated at build
-- [ ] Spell effects in `shared`: damage and criticals, heals, tackle, pushback, AP/MP removal, buffs and states
+- [x] Spell effects in `shared`: damage and criticals, steal, heals, shields, buffs and states, push/pull with pushback damage, AP/MP removal, teleport, swap; tackle on movement
+- [ ] Summons, glyphs, traps and damage over time
 - [ ] Write full 20-spell kits for the four prototype classes (Vanguard, Longshot, Mender, Warden)
 - [ ] Commission placeholder art: one tileset, four class sprites, three monsters

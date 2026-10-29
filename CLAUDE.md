@@ -23,7 +23,7 @@ Before finishing any change: `npm test && npm run typecheck && npm run build` mu
 
 ## Layout
 
-- `packages/shared` — game rules with no rendering or I/O: grid math, A* pathfinding, line of sight, map types, seeded RNG (`rng.ts`), fight state and spell casting (`fight.ts`), spell types (`spell.ts`), areas (`zone.ts`). The client today and the server from M2 both import it. Tests in `packages/shared/test`.
+- `packages/shared` — game rules with no rendering or I/O: grid math, A* pathfinding, line of sight, map types, seeded RNG (`rng.ts`), stats (`stats.ts`), formulas (`formulas.ts`), spell types (`spell.ts`), areas (`zone.ts`), fight types and queries (`fightState.ts`), fight actions (`fight.ts`) on top of the internal `engine.ts`. The client today and the server from M2 both import it. Tests in `packages/shared/test`.
 - `packages/client` — Phaser scenes (`BootScene`, `MapScene`), DOM HUD (`index.html` + `src/hud.ts`), config in `src/config.ts`.
 - `packages/tools` — map generator, Tiled converter (`src/tiled.ts` holds the zod schema), spell validation (`src/spells.ts`), placeholder art (`art/generate_placeholder_art.py`).
 - `packages/server` — empty until M2 (Colyseus).
@@ -34,7 +34,7 @@ Before finishing any change: `npm test && npm run typecheck && npm run build` mu
 ## Rules of the codebase
 
 - **Gameplay logic goes in `shared`**, as pure deterministic functions with Vitest tests. The client only renders and forwards input. Randomness must be injectable (an `Rng` from `createRng(seed)` passed in, never `Math.random`), because the server will roll it from M2 on.
-- **Fight actions** (`fight.ts`) take a `FightState` and return `{ ok: false, error }` or `{ ok: true, state, events }` without mutating the input. New actions (spell casts) follow the same shape.
+- **Fight actions** (`fight.ts`) take a `FightState` and return `{ ok: false, error }` or `{ ok: true, state, events }` without mutating the input. They validate, `cloneFight`, then let `engine.ts` edit the copy; engine functions mutate and must never see a caller's state, so `index.ts` does not export them. Rolls come from the `Rng` passed to the action.
 - **Grid vs screen coordinates.** A map is 14 cells across × 40 staggered lines = 560 cells. Gameplay (range, areas, distance, pathfinding, LoS) uses diamond grid coordinates from `cellToGrid`; screen pixels (`cellToScreen`) are for drawing only. Never compute gameplay from pixels.
 - **Combat movement is orthogonal only** (`findPath` without `diagonals`, `reachableCells`); diagonal steps are for exploration.
 - **Content is data.** Spells, monsters and items go in typed JSON under `content/`, validated with zod at build time, not hard-coded in TypeScript. Follow the spell data model in `docs/design.md`; enum lists (`ELEMENTS`, `EFFECT_KINDS`, ...) are constants in `spell.ts` so the zod schema and the types share them.
@@ -45,7 +45,7 @@ Before finishing any change: `npm test && npm run typecheck && npm run build` mu
 ## Next up: M1 (offline combat prototype)
 
 1. ~~Fight state in `shared`: placement on start cells, initiative order, turns, AP/MP, end conditions.~~ Done (`fight.ts`). Tackle and buff ticks hook into `moveFighter` and `beginTurn`.
-2. Spell data model and engine. **2a done**: types, content validation, cast rules (range, line rules, LoS, areas, cooldowns, cast limits) in `castSpell`, which spends AP but applies no effects yet. **2b next**: resolve effects in `castSpell` (damage with criticals, heals, push/pull, AP/MP removal, buffs and states), tackle in `moveFighter`; formulas exactly as in `docs/design.md`, each with tests. Fighter stats will need power, flat damage, resistances, dodge, lock, parry, removal.
+2. ~~Spell data model and engine.~~ Done: cast rules (`fight.ts`), effects (`engine.ts`, rules in `docs/design.md` > Spells > Effects), formulas (`formulas.ts`), tackle in `moveFighter`. Summons, glyphs, traps and damage over time are not supported yet; the content check rejects them.
 3. First kits for Vanguard, Longshot, Mender and Warden (start with the 3 pairs per class in the doc). Pair 1 of Vanguard and Longshot is already in `content/spells/`, with provisional numbers.
 4. Monster AI by utility scoring (Brute and Caster archetypes first).
 5. Client: a fight on Brightmoor Meadow against one monster group, with a turn timeline, spell bar, range and area previews. The test maps have no start cells flagged yet; add them in the map generator.

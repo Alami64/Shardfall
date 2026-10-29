@@ -2,7 +2,7 @@
 
 A browser-based, turn-based tactical MMORPG on an isometric grid, built with Phaser 3 and TypeScript. The full design lives in [docs/design.md](docs/design.md).
 
-This repository has finished **milestone M0 (Foundations)**: the isometric renderer, map pipeline and click-to-move exploration. **M1 (combat prototype)** is under way: the fight state and spell casting rules are in `shared`, with no fight in the client yet.
+This repository has finished **milestone M0 (Foundations)**: the isometric renderer, map pipeline and click-to-move exploration. **M1 (combat prototype)** is under way: the fight engine (turns, spells and their effects, tackle) is in `shared`, with no fight in the client yet.
 
 ## Quick start
 
@@ -11,7 +11,7 @@ Requires Node 20+ (tested on Node 22) and Python 3 with Pillow (only to regenera
 ```bash
 npm install          # an .npmrc sets legacy-peer-deps to sidestep an npm workspace bug
 npm run dev          # http://localhost:5173
-npm test             # rules tests: grid, pathfinding, line of sight, fights, spells
+npm test             # rules tests: grid, pathfinding, line of sight, fights, spells, formulas
 npm run typecheck
 npm run build        # one self-contained file: packages/client/dist/index.html
 ```
@@ -32,7 +32,7 @@ npm run build        # one self-contained file: packages/client/dist/index.html
 shardfall/
   docs/                design document
   packages/
-    shared/   grid math, A* pathfinding, line of sight, map types, fight state (+ tests)
+    shared/   grid math, A* pathfinding, line of sight, map types, fight engine (+ tests)
     client/   Phaser scenes, HUD, Vite single-file build
     tools/    test-map generator, Tiled -> game map converter, placeholder art
     server/   empty until M2 (Colyseus rooms)
@@ -73,6 +73,6 @@ Spells are data: `content/spells/<class>.json` holds a list of spells in the for
 
 - ~~Fight state machine in `shared`: placement, initiative order, turns, AP/MP.~~ Done: `packages/shared/src/fight.ts`.
 - ~~Spell data model and casting rules (range, line of sight, areas, cooldowns).~~ Done: `spell.ts`, `zone.ts`, `fight.ts`.
-- Spell effects: damage, heals, tackle, pushback, AP/MP removal, buffs.
+- ~~Spell effects: damage, heals, tackle, pushback, AP/MP removal, buffs.~~ Done: `formulas.ts`, `engine.ts`.
 - The first kits for Vanguard, Longshot, Mender and Warden.
 - Monster AI by utility scoring; one monster group on Brightmoor Meadow to fight.

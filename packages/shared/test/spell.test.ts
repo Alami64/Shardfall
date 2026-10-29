@@ -13,7 +13,6 @@ import {
   spellRange,
   spellRangeCells,
   type FightState,
-  type FighterSetup,
   type Spell,
   type SpellCatalogue,
   type SpellGrade,
@@ -30,9 +29,8 @@ const B_CELL = cell(12, 5);
  */
 function duel(spells: Spell[], range = 0): FightState {
   const slots = spells.map((s) => ({ spellId: s.id, grade: 1 }));
-  const a = fighter('a', 'A', 100, { spells: slots });
-  const withRange: FighterSetup = { ...a, stats: { ...a.stats, range } };
-  const state = started([withRange, fighter('b', 'B', 50, { spells: slots })], 1, spells);
+  const a = fighter('a', 'A', 100, { spells: slots, stats: { range } });
+  const state = started([a, fighter('b', 'B', 50, { spells: slots })], 1, spells);
   return teleport(teleport(state, 'a', A_CELL), 'b', B_CELL);
 }
 
@@ -40,7 +38,7 @@ function duel(spells: Spell[], range = 0): FightState {
 const nextTurnOfA = (state: FightState) => expectOk(endTurn(expectOk(endTurn(state, 'a')).state, 'b')).state;
 
 const cast = (state: FightState, spellId: string, target: number) =>
-  expectOk(castSpell(state, 'a', spellId, target)).state;
+  expectOk(castSpell(state, 'a', spellId, target, createRng(1))).state;
 
 const only = (g: Partial<SpellGrade>) => [spell('s', grade(g))];
 
@@ -98,17 +96,19 @@ describe('spell loadout', () => {
 describe('castSpell', () => {
   it('spends AP and reports the cast', () => {
     const state = duel(only({ apCost: 4 }));
-    const r = expectOk(castSpell(state, 'a', 's', B_CELL));
+    const r = expectOk(castSpell(state, 'a', 's', B_CELL, createRng(1)));
     expect(getFighter(r.state, 'a')!.ap).toBe(2);
-    expect(r.events).toEqual([{ type: 'spellCast', fighterId: 'a', spellId: 's', grade: 1, cell: B_CELL }]);
-    expect(castSpell(r.state, 'a', 's', B_CELL)).toEqual({ ok: false, error: 'not-enough-ap' });
+    expect(r.events).toEqual([
+      { type: 'spellCast', fighterId: 'a', spellId: 's', grade: 1, cell: B_CELL, critical: false },
+    ]);
+    expect(castSpell(r.state, 'a', 's', B_CELL, createRng(1))).toEqual({ ok: false, error: 'not-enough-ap' });
   });
 
   it('only works for the active fighter, with a spell on its bar', () => {
     const state = duel(only({}));
-    expect(castSpell(state, 'b', 's', A_CELL)).toEqual({ ok: false, error: 'not-your-turn' });
-    expect(castSpell(state, 'a', 'other', B_CELL)).toEqual({ ok: false, error: 'unknown-spell' });
-    expect(castSpell(create([fighter('a', 'A', 0)]), 'a', 's', B_CELL)).toEqual({
+    expect(castSpell(state, 'b', 's', A_CELL, createRng(1))).toEqual({ ok: false, error: 'not-your-turn' });
+    expect(castSpell(state, 'a', 'other', B_CELL, createRng(1))).toEqual({ ok: false, error: 'unknown-spell' });
+    expect(castSpell(create([fighter('a', 'A', 0)]), 'a', 's', B_CELL, createRng(1))).toEqual({
       ok: false,
       error: 'wrong-phase',
     });
@@ -117,7 +117,7 @@ describe('castSpell', () => {
   it('never changes the state it was given', () => {
     const state = duel(only({ cooldown: 2, castsPerTarget: 1 }));
     const snapshot = JSON.stringify({ ...state, map: null });
-    castSpell(state, 'a', 's', B_CELL);
+    castSpell(state, 'a', 's', B_CELL, createRng(1));
     expect(JSON.stringify({ ...state, map: null })).toBe(snapshot);
   });
 });

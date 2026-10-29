@@ -3,11 +3,13 @@ import {
   CellFlag,
   createFight,
   createRng,
+  fighterStats,
   gridToCell,
   startFight,
   type FightResult,
   type FightState,
   type FighterSetup,
+  type FighterStats,
   type GameMap,
   type Spell,
   type SpellGrade,
@@ -54,26 +56,15 @@ export function fighter(
   id: string,
   team: Team,
   initiative: number,
-  extra: Partial<Omit<FighterSetup, 'stats'>> & { mp?: number; maxHp?: number } = {},
+  extra: Partial<Omit<FighterSetup, 'stats'>> & { mp?: number; maxHp?: number; stats?: Partial<FighterStats> } = {},
 ): FighterSetup {
-  const { mp = 3, maxHp = 100, ...rest } = extra;
+  const { mp = 3, maxHp = 100, stats = {}, ...rest } = extra;
   return {
     id,
     name: id,
     team,
     controller: 'player',
-    stats: {
-      level: 1,
-      maxHp,
-      ap: 6,
-      mp,
-      initiative,
-      strength: 0,
-      intelligence: 0,
-      chance: 0,
-      agility: 0,
-      range: 0,
-    },
+    stats: fighterStats({ maxHp, mp, initiative, ...stats }),
     ...rest,
   };
 }

@@ -8,8 +8,12 @@ import {
   EFFECT_KINDS,
   EFFECT_TARGETS,
   ELEMENTS,
+  ELEMENT_STATS,
   MAX_LEVEL,
+  SCALAR_STATS,
   ZONE_SHAPES,
+  isElementStat,
+  isScalarStat,
   type Effect,
   type Spell,
 } from '@shardfall/shared';
@@ -62,17 +66,66 @@ export const spellSchema: z.ZodType<Spell> = z.strictObject({
 /** One content file: a list of spells, usually one class. */
 export const spellFileSchema = z.array(spellSchema);
 
-const ROLLED: ReadonlySet<Effect['kind']> = new Set(['damage', 'steal', 'heal', 'shield']);
+/** Effect kinds whose amount is rolled from min..max. */
+const ROLLED: ReadonlySet<Effect['kind']> = new Set([
+  'damage',
+  'steal',
+  'heal',
+  'buff',
+  'debuff',
+  'removeAP',
+  'removeMP',
+]);
 const ELEMENTAL: ReadonlySet<Effect['kind']> = new Set(['damage', 'steal']);
+const UNSUPPORTED: ReadonlySet<Effect['kind']> = new Set(['summon', 'glyph', 'trap']);
 
+const positiveInt = (v: unknown) => typeof v === 'number' && Number.isInteger(v) && v > 0;
+
+/** What each effect kind needs from min/max, element, duration and params (design doc, Spells > Effects). */
 function checkEffect(e: Effect, where: string): string[] {
   const errors: string[] = [];
+  const p = e.params ?? {};
+  if (UNSUPPORTED.has(e.kind)) errors.push(`${where}: ${e.kind} effects are not supported yet`);
   if (ROLLED.has(e.kind) && (e.min === undefined || e.max === undefined)) {
     errors.push(`${where}: ${e.kind} needs min and max`);
   }
   if (e.min !== undefined && e.max !== undefined && e.min > e.max) errors.push(`${where}: min ${e.min} > max ${e.max}`);
   if (ELEMENTAL.has(e.kind) && !e.element) errors.push(`${where}: ${e.kind} needs an element`);
+  if (ELEMENTAL.has(e.kind) && (e.duration ?? 0) > 0) errors.push(`${where}: damage over time is not supported yet`);
   if (e.zone.shape === 'single' && e.zone.size !== 0) errors.push(`${where}: a single-cell zone has size 0`);
+  switch (e.kind) {
+    case 'buff':
+    case 'debuff': {
+      const stat = typeof p.stat === 'string' ? p.stat : '';
+      if (!isScalarStat(stat) && !isElementStat(stat)) {
+        errors.push(`${where}: params.stat must be one of ${[...SCALAR_STATS, ...ELEMENT_STATS].join(', ')}`);
+      } else if (isScalarStat(stat) && e.element) {
+        errors.push(`${where}: element only applies to ${ELEMENT_STATS.join(', ')}`);
+      }
+      if ((e.duration ?? 0) === 0 && stat !== 'ap' && stat !== 'mp') {
+        errors.push(`${where}: only ap and mp changes can be instant; give a duration`);
+      }
+      break;
+    }
+    case 'push':
+    case 'pull':
+      if (!positiveInt(p.cells)) errors.push(`${where}: ${e.kind} needs params.cells, a positive integer`);
+      break;
+    case 'state':
+      if (typeof p.state !== 'string' || !p.state) errors.push(`${where}: state needs params.state`);
+      break;
+    case 'shield':
+      if (p.maxHpPercent === undefined && (e.min === undefined || e.max === undefined)) {
+        errors.push(`${where}: shield needs min and max, or params.maxHpPercent`);
+      }
+      if (p.maxHpPercent !== undefined && !positiveInt(p.maxHpPercent)) {
+        errors.push(`${where}: params.maxHpPercent must be a positive integer`);
+      }
+      break;
+    case 'teleport':
+      if (!e.targets.includes('cell')) errors.push(`${where}: teleport targets the cell`);
+      break;
+  }
   return errors;
 }
 
