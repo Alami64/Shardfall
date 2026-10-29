@@ -2,6 +2,7 @@ import { CELL_COUNT } from './grid.js';
 import { CellFlag, hasFlag, isWalkable, type GameMap } from './map.js';
 import { reachableCells } from './pathfinding.js';
 import { shuffle, type Rng } from './rng.js';
+import type { AiProfile } from './monster.js';
 import type { Element, Spell } from './spell.js';
 import { ELEMENTS } from './spell.js';
 import type { ElementStat, FighterStats, ScalarStat } from './stats.js';
@@ -66,6 +67,8 @@ export interface FighterSetup {
   hp?: number;
   /** Spells the fighter can cast; each must be in the fight's spell catalogue. */
   spells?: SpellSlot[];
+  /** How the AI plays this fighter (monsters; also lets the AI stand in for a player). */
+  ai?: AiProfile;
 }
 
 export type FighterStatus = 'alive' | 'dead' | 'fled';
@@ -91,6 +94,7 @@ export interface Fighter {
   turns: number;
   /** Buffs, debuffs, states and shields on this fighter, oldest first. */
   buffs: Buff[];
+  readonly ai?: Readonly<AiProfile>;
 }
 
 export type FightPhase = 'placement' | 'fighting' | 'ended';

@@ -1,51 +1,62 @@
 /**
  * Plays fights through the real fight engine (packages/shared) with the built
- * spell content, using a naive controller: cast any spell that can hit the
- * enemy (and the few self-buffs), else take one step towards a preferred
- * distance, repeat, end turn. Prints a turn-by-turn log, or one line per seed.
+ * content, every fighter driven by the monster AI (playAiTurn). Prints a
+ * turn-by-turn log, or one line per seed.
  *
- *   npx tsx .claude/skills/run-shardfall/fight-smoke.ts            # one fight, full log (seed 7)
- *   npx tsx .claude/skills/run-shardfall/fight-smoke.ts 3          # seed 3
- *   npx tsx .claude/skills/run-shardfall/fight-smoke.ts 1-20       # 20 fights, winner and length only
+ *   npx tsx .claude/skills/run-shardfall/fight-smoke.ts                 # meadow battle, seed 7, full log
+ *   npx tsx .claude/skills/run-shardfall/fight-smoke.ts 3 duel          # Vanguard vs Longshot, seed 3
+ *   npx tsx .claude/skills/run-shardfall/fight-smoke.ts 1-20 meadow     # 20 fights: winner and length, then a tally
  *
- * The client does not run fights yet, so this is how to see engine changes play out.
- * The controller is not the monster AI; it plays badly, so read balance results loosely.
+ * Scenarios: `meadow` = Vanguard, Longshot and Mender against two Thornback Boars and a Dewdrop Wisp;
+ * `duel` = Vanguard against Longshot. The client does not run fights yet, so this is how to see
+ * engine, content and AI changes play out.
  */
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as S from '../../../packages/shared/src/index.ts';
-import type { FightEvent, FightResult, FightState, SpellCatalogue, WorldData } from '../../../packages/shared/src/index.ts';
+import type { FightEvent, FightState, MonsterCatalogue, SpellCatalogue, WorldData } from '../../../packages/shared/src/index.ts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const world = JSON.parse(readFileSync(`${ROOT}/content/maps/built/world.json`, 'utf8')) as WorldData;
 const { spells } = JSON.parse(readFileSync(`${ROOT}/content/spells/built/spells.json`, 'utf8')) as SpellCatalogue;
+const { monsters } = JSON.parse(readFileSync(`${ROOT}/content/monsters/built/monsters.json`, 'utf8')) as MonsterCatalogue;
 const map = world.maps.find((m) => m.id === 'brightmoor_0_0')!;
 const LEVEL = 6; // all three spell pairs unlocked
-const SELF_BUFFS = new Set(['rally', 'brace', 'eagle_eye']);
-
 const kit = (cls: string) => spells.filter((s) => s.classId === cls).map((s) => ({ spellId: s.id, grade: 1 }));
 const hp = S.characterMaxHp(LEVEL, 0);
-const setups: S.FighterSetup[] = [
-  {
-    id: 'Vanguard',
-    name: 'Vanguard',
-    team: 'A',
-    controller: 'player',
-    spells: kit('vanguard'),
-    stats: S.fighterStats({ level: LEVEL, maxHp: hp, strength: 30, agility: 10, initiative: 10 }),
+const hero = (id: string, ai: S.AiProfile, stats: Partial<S.FighterStats>): S.FighterSetup => ({
+  id,
+  name: id,
+  team: 'A',
+  controller: 'player',
+  ai, // the AI stands in for the player
+  spells: kit(id.toLowerCase()),
+  stats: S.fighterStats({ level: LEVEL, maxHp: hp, ...stats }),
+});
+const vanguard = hero('Vanguard', { archetype: 'brute', preferredRange: 1 }, { strength: 30, agility: 10, initiative: 10 });
+const longshot = hero('Longshot', { archetype: 'caster', preferredRange: 5 }, { agility: 30, intelligence: 10 });
+const mender = hero('Mender', { archetype: 'caster', preferredRange: 4 }, { intelligence: 30, chance: 10 });
+const monster = (id: string) => monsters.find((m) => m.id === id)!;
+
+// The test maps have no start cells flagged yet, so each scenario names its own (walkable cells on the meadow).
+const SCENARIOS: Record<string, { setups: S.FighterSetup[]; startCells: Record<S.Team, number[]> }> = {
+  meadow: {
+    setups: [
+      vanguard,
+      longshot,
+      mender,
+      S.monsterSetup(monster('thornback_boar'), 1, 'Boar1', 'B'),
+      S.monsterSetup(monster('thornback_boar'), 2, 'Boar2', 'B'),
+      S.monsterSetup(monster('dewdrop_wisp'), 2, 'Wisp', 'B'),
+    ],
+    startCells: { A: [339, 325, 353], B: [316, 302, 330] },
   },
-  {
-    id: 'Longshot',
-    name: 'Longshot',
-    team: 'B',
-    controller: 'ai',
-    spells: kit('longshot'),
-    stats: S.fighterStats({ level: LEVEL, maxHp: hp, agility: 30, intelligence: 10 }),
+  duel: {
+    setups: [vanguard, { ...longshot, team: 'B' }],
+    startCells: { A: [339], B: [315] },
   },
-];
-/** Preferred distance to the enemy for each fighter's naive movement. */
-const PREFERRED: Record<string, number> = { Vanguard: 1, Longshot: 5 };
+};
 
 const g = (c: number) => {
   const p = S.cellToGrid(c);
@@ -75,60 +86,53 @@ function describe(e: FightEvent): string | null {
   }
 }
 
-function fight(seed: number, log: boolean): { winner: S.Team | null; rounds: number } {
+function fight(scenario: string, seed: number, log: boolean): { winner: S.Team | null; rounds: number; ms: number } {
+  const { setups, startCells } = SCENARIOS[scenario] ?? SCENARIOS.meadow!;
   const rng = S.createRng(seed);
-  let state: FightState;
-  const apply = (r: FightResult) => {
-    if (!r.ok) return false;
-    state = r.state;
-    if (log) for (const e of r.events) {
+  const print = (events: FightEvent[]) => {
+    if (!log) return;
+    for (const e of events) {
       const line = describe(e);
       if (line) console.log(line);
     }
-    return true;
   };
-  // The test maps have no start cells flagged yet: two cells on the dirt path, 8 apart.
-  const created = S.createFight(map, setups, rng, { startCells: { A: [339], B: [315] }, spells });
+  const created = S.createFight(map, setups, rng, { startCells, spells });
   if (!created.ok) throw new Error(created.error);
-  state = created.state;
-  if (log) console.log(`seed ${seed}: Vanguard at ${g(339)} vs Longshot at ${g(315)}, level ${LEVEL}, ${hp} HP each`);
-  apply(S.startFight(state, rng));
-
-  for (let turn = 0; turn < 60 && state.phase === 'fighting'; turn++) {
-    const me = S.activeFighter(state)!.id;
-    const foeId = state.fighters.find((f) => f.id !== me)!.id;
-    for (let guard = 0; guard < 20 && S.activeFighter(state)?.id === me; guard++) {
-      const f = S.getFighter(state, me)!;
-      const foe = S.getFighter(state, foeId)!;
-      const cast = f.spells.find(({ spellId }) =>
-        SELF_BUFFS.has(spellId)
-          ? S.castError(state, me, spellId, f.cell) === null
-          : S.castError(state, me, spellId, foe.cell) === null,
-      );
-      if (cast) {
-        apply(S.castSpell(state, me, cast.spellId, SELF_BUFFS.has(cast.spellId) ? f.cell : foe.cell, rng));
-        continue;
-      }
-      const off = (c: number) => Math.abs(S.distance(c, foe.cell) - PREFERRED[me]!);
-      const step = [...S.movementRange(state, me)].filter(([, cost]) => cost === 1).map(([c]) => c).sort((a, b) => off(a) - off(b))[0];
-      if (step === undefined || off(step) >= off(f.cell) || !apply(S.moveFighter(state, me, [step]))) break;
-    }
-    if (S.activeFighter(state)?.id === me) apply(S.endTurn(state, me));
+  const started = S.startFight(created.state, rng);
+  if (!started.ok) throw new Error(started.error);
+  let state: FightState = started.state;
+  if (log) {
+    console.log(`seed ${seed}, ${scenario}: ${state.fighters.map((f) => `${f.name} (${f.team}) at ${g(f.cell)}`).join(', ')}`);
+    console.log(`turn order: ${state.turnOrder.join(', ')}`);
   }
-  return { winner: state.winner, rounds: state.round };
+  print(started.events);
+
+  let ms = 0;
+  let turns = 0;
+  while (state.phase === 'fighting' && turns < 300) {
+    const t0 = performance.now();
+    const r = S.playAiTurn(state, S.activeFighter(state)!.id, rng);
+    ms += performance.now() - t0;
+    turns++;
+    if (!r.ok) throw new Error(r.error);
+    state = r.state;
+    print(r.events);
+  }
+  return { winner: state.winner, rounds: state.round, ms: ms / turns };
 }
 
-const arg = process.argv[2] ?? '7';
+const [arg = '7', scenario = 'meadow'] = process.argv.slice(2);
 const range = arg.match(/^(\d+)-(\d+)$/);
+const teamName = (t: S.Team | null) => (t === null ? 'draw' : t === 'A' ? 'heroes' : scenario === 'duel' ? 'Longshot' : 'monsters');
 if (range) {
   const tally: Record<string, number> = {};
   for (let seed = Number(range[1]); seed <= Number(range[2]); seed++) {
-    const { winner, rounds } = fight(seed, false);
-    const who = winner === null ? 'draw' : winner === 'A' ? 'Vanguard' : 'Longshot';
-    tally[who] = (tally[who] ?? 0) + 1;
-    console.log(`seed ${seed}: ${who} wins in round ${rounds}`);
+    const { winner, rounds, ms } = fight(scenario, seed, false);
+    tally[teamName(winner)] = (tally[teamName(winner)] ?? 0) + 1;
+    console.log(`seed ${seed}: ${teamName(winner)} win in round ${rounds} (AI ${ms.toFixed(1)} ms per turn)`);
   }
   console.log(JSON.stringify(tally));
 } else {
-  fight(Number(arg), true);
+  const { ms } = fight(scenario, Number(arg), true);
+  console.log(`(AI ${ms.toFixed(1)} ms per turn on average)`);
 }

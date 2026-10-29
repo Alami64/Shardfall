@@ -1,0 +1,491 @@
+[
+  {
+    "id": "boar_gore",
+    "classId": "monster",
+    "name": "Gore",
+    "unlockLevel": 1,
+    "pairId": "boar_gore",
+    "grades": [
+      {
+        "apCost": 4,
+        "minRange": 1,
+        "maxRange": 1,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 1,
+        "castsPerTarget": 0,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 5,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "earth",
+            "min": 10,
+            "max": 13,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "damage",
+            "element": "earth",
+            "min": 14,
+            "max": 17,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ]
+      },
+      {
+        "apCost": 4,
+        "minRange": 1,
+        "maxRange": 1,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 1,
+        "castsPerTarget": 0,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 5,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "earth",
+            "min": 12,
+            "max": 15,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "damage",
+            "element": "earth",
+            "min": 16,
+            "max": 19,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ]
+      },
+      {
+        "apCost": 4,
+        "minRange": 1,
+        "maxRange": 1,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 1,
+        "castsPerTarget": 0,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 5,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "earth",
+            "min": 14,
+            "max": 17,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "damage",
+            "element": "earth",
+            "min": 18,
+            "max": 21,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "boar_headbutt",
+    "classId": "monster",
+    "name": "Headbutt",
+    "unlockLevel": 1,
+    "pairId": "boar_headbutt",
+    "grades": [
+      {
+        "apCost": 2,
+        "minRange": 1,
+        "maxRange": 1,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "neutral",
+            "min": 3,
+            "max": 5,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 2,
+        "minRange": 1,
+        "maxRange": 1,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "neutral",
+            "min": 4,
+            "max": 6,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 2,
+        "minRange": 1,
+        "maxRange": 1,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "neutral",
+            "min": 5,
+            "max": 7,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": []
+      }
+    ]
+  },
+  {
+    "id": "wisp_dew_bolt",
+    "classId": "monster",
+    "name": "Dew Bolt",
+    "unlockLevel": 1,
+    "pairId": "wisp_dew_bolt",
+    "grades": [
+      {
+        "apCost": 3,
+        "minRange": 2,
+        "maxRange": 6,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 2,
+        "castsPerTarget": 0,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 5,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "water",
+            "min": 6,
+            "max": 8,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "damage",
+            "element": "water",
+            "min": 9,
+            "max": 11,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ]
+      },
+      {
+        "apCost": 3,
+        "minRange": 2,
+        "maxRange": 6,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 2,
+        "castsPerTarget": 0,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 5,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "water",
+            "min": 7,
+            "max": 10,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "damage",
+            "element": "water",
+            "min": 10,
+            "max": 13,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ]
+      },
+      {
+        "apCost": 3,
+        "minRange": 2,
+        "maxRange": 6,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 2,
+        "castsPerTarget": 0,
+        "cooldown": 0,
+        "initialCooldown": 0,
+        "criticalChance": 5,
+        "effects": [
+          {
+            "kind": "damage",
+            "element": "water",
+            "min": 9,
+            "max": 12,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ],
+        "criticalEffects": [
+          {
+            "kind": "damage",
+            "element": "water",
+            "min": 12,
+            "max": 15,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "enemies"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "wisp_soothing_dew",
+    "classId": "monster",
+    "name": "Soothing Dew",
+    "unlockLevel": 1,
+    "pairId": "wisp_soothing_dew",
+    "grades": [
+      {
+        "apCost": 2,
+        "minRange": 1,
+        "maxRange": 5,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 2,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "heal",
+            "min": 8,
+            "max": 10,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ]
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 2,
+        "minRange": 1,
+        "maxRange": 5,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 2,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "heal",
+            "min": 10,
+            "max": 12,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ]
+          }
+        ],
+        "criticalEffects": []
+      },
+      {
+        "apCost": 2,
+        "minRange": 1,
+        "maxRange": 5,
+        "rangeBoostable": false,
+        "castInLine": false,
+        "castInDiagonal": false,
+        "needsLineOfSight": true,
+        "needsFreeCell": false,
+        "castsPerTurn": 0,
+        "castsPerTarget": 0,
+        "cooldown": 2,
+        "initialCooldown": 0,
+        "criticalChance": 0,
+        "effects": [
+          {
+            "kind": "heal",
+            "min": 12,
+            "max": 15,
+            "zone": {
+              "shape": "single",
+              "size": 0
+            },
+            "targets": [
+              "allies"
+            ]
+          }
+        ],
+        "criticalEffects": []
+      }
+    ]
+  }
+]

@@ -109,6 +109,7 @@ export function joinFight(state: FightState, setup: FighterSetup, rng: Rng): Fig
     spellUsage,
     turns: 0,
     buffs: [],
+    ...(setup.ai && { ai: { ...setup.ai } }),
   });
   return { ok: true, state: next, events: [{ type: 'joined', fighterId: setup.id, cell }] };
 }

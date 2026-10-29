@@ -321,6 +321,15 @@ Resources (trees, ore, plants, fishing spots) respawn on a timer after harvestin
 
 Monsters use the same stats and spell system as players, so one combat engine runs everything. Each monster has 1–5 grades (level variants) with their own HP, resistances and spell grades.
 
+**Data.** A monster is an id, a name, an AI profile (archetype and preferred range) and its grades; each grade sets a level, the stats that differ from the level-1 defaults (max HP is required) and its spells at a spell grade. Monster spells are ordinary spells with `classId` `monster`, in `content/spells/monsters.json`. Monsters live in `content/monsters/*.json`; `npm run monsters:build` (part of `npm run build`, after the spells) validates them against the spell catalogue and writes `content/monsters/built/monsters.json`. `monsterSetup` in [`packages/shared/src/monster.ts`](../packages/shared/src/monster.ts) turns a grade into a fighter.
+
+**Launch monsters (Brightmoor Meadow)**, grades at levels 2, 3 and 4:
+
+| Monster | Archetype | Spells | Notes |
+| --- | --- | --- | --- |
+| Thornback Boar | Brute | Gore (4 AP, Earth 10–13, melee, once per turn), Headbutt (2 AP, Neutral 3–5, melee) | 70–94 HP; resists Earth, weak to Fire |
+| Dewdrop Wisp | Caster, range 5 | Dew Bolt (3 AP, Water 6–8, range 2–6, twice per turn), Soothing Dew (2 AP, heal an ally 8–10, range 1–5) | 48–64 HP; resists Water, weak to Air; plays early (high initiative) |
+
 ### Monster AI
 
 The AI picks actions by **utility scoring** rather than scripted behaviour trees:
@@ -340,6 +349,24 @@ The AI picks actions by **utility scoring** rather than scripted behaviour trees
 | Boss | Scripted phases at HP thresholds on top of utility scoring |
 
 Scoring is capped (top N cells by distance, pruned spells) so a turn resolves in under 50 ms on the server.
+
+**How it is built** ([`packages/shared/src/ai.ts`](../packages/shared/src/ai.ts); Brute and Caster so far):
+
+- Options are tried with the real actions on copies of the fight: each reachable cell is reached with `moveFighter` (so tackle counts, and a walk tackle cuts short ends where it really ends), and each cast is `castSpell` with "average" rolls (the middle of every range, no critical hit, removals that are likelier than not succeed). Targets tried: every fighter's cell, the cells next to them, and the caster's own.
+- A cast is scored from its events: damage to enemies, kills, heals and shields on allies, AP/MP removed from enemies, buffs on allies and debuffs or states on enemies; damage to its own side counts against it (×1.5), a winning cast is worth everything. Then the position it leaves the caster in is added: distance from its preferred range to the nearest enemy, line of sight to that enemy, and how many enemies could walk up to it next turn.
+- The six best casts also get the value of the best cast that could follow from the same cell, so a buff is cast before the hit it improves.
+- It casts the best option while any cast is worth something, then spends leftover MP on a better position, then ends its turn. The same state always gives the same plan; only the real casts roll dice.
+
+| Weight | Brute | Caster |
+| --- | --- | --- |
+| Damage, heals (per HP) | 1 | 1 |
+| Kill | 40 | 40 |
+| Control (per AP/MP removed, per buff or debuff) | 4 | 4 |
+| Per cell away from preferred range | 3 | 3 |
+| Nearest enemy out of sight | 0 | 6 |
+| Per enemy that can reach it next turn | 0 | 4 |
+
+A turn takes about 5–20 ms with six fighters on the meadow. The same AI can stand in for players (give a fighter an `ai` profile), which is how fights are simulated before the client plays them: `.claude/skills/run-shardfall/fight-smoke.ts`.
 
 ### Dungeons
 
@@ -526,11 +553,11 @@ Grid coordinates are used for range, areas, pathfinding and line of sight; scree
 shardfall/
   docs/         this design document
   packages/
-    shared/     grid math, pathfinding, line of sight, map types, fight engine (turns, spells, effects)
+    shared/     grid math, pathfinding, line of sight, map types, fight engine (turns, spells, effects), monster AI
     client/     Phaser scenes, HUD, asset loading
     server/     Colyseus rooms, persistence, AI (from M2)
     tools/      map generator and converter, placeholder art
-  content/      maps and spells today; items, monsters, quests later (JSON)
+  content/      maps, spells and monsters today; items, quests later (JSON)
   assets/       sprites, atlases, audio
 ```
 
@@ -574,5 +601,7 @@ If the offline combat prototype does not make people want another fight, everyth
 - [ ] Summons, glyphs, traps and damage over time
 - [x] Cut the launch scope: 3 classes, 3 regions, level cap 60, no erosion, no pushback damage
 - [x] First three spell pairs for the three launch classes, played through the engine in tests
+- [x] Monster data and the first two Brightmoor Meadow monsters (Thornback Boar, Dewdrop Wisp), validated at build
+- [x] Monster AI by utility scoring: Brute and Caster archetypes, under 50 ms per turn
 - [ ] Write full 20-spell kits for the three launch classes (Vanguard, Longshot, Mender)
 - [ ] Commission placeholder art: one tileset, three class sprites, three monsters

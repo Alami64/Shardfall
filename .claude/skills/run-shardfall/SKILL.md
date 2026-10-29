@@ -1,12 +1,13 @@
 ---
 name: run-shardfall
-description: Run, start, build, test, screenshot and drive the Shardfall game. Use when asked to launch the client, take screenshots of the map or overlays, click to move, walk to another map, check a change in the real app, or play fights through the combat engine (spells, effects, balance) from the command line.
+description: Run, start, build, test, screenshot and drive the Shardfall game. Use when asked to launch the client, take screenshots of the map or overlays, click to move, walk to another map, check a change in the real app, or play fights through the combat engine and monster AI (spells, effects, monsters, balance) from the command line.
 ---
 
 Shardfall has two things to run. The **client** (Phaser on Vite) is driven in headless Chromium by
 `.claude/skills/run-shardfall/driver.ts`, which starts and stops the dev server itself. The **fight
 engine** (`packages/shared`) has no on-screen fights yet (they arrive in M1 step 5), so
-`.claude/skills/run-shardfall/fight-smoke.ts` plays fights through it and prints a turn-by-turn log.
+`.claude/skills/run-shardfall/fight-smoke.ts` plays fights through it, every fighter driven by the
+monster AI, and prints a turn-by-turn log.
 Most changes in M1 touch the engine: run the fight smoke for those, the driver for client changes.
 
 All paths are relative to the repo root.
@@ -51,15 +52,16 @@ cell 339; 251 is an east exit; 426 is open grass.
 ## Run the fight engine
 
 ```bash
-npx tsx .claude/skills/run-shardfall/fight-smoke.ts          # Vanguard vs Longshot, seed 7, full log
-npx tsx .claude/skills/run-shardfall/fight-smoke.ts 3        # another seed
-npx tsx .claude/skills/run-shardfall/fight-smoke.ts 1-20     # 20 fights: winner and length per seed, then a tally
+npx tsx .claude/skills/run-shardfall/fight-smoke.ts                # meadow: 3 heroes vs 2 boars + a wisp, seed 7, full log
+npx tsx .claude/skills/run-shardfall/fight-smoke.ts 3 duel         # Vanguard vs Longshot, seed 3
+npx tsx .claude/skills/run-shardfall/fight-smoke.ts 1-20 meadow    # 20 fights: winner, length, AI ms per turn; then a tally
 ```
 
-It reads the built content (`content/maps/built/world.json`, `content/spells/built/spells.json`), so
-run `npm run spells:build` after editing `content/spells/*.json`. The controller is naive (casts
-whatever reaches, walks one cell at a time towards a preferred distance), so a tally is a hint about
-balance, not a verdict. Edit `setups` in the script to try other classes, levels or stats.
+It reads the built content (`content/maps/built/world.json`, `content/spells/built/spells.json`,
+`content/monsters/built/monsters.json`), so run `npm run spells:build && npm run monsters:build` after
+editing content. Heroes are played by the same AI as monsters (Vanguard as a Brute, Longshot and
+Mender as Casters), so tallies say as much about the AI as about balance. Edit `SCENARIOS` in the
+script to try other line-ups, levels or stats.
 
 ## Run (human path)
 
@@ -91,6 +93,7 @@ All three must pass before finishing a change (CLAUDE.md).
   The driver spawns it detached and kills the process group. To stop a server you started by hand:
   `lsof -ti:5173 -sTCP:LISTEN | xargs -r kill`.
 - **The test maps have no start cells flagged** (`CellFlag.StartTeamA/B`), so `createFight` needs
-  `startCells` passed in; the fight smoke uses cells 339 and 315 on the meadow's dirt path.
+  `startCells` passed in; each fight-smoke scenario names its own (walkable meadow cells such as
+  339, 325, 353 against 316, 302, 330). Check a cell with `(map.flags[c] & 1) !== 0` before using it.
 - **tsx runs the scripts without type-checking.** To check them:
   `npx tsc --noEmit --strict --noUncheckedIndexedAccess --target ES2022 --module ESNext --moduleResolution Bundler --allowImportingTsExtensions --resolveJsonModule --skipLibCheck --types node .claude/skills/run-shardfall/driver.ts .claude/skills/run-shardfall/fight-smoke.ts`
