@@ -4,4 +4,6 @@ export * from './pathfinding.js';
 export * from './lineOfSight.js';
 export * from './rng.js';
 export * from './stats.js';
+export * from './spell.js';
+export * from './zone.js';
 export * from './fight.js';

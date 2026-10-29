@@ -1,7 +1,9 @@
-import { CELL_COUNT, neighbors } from './grid.js';
-import { CellFlag, hasFlag, isWalkable, type GameMap } from './map.js';
+import { CELL_COUNT, cellToGrid, distance, isValidCell, neighbors } from './grid.js';
+import { hasLineOfSight } from './lineOfSight.js';
+import { CellFlag, blocksLineOfSight, hasFlag, isWalkable, type GameMap } from './map.js';
 import { reachableCells } from './pathfinding.js';
 import { shuffle, type Rng } from './rng.js';
+import type { Spell, SpellGrade } from './spell.js';
 
 /**
  * Fight state: placement, initiative order, turns, AP/MP and end conditions
@@ -13,6 +15,10 @@ import { shuffle, type Rng } from './rng.js';
  * intent before committing it. Events are what the client animates and the
  * server broadcasts. Timers (placement, turn) belong to the caller, which calls
  * `startFight` or `endTurn` when they run out.
+ *
+ * Spell casting (design doc, Tactical combat > Rules that make positioning
+ * matter) is checked here too: AP cost, range, line of sight, cooldowns and
+ * cast limits. Resolving a spell's effects comes with the effect engine.
  */
 
 export type Team = 'A' | 'B';
@@ -37,6 +43,23 @@ export interface FighterStats {
   intelligence: number;
   chance: number;
   agility: number;
+  /** Bonus range for spells whose range is boostable; may be negative. */
+  range: number;
+}
+
+/** A spell on a fighter's bar, at a 1-based grade. */
+export interface SpellSlot {
+  spellId: string;
+  grade: number;
+}
+
+/** Per-spell bookkeeping for cooldowns and cast limits. */
+export interface SpellUsage {
+  /** The caster's own turn number from which the spell can be cast again. */
+  castableFromTurn: number;
+  castsThisTurn: number;
+  /** Casts this turn per target fighter id. */
+  castsOnTarget: Record<string, number>;
 }
 
 export interface FighterSetup {
@@ -48,6 +71,8 @@ export interface FighterSetup {
   stats: FighterStats;
   /** HP on entering the fight, clamped to 1..maxHp. Defaults to full. */
   hp?: number;
+  /** Spells the fighter can cast; each must be in the fight's spell catalogue. */
+  spells?: SpellSlot[];
 }
 
 export type FighterStatus = 'alive' | 'dead' | 'fled';
@@ -67,6 +92,10 @@ export interface Fighter {
   /** Cell id, or -1 once the fighter has left the board (dead or fled). */
   cell: number;
   status: FighterStatus;
+  readonly spells: readonly SpellSlot[];
+  spellUsage: Record<string, SpellUsage>;
+  /** Number of its own turns the fighter has started; 1 during its first turn. */
+  turns: number;
 }
 
 export type FightPhase = 'placement' | 'fighting' | 'ended';
@@ -74,6 +103,8 @@ export type FightPhase = 'placement' | 'fighting' | 'ended';
 export interface FightState {
   /** Shared and read-only: fight functions never copy or change it. */
   readonly map: GameMap;
+  /** Spell catalogue by id, shared and read-only like the map. */
+  readonly spells: Readonly<Record<string, Spell>>;
   readonly startCells: Readonly<Record<Team, readonly number[]>>;
   phase: FightPhase;
   /** In join order. */
@@ -94,6 +125,7 @@ export type FightEvent =
   | { type: 'fightStarted'; turnOrder: string[] }
   | { type: 'turnStarted'; fighterId: string; round: number }
   | { type: 'moved'; fighterId: string; path: number[] }
+  | { type: 'spellCast'; fighterId: string; spellId: string; grade: number; cell: number }
   | { type: 'turnEnded'; fighterId: string }
   | { type: 'damaged'; fighterId: string; amount: number; erosion: number; hp: number }
   | { type: 'died'; fighterId: string; cell: number }
@@ -113,7 +145,16 @@ export type FightError =
   | 'empty-path'
   | 'invalid-path'
   | 'cell-occupied'
-  | 'not-enough-mp';
+  | 'not-enough-mp'
+  | 'unknown-spell'
+  | 'not-enough-ap'
+  | 'on-cooldown'
+  | 'cast-limit'
+  | 'target-limit'
+  | 'invalid-target'
+  | 'out-of-range'
+  | 'not-in-line'
+  | 'no-line-of-sight';
 
 export type FightResult =
   | { ok: true; state: FightState; events: FightEvent[] }
@@ -125,9 +166,15 @@ const fail = (error: FightError): FightResult => ({ ok: false, error });
 function draft(state: FightState): FightState {
   return {
     ...state,
-    fighters: state.fighters.map((f) => ({ ...f })),
+    fighters: state.fighters.map((f) => ({ ...f, spellUsage: cloneUsage(f.spellUsage) })),
     turnOrder: [...state.turnOrder],
   };
+}
+
+function cloneUsage(usage: Record<string, SpellUsage>): Record<string, SpellUsage> {
+  const out: Record<string, SpellUsage> = {};
+  for (const [id, u] of Object.entries(usage)) out[id] = { ...u, castsOnTarget: { ...u.castsOnTarget } };
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -212,6 +259,8 @@ export function movementRange(state: FightState, fighterId: string): Map<number,
 export interface CreateFightOptions {
   /** Overrides the start cells flagged on the map. */
   startCells?: Record<Team, number[]>;
+  /** Every spell fighters in this fight may carry. */
+  spells?: readonly Spell[];
 }
 
 /** Opens a fight in the placement phase and places every fighter on a random free start cell of its team. */
@@ -224,6 +273,7 @@ export function createFight(
   const start = options.startCells ?? mapStartCells(map);
   let state: FightState = {
     map,
+    spells: Object.fromEntries((options.spells ?? []).map((sp) => [sp.id, sp])),
     startCells: { A: [...start.A], B: [...start.B] },
     phase: 'placement',
     fighters: [],
@@ -246,6 +296,13 @@ export function createFight(
 export function joinFight(state: FightState, setup: FighterSetup, rng: Rng): FightResult {
   if (state.phase !== 'placement') return fail('wrong-phase');
   if (getFighter(state, setup.id)) return fail('duplicate-fighter');
+  const slots = setup.spells ?? [];
+  const spellUsage: Record<string, SpellUsage> = {};
+  for (const slot of slots) {
+    const grade = state.spells[slot.spellId]?.grades[slot.grade - 1];
+    if (!grade || spellUsage[slot.spellId]) return fail('unknown-spell');
+    spellUsage[slot.spellId] = { castableFromTurn: 1 + grade.initialCooldown, castsThisTurn: 0, castsOnTarget: {} };
+  }
   const free = state.startCells[setup.team].filter((c) => !fighterAt(state, c));
   const cell = shuffle(rng, free)[0];
   if (cell === undefined) return fail('no-free-start-cell');
@@ -264,6 +321,9 @@ export function joinFight(state: FightState, setup: FighterSetup, rng: Rng): Fig
     mp: setup.stats.mp,
     cell,
     status: 'alive',
+    spells: slots.map((slot) => ({ ...slot })),
+    spellUsage,
+    turns: 0,
   });
   return { ok: true, state: next, events: [{ type: 'joined', fighterId: setup.id, cell }] };
 }
@@ -308,11 +368,19 @@ export function startFight(state: FightState, rng: Rng): FightResult {
 // ---------------------------------------------------------------------------
 // Turns
 
-/** Refills the active fighter's AP and MP. Buff and poison ticks will hook in here. */
+/**
+ * Refills the active fighter's AP and MP, counts the turn and resets per-turn
+ * cast counts. Buff and poison ticks will hook in here.
+ */
 function beginTurn(state: FightState, events: FightEvent[]): void {
   const f = activeFighter(state)!;
   f.ap = f.stats.ap;
   f.mp = f.stats.mp;
+  f.turns++;
+  for (const usage of Object.values(f.spellUsage)) {
+    usage.castsThisTurn = 0;
+    usage.castsOnTarget = {};
+  }
   events.push({ type: 'turnStarted', fighterId: f.id, round: state.round });
 }
 
@@ -432,4 +500,122 @@ export function applyDamage(state: FightState, fighterId: string, amount: number
     if (!checkEnd(next, events) && wasActive) passTurn(next, events);
   }
   return { ok: true, state: next, events };
+}
+
+// ---------------------------------------------------------------------------
+// Spells
+
+/** The grade a fighter carries a spell at, or undefined if the spell is not on its bar. */
+export function spellGradeOf(state: FightState, fighter: Fighter, spellId: string): SpellGrade | undefined {
+  const slot = fighter.spells.find((s) => s.spellId === spellId);
+  return slot && state.spells[spellId]?.grades[slot.grade - 1];
+}
+
+/** Min and max range of a grade for this fighter: +Range applies when boostable, never below the min. */
+export function spellRange(fighter: Fighter, grade: SpellGrade): { min: number; max: number } {
+  const bonus = grade.rangeBoostable ? fighter.stats.range : 0;
+  return { min: grade.minRange, max: Math.max(grade.minRange, grade.maxRange + bonus) };
+}
+
+/**
+ * Why the fighter cannot cast this spell right now, whatever the target, or
+ * null if it can: its turn, the spell on its bar, AP, cooldown, casts per turn.
+ * The spell bar greys out spells on this.
+ */
+export function spellError(state: FightState, fighterId: string, spellId: string): FightError | null {
+  const error = checkTurn(state, fighterId);
+  if (error) return error;
+  const f = getFighter(state, fighterId)!;
+  const grade = spellGradeOf(state, f, spellId);
+  const usage = f.spellUsage[spellId];
+  if (!grade || !usage) return 'unknown-spell';
+  if (f.ap < grade.apCost) return 'not-enough-ap';
+  if (f.turns < usage.castableFromTurn) return 'on-cooldown';
+  if (grade.castsPerTurn > 0 && usage.castsThisTurn >= grade.castsPerTurn) return 'cast-limit';
+  return null;
+}
+
+function inRange(fighter: Fighter, grade: SpellGrade, cell: number): boolean {
+  const { min, max } = spellRange(fighter, grade);
+  const d = distance(fighter.cell, cell);
+  return d >= min && d <= max;
+}
+
+/** The castInLine / castInDiagonal rule: a grid axis or an exact grid diagonal of the caster. */
+function fitsLineRule(fighter: Fighter, grade: SpellGrade, cell: number): boolean {
+  if (!grade.castInLine && !grade.castInDiagonal) return true;
+  const a = cellToGrid(fighter.cell);
+  const b = cellToGrid(cell);
+  const dx = Math.abs(b.x - a.x);
+  const dy = Math.abs(b.y - a.y);
+  return (grade.castInLine && (dx === 0 || dy === 0)) || (grade.castInDiagonal && dx === dy);
+}
+
+/**
+ * Why the fighter cannot cast this spell on `cell`, or null if it can. On top
+ * of spellError: the cell must be a walkable map cell within range, on a line
+ * or diagonal if the spell asks for one, free if it needs a free cell, under
+ * the per-target limit, and in line of sight if needed. Map obstacles and
+ * fighters block line of sight; the target cell never does.
+ */
+export function castError(state: FightState, fighterId: string, spellId: string, cell: number): FightError | null {
+  const error = spellError(state, fighterId, spellId);
+  if (error) return error;
+  const f = getFighter(state, fighterId)!;
+  const grade = spellGradeOf(state, f, spellId)!;
+  if (!isValidCell(cell) || !isWalkable(state.map, cell)) return 'invalid-target';
+  if (!inRange(f, grade, cell)) return 'out-of-range';
+  if (!fitsLineRule(f, grade, cell)) return 'not-in-line';
+  const target = fighterAt(state, cell);
+  if (grade.needsFreeCell && target) return 'cell-occupied';
+  const castsOnTarget = target ? (f.spellUsage[spellId]!.castsOnTarget[target.id] ?? 0) : 0;
+  if (grade.castsPerTarget > 0 && castsOnTarget >= grade.castsPerTarget) return 'target-limit';
+  if (grade.needsLineOfSight) {
+    const blocks = (c: number) => blocksLineOfSight(state.map, c) || fighterAt(state, c) !== undefined;
+    if (!hasLineOfSight(f.cell, cell, blocks)) return 'no-line-of-sight';
+  }
+  return null;
+}
+
+/**
+ * Walkable cells inside the spell's range and line/diagonal rule, before line
+ * of sight and units are considered. With castableCells, the client shows
+ * cells in range that cannot be targeted right now.
+ */
+export function spellRangeCells(state: FightState, fighterId: string, spellId: string): number[] {
+  const f = getFighter(state, fighterId);
+  const grade = f && spellGradeOf(state, f, spellId);
+  if (!f || !grade || f.cell === -1) return [];
+  const out: number[] = [];
+  for (let c = 0; c < CELL_COUNT; c++) {
+    if (isWalkable(state.map, c) && inRange(f, grade, c) && fitsLineRule(f, grade, c)) out.push(c);
+  }
+  return out;
+}
+
+/** Cells the fighter can cast this spell on right now. */
+export function castableCells(state: FightState, fighterId: string, spellId: string): number[] {
+  if (spellError(state, fighterId, spellId)) return [];
+  return spellRangeCells(state, fighterId, spellId).filter((c) => castError(state, fighterId, spellId, c) === null);
+}
+
+/**
+ * Casts a spell on a cell: spends its AP, starts its cooldown and counts the
+ * cast towards the per-turn and per-target limits.
+ */
+export function castSpell(state: FightState, fighterId: string, spellId: string, cell: number): FightResult {
+  const error = castError(state, fighterId, spellId, cell);
+  if (error) return fail(error);
+
+  const next = draft(state);
+  const f = getFighter(next, fighterId)!;
+  const slot = f.spells.find((s) => s.spellId === spellId)!;
+  const grade = spellGradeOf(next, f, spellId)!;
+  const usage = f.spellUsage[spellId]!;
+  f.ap -= grade.apCost;
+  usage.castsThisTurn++;
+  usage.castableFromTurn = Math.max(usage.castableFromTurn, f.turns + grade.cooldown);
+  const target = fighterAt(next, cell);
+  if (target) usage.castsOnTarget[target.id] = (usage.castsOnTarget[target.id] ?? 0) + 1;
+  return { ok: true, state: next, events: [{ type: 'spellCast', fighterId, spellId, grade: slot.grade, cell }] };
 }

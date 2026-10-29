@@ -220,6 +220,27 @@ interface Effect {
 interface Spell { id: string; classId: string; name: string; unlockLevel: number; pairId: string; grades: SpellGrade[] }
 ```
 
+The types live in [`packages/shared/src/spell.ts`](../packages/shared/src/spell.ts). Spell content is one JSON file per class in `content/spells/`; `npm run spells:build` (part of `npm run build`) validates it with a zod schema typed against those types, checks the cross-field rules (min range ≤ max range, min roll ≤ max roll, damage has an element, at most two spells per pair, both with the same class and unlock level) and writes `content/spells/built/spells.json`.
+
+### Casting rules
+
+A cast is checked in this order; the first failure is the error the player sees. The checks are in [`packages/shared/src/fight.ts`](../packages/shared/src/fight.ts) (`spellError`, `castError`, `castSpell`).
+
+1. It is the caster's turn, and the spell is on its bar.
+2. **AP:** the caster has at least the grade's AP cost.
+3. **Cooldown:** cast on the caster's own turn *t*, the spell is castable again from its turn *t* + cooldown, so cooldown 1 means once per turn. Initial cooldown delays the first cast to the caster's turn 1 + initialCooldown.
+4. **Casts per turn:** 0 means unlimited.
+5. **Target cell:** a walkable cell of the map (obstacles and holes cannot be targeted).
+6. **Range:** Manhattan distance in grid coordinates between minRange and maxRange. +Range (gear, buffs) extends maxRange only on boostable spells and can never bring it below minRange. Range 0 is the caster's own cell.
+7. **Line rules:** castInLine needs the target on one of the caster's grid axes; castInDiagonal needs it on an exact grid diagonal; with both, either works.
+8. **Free cell:** a spell that needs one cannot target a fighter.
+9. **Casts per target:** counted per fighter on the target cell, per turn; 0 means unlimited.
+10. **Line of sight:** map obstacles and fighters block it; the caster's and target's own cells never do.
+
+Casting spends the AP and records the cooldown and counts; per-turn counts reset at the start of the caster's next turn. A character's grade follows its level: grade 2 at unlock level + 50 and grade 3 at unlock level + 100, both reached by level 200 at the latest.
+
+**Areas.** A zone's size counts cells beyond its centre, so size 0 is always the centre alone. Circle is Manhattan distance ≤ size, ring exactly size, square both axis gaps ≤ size, cross the centre plus size cells along each grid axis. Line and cone point away from the caster, along the grid axis with the larger gap between caster and target (the x axis on an exact diagonal or a self-cast): a line is the centre plus size cells further on, a cone widens by one cell per side for each step. Cells off the map are dropped, and effects resolve from the centre outwards. Area previews come from `zoneCells` in [`packages/shared/src/zone.ts`](../packages/shared/src/zone.ts).
+
 ### Sample kits (first three pairs per class)
 
 | Class | Pair 1 | Pair 2 | Pair 3 |
@@ -464,11 +485,11 @@ Grid coordinates are used for range, areas, pathfinding and line of sight; scree
 shardfall/
   docs/         this design document
   packages/
-    shared/     grid math, pathfinding, line of sight, map types, fight state (spell engine next)
+    shared/     grid math, pathfinding, line of sight, map types, fight state, spell casting
     client/     Phaser scenes, HUD, asset loading
     server/     Colyseus rooms, persistence, AI (from M2)
     tools/      map generator and converter, placeholder art
-  content/      maps today; spells, items, monsters, quests later (JSON)
+  content/      maps and spells today; items, monsters, quests later (JSON)
   assets/       sprites, atlases, audio
 ```
 
@@ -507,6 +528,7 @@ If the offline combat prototype does not make people want another fight, everyth
 - [x] Write the Tiled-to-JSON map converter and test maps
 - [x] Render the isometric grid in Phaser with click-to-move and A* pathfinding
 - [x] Fight state in `shared`: placement, initiative order, turns, AP/MP, movement, erosion, end conditions, seeded RNG
-- [ ] Implement the spell engine in `shared`: range shapes, areas, line of sight, cooldowns, damage, tackle, pushback, AP/MP removal
+- [x] Spell data model and casting in `shared`: range shapes, line rules, areas, line of sight, cooldowns, cast limits; spell content validated at build
+- [ ] Spell effects in `shared`: damage and criticals, heals, tackle, pushback, AP/MP removal, buffs and states
 - [ ] Write full 20-spell kits for the four prototype classes (Vanguard, Longshot, Mender, Warden)
 - [ ] Commission placeholder art: one tileset, four class sprites, three monsters

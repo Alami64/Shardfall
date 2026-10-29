@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-  CELL_COUNT,
-  CellFlag,
   activeFighter,
   applyDamage,
   computeTurnOrder,
@@ -11,87 +9,14 @@ import {
   fighterAt,
   flee,
   getFighter,
-  gridToCell,
   initiativeOf,
   joinFight,
   moveFighter,
   movementRange,
   placeFighter,
   startFight,
-  type FightResult,
-  type FightState,
-  type FighterSetup,
-  type GameMap,
-  type Team,
 } from '../src/index.js';
-
-const cell = (x: number, y: number) => {
-  const c = gridToCell(x, y);
-  if (c === -1) throw new Error(`(${x}, ${y}) is outside the map`);
-  return c;
-};
-
-const START = {
-  A: [cell(10, 0), cell(10, 1), cell(11, 0)],
-  B: [cell(20, 0), cell(20, 1), cell(21, 0)],
-};
-const ROCK = cell(15, 1);
-
-/** An open map with one blocked cell and the start cells above flagged. */
-function makeMap(): GameMap {
-  const flags = new Array<number>(CELL_COUNT).fill(CellFlag.Walkable);
-  flags[ROCK] = CellFlag.BlocksLineOfSight;
-  for (const c of START.A) flags[c] = CellFlag.Walkable | CellFlag.StartTeamA;
-  for (const c of START.B) flags[c] = CellFlag.Walkable | CellFlag.StartTeamB;
-  return {
-    id: 'test',
-    name: 'Test',
-    worldX: 0,
-    worldY: 0,
-    width: 14,
-    lines: 40,
-    ground: new Array<number>(CELL_COUNT).fill(0),
-    objects: new Array<number>(CELL_COUNT).fill(-1),
-    flags,
-    tiles: ['grass_1'],
-  };
-}
-
-const MAP = makeMap();
-
-function fighter(
-  id: string,
-  team: Team,
-  initiative: number,
-  extra: Partial<Omit<FighterSetup, 'stats'>> & { mp?: number; maxHp?: number } = {},
-): FighterSetup {
-  const { mp = 3, maxHp = 100, ...rest } = extra;
-  return {
-    id,
-    name: id,
-    team,
-    controller: 'player',
-    stats: { level: 1, maxHp, ap: 6, mp, initiative, strength: 0, intelligence: 0, chance: 0, agility: 0 },
-    ...rest,
-  };
-}
-
-function expectOk(r: FightResult): Extract<FightResult, { ok: true }> {
-  if (!r.ok) throw new Error(`expected success, got ${r.error}`);
-  return r;
-}
-
-const create = (setups: FighterSetup[], seed = 1) => expectOk(createFight(MAP, setups, createRng(seed))).state;
-
-/** A started fight; `a` (initiative 100) plays first, then `b`. */
-function started(setups: FighterSetup[] = [fighter('a', 'A', 100), fighter('b', 'B', 50)], seed = 1) {
-  return expectOk(startFight(create(setups, seed), createRng(seed))).state;
-}
-
-/** Puts a fighter on a given cell, bypassing the rules, to set up a scenario. */
-function teleport(state: FightState, id: string, to: number): FightState {
-  return { ...state, fighters: state.fighters.map((f) => (f.id === id ? { ...f, cell: to } : f)) };
-}
+import { MAP, ROCK, START, cell, create, expectOk, fighter, started, teleport } from './fixtures.js';
 
 describe('placement', () => {
   it('puts every fighter on a distinct free start cell of its team', () => {

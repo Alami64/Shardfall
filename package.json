@@ -13,8 +13,9 @@
     "art": "python3 packages/tools/art/generate_placeholder_art.py",
     "maps:generate": "npm run generate -w @shardfall/tools",
     "maps:build": "npm run convert -w @shardfall/tools",
+    "spells:build": "npm run spells -w @shardfall/tools",
     "dev": "npm run dev -w @shardfall/client",
-    "build": "npm run maps:build && npm run build -w @shardfall/client",
+    "build": "npm run maps:build && npm run spells:build && npm run build -w @shardfall/client",
     "test": "npm run test -w @shardfall/shared",
     "typecheck": "tsc -p packages/shared && tsc -p packages/tools && tsc -p packages/client"
   },
