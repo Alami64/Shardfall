@@ -202,6 +202,34 @@
     "anchorX": 24.0,
     "anchorY": 64
   },
+  "sentry_0": {
+    "kind": "character",
+    "width": 64,
+    "height": 104,
+    "anchorX": 32.0,
+    "anchorY": 96
+  },
+  "moth_0": {
+    "kind": "character",
+    "width": 64,
+    "height": 72,
+    "anchorX": 32.0,
+    "anchorY": 64
+  },
+  "stalker_0": {
+    "kind": "character",
+    "width": 84,
+    "height": 68,
+    "anchorX": 42.0,
+    "anchorY": 58
+  },
+  "mirecap_0": {
+    "kind": "character",
+    "width": 60,
+    "height": 72,
+    "anchorX": 30.0,
+    "anchorY": 64
+  },
   "boar_1": {
     "kind": "character",
     "width": 76,
@@ -214,6 +242,34 @@
     "width": 48,
     "height": 72,
     "anchorX": 24.0,
+    "anchorY": 64
+  },
+  "sentry_1": {
+    "kind": "character",
+    "width": 64,
+    "height": 104,
+    "anchorX": 32.0,
+    "anchorY": 96
+  },
+  "moth_1": {
+    "kind": "character",
+    "width": 64,
+    "height": 72,
+    "anchorX": 32.0,
+    "anchorY": 64
+  },
+  "stalker_1": {
+    "kind": "character",
+    "width": 84,
+    "height": 68,
+    "anchorX": 42.0,
+    "anchorY": 58
+  },
+  "mirecap_1": {
+    "kind": "character",
+    "width": 60,
+    "height": 72,
+    "anchorX": 30.0,
     "anchorY": 64
   }
 }

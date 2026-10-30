@@ -16,6 +16,8 @@ export const CellFlag = {
 export interface GameMap {
   id: string;
   name: string;
+  /** The region the map belongs to, e.g. "Brightmoor Isle". */
+  region: string;
   /** Position on the world map; neighbours are found by coordinates. */
   worldX: number;
   worldY: number;

@@ -1,12 +1,14 @@
 /**
- * Generates the two M0 test maps as Tiled files (content/maps/*.tmj), so they
- * can be opened and edited in Tiled. Run once; after that, edit in Tiled and
- * use `npm run maps:build` to convert.
+ * Generates the test maps as Tiled files (content/maps/*.tmj), so they can be
+ * opened and edited in Tiled. Run once; after that, edit in Tiled and use
+ * `npm run maps:build` to convert.
  *
  *   brightmoor_0_0  Brightmoor Meadow    grass, a pond, trees along the edges
  *   brightmoor_1_0  Brightmoor Crossing  a stone square where the road crosses
+ *   gildhaven_0_0   Gildhaven Outskirts  paved yards behind hedges, outside the capital
+ *   thornwild_0_0   Thornwild Edge       thick woods with clearings along the road
  *
- * The road runs east-west across both maps and lines up at their shared edge.
+ * The road runs east-west across all of them and lines up at their shared edges.
  * Each map also gets fight start cells: six per team, on open ground around the
  * road, team A to the west and team B to the east (map properties startA/startB).
  */
@@ -103,6 +105,7 @@ const roadY = (worldPx: number) => MAP_PIXEL_H * 0.52 + 70 * Math.sin(worldPx / 
 interface MapSpec {
   id: string;
   name: string;
+  region: string;
   worldX: number;
   worldY: number;
   seed: number;
@@ -175,6 +178,7 @@ function buildMap(spec: MapSpec): TiledMap {
     properties: [
       { name: 'id', type: 'string', value: spec.id },
       { name: 'name', type: 'string', value: spec.name },
+      { name: 'region', type: 'string', value: spec.region },
       { name: 'worldX', type: 'int', value: spec.worldX },
       { name: 'worldY', type: 'int', value: spec.worldY },
       { name: 'startA', type: 'string', value: startA.join(',') },
@@ -197,6 +201,7 @@ const specs: MapSpec[] = [
   {
     id: 'brightmoor_0_0',
     name: 'Brightmoor Meadow',
+    region: 'Brightmoor Isle',
     worldX: 0,
     worldY: 0,
     seed: 11,
@@ -218,6 +223,7 @@ const specs: MapSpec[] = [
   {
     id: 'brightmoor_1_0',
     name: 'Brightmoor Crossing',
+    region: 'Brightmoor Isle',
     worldX: 1,
     worldY: 0,
     seed: 23,
@@ -235,6 +241,61 @@ const specs: MapSpec[] = [
       const ring = ellipse(MAP_PIXEL_W * 0.55, MAP_PIXEL_H * 0.5, 300, 180);
       for (let c = 0; c < CELL_COUNT; c++) {
         if (ring(c) && !square(c) && ground[c] !== 'path' && rand() < 0.3) objects[c] = 'bush';
+      }
+    },
+  },
+  {
+    id: 'gildhaven_0_0',
+    name: 'Gildhaven Outskirts',
+    region: 'Gildhaven',
+    worldX: 2,
+    worldY: 0,
+    seed: 37,
+    decorate(ground, objects, rand) {
+      // Two paved yards, north and south of the road, each behind a broken hedge.
+      const yards = [
+        { x: MAP_PIXEL_W * 0.3, y: MAP_PIXEL_H * 0.26 },
+        { x: MAP_PIXEL_W * 0.7, y: MAP_PIXEL_H * 0.76 },
+      ];
+      for (const { x, y } of yards) {
+        const yard = ellipse(x, y, 190, 100);
+        const hedge = ellipse(x, y, 225, 125);
+        for (let c = 0; c < CELL_COUNT; c++) {
+          if (ground[c] === 'path') continue;
+          if (yard(c)) ground[c] = rand() < 0.15 ? 'path' : 'stone';
+          else if (hedge(c) && rand() < 0.55) objects[c] = 'bush';
+        }
+      }
+      // A few rocks scattered over the grass.
+      for (let c = 0; c < CELL_COUNT; c++) {
+        if (ground[c] === 'grass_1' && !objects[c] && rand() < 0.03) objects[c] = 'rock';
+      }
+    },
+  },
+  {
+    id: 'thornwild_0_0',
+    name: 'Thornwild Edge',
+    region: 'Thornwild Forest',
+    worldX: 3,
+    worldY: 0,
+    seed: 53,
+    decorate(ground, objects, rand) {
+      // Thick woods everywhere but along the road and in two clearings where fights happen.
+      const clearings = [ellipse(MAP_PIXEL_W * 0.3, MAP_PIXEL_H * 0.52, 230, 120), ellipse(MAP_PIXEL_W * 0.62, MAP_PIXEL_H * 0.52, 230, 120)];
+      for (let c = 0; c < CELL_COUNT; c++) {
+        if (ground[c] === 'path' || clearings.some((open) => open(c))) continue;
+        const { sy } = cellToScreen(c);
+        const nearRoad = Math.abs(sy - roadY(cellToScreen(c).sx + 3 * MAP_PIXEL_W)) < 70;
+        const r = rand();
+        if (r < (nearRoad ? 0.12 : 0.3)) objects[c] = rand() < 0.75 ? 'tree_pine' : 'tree_oak';
+        else if (r < (nearRoad ? 0.15 : 0.36)) objects[c] = rand() < 0.5 ? 'bush' : 'rock';
+        else if (r < 0.5) ground[c] = 'grass_3';
+      }
+      // A handful of trees and rocks inside the clearings, for cover.
+      for (let c = 0; c < CELL_COUNT; c++) {
+        if (ground[c] !== 'path' && !objects[c] && clearings.some((open) => open(c)) && rand() < 0.05) {
+          objects[c] = rand() < 0.5 ? 'tree_pine' : 'rock';
+        }
       }
     },
   },

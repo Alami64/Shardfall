@@ -32,7 +32,7 @@ import {
   type Rng,
 } from '@shardfall/shared';
 import { spells, sprite, world } from '../assets';
-import { DEPTH, ORIGIN_X, ORIGIN_Y, REGION_NAME } from '../config';
+import { DEPTH, ORIGIN_X, ORIGIN_Y } from '../config';
 import { buffLabel, describeEvent, errorText, spellName } from '../fight/describe';
 import { fightHud, type FighterCard } from '../fight/fightHud';
 import { ENCOUNTERS, encounterSetups, lookOf, textureOf, type Encounter, type Look } from '../fight/setup';
@@ -147,7 +147,7 @@ export class FightScene extends Phaser.Scene {
     for (const f of this.state.fighters) this.addUnit(f);
     this.placing = this.heroes()[0]?.id ?? '';
 
-    hud.setMap(map.name, REGION_NAME, map.worldX, map.worldY);
+    hud.setMap(map.name, map.region, map.worldX, map.worldY);
     hud.showExplore(false);
     fightHud.show(true);
     bar.clearLog();

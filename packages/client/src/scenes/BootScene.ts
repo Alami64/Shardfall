@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
-import { spriteUrls } from '../assets';
+import { spriteUrls, world } from '../assets';
 import { GAME_H, GAME_W, START_MAP_ID } from '../config';
 
-/** Loads every sprite, with a thin progress bar, then opens the starting map. */
+/** Loads every sprite, with a thin progress bar, then opens the starting map (`?map=<id>` picks another). */
 export class BootScene extends Phaser.Scene {
   constructor() {
     super('boot');
@@ -25,6 +25,8 @@ export class BootScene extends Phaser.Scene {
   }
 
   create() {
-    this.scene.start('map', { mapId: START_MAP_ID });
+    const asked = new URLSearchParams(window.location.search).get('map');
+    const mapId = world.maps.some((m) => m.id === asked) ? asked! : START_MAP_ID;
+    this.scene.start('map', { mapId });
   }
 }

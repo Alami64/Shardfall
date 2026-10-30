@@ -6,7 +6,7 @@
  * optional object on top. Tile properties decide the cell flags:
  *   walkable  = ground is walkable AND (no object OR object is walkable)
  *   blocksLos = ground blocks OR object blocks
- * The optional map properties `startA` and `startB` list the fight start cells
+ * Every map names its `region`. The optional map properties `startA` and `startB` list the fight start cells
  * of each team as comma-separated cell ids; they must be walkable and distinct.
  */
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
@@ -128,6 +128,7 @@ export function convert(raw: unknown, file: string): GameMap {
   const out: GameMap = {
     id: str('id'),
     name: str('name'),
+    region: str('region'),
     worldX: num('worldX'),
     worldY: num('worldY'),
     width: MAP_WIDTH,

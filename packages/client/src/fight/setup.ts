@@ -1,7 +1,8 @@
 /**
- * The M1 prototype encounter: the player's party of three and the monster
- * group on Brightmoor Meadow. Spells and monsters come from content; what is
- * defined here is who fights where. Monster spawns become data with M3.
+ * The M1 prototype encounters: the player's party of three and the monster
+ * groups on Brightmoor Meadow, Gildhaven Outskirts and Thornwild Edge. Spells
+ * and monsters come from content; what is defined here is who fights where.
+ * Monster spawns become data with M3.
  */
 import { CLASS_BUILDS, heroSetup, monsterSetup, type FighterSetup, type Loadout } from '@shardfall/shared';
 import { monsters, spells } from '../assets';
@@ -26,6 +27,48 @@ export const ENCOUNTERS: Encounter[] = [
       { id: 'thornback_boar', grade: 2 },
       { id: 'thornback_boar', grade: 3 },
       { id: 'dewdrop_wisp', grade: 2 },
+    ],
+  },
+  // Gildhaven Outskirts: for a party around level 18, then around 28 (fight-smoke.ts patrol, yard).
+  {
+    id: 'gildhaven_patrol',
+    mapId: 'gildhaven_0_0',
+    cells: [302, 316, 288],
+    monsters: [
+      { id: 'rustpike_sentry', grade: 3 },
+      { id: 'rustpike_sentry', grade: 2 },
+      { id: 'coinmoth', grade: 2 },
+    ],
+  },
+  {
+    id: 'gildhaven_yard',
+    mapId: 'gildhaven_0_0',
+    cells: [319, 305, 333],
+    monsters: [
+      { id: 'rustpike_sentry', grade: 5 },
+      { id: 'rustpike_sentry', grade: 4 },
+      { id: 'coinmoth', grade: 5 },
+    ],
+  },
+  // Thornwild Edge: for a party around level 40, then around 58 (fight-smoke.ts hunt, deep).
+  {
+    id: 'thornwild_hunt',
+    mapId: 'thornwild_0_0',
+    cells: [246, 260, 232],
+    monsters: [
+      { id: 'bramble_stalker', grade: 3 },
+      { id: 'bramble_stalker', grade: 2 },
+      { id: 'mirecap', grade: 2 },
+    ],
+  },
+  {
+    id: 'thornwild_deep',
+    mapId: 'thornwild_0_0',
+    cells: [263, 249, 278],
+    monsters: [
+      { id: 'bramble_stalker', grade: 5 },
+      { id: 'bramble_stalker', grade: 4 },
+      { id: 'mirecap', grade: 4 },
     ],
   },
 ];
@@ -55,7 +98,14 @@ export function encounterSetups(encounter: Encounter): FighterSetup[] {
   });
 }
 
-const MONSTER_LOOKS: Record<string, string> = { thornback_boar: 'boar', dewdrop_wisp: 'wisp' };
+const MONSTER_LOOKS: Record<string, string> = {
+  thornback_boar: 'boar',
+  dewdrop_wisp: 'wisp',
+  rustpike_sentry: 'sentry',
+  coinmoth: 'moth',
+  bramble_stalker: 'stalker',
+  mirecap: 'mirecap',
+};
 
 /** The sprite set for a monster id. */
 export const monsterLook = (monsterId: string): Look => ({ key: MONSTER_LOOKS[monsterId] ?? 'boar', hasBack: false });

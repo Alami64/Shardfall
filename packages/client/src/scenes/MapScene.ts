@@ -22,7 +22,7 @@ import {
   type GameMap,
 } from '@shardfall/shared';
 import { monsters, sprite, world } from '../assets';
-import { DEPTH, ORIGIN_X, ORIGIN_Y, PREVIEW_MP, REGION_NAME, WALK_SPEED } from '../config';
+import { DEPTH, ORIGIN_X, ORIGIN_Y, PREVIEW_MP, WALK_SPEED } from '../config';
 import { ENCOUNTERS, monsterLook, textureOf, type Encounter } from '../fight/setup';
 import { party } from '../party';
 import { SELECTED_HERO, type FightSceneData } from './FightScene';
@@ -207,7 +207,7 @@ export class MapScene extends Phaser.Scene {
     this.pendingExit = null;
     this.stopWalking();
     this.placePlayer(cell);
-    hud.setMap(map.name, REGION_NAME, map.worldX, map.worldY);
+    hud.setMap(map.name, map.region, map.worldX, map.worldY);
     bar.log(`You are in ${map.name}.`, 'system');
     this.redrawOverlay();
     this.drawDebug();

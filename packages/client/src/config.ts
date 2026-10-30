@@ -17,7 +17,6 @@ export const WALK_SPEED = 190;
 export const PREVIEW_MP = 3;
 
 export const START_MAP_ID = 'brightmoor_0_0';
-export const REGION_NAME = 'Brightmoor Isle';
 
 /** Depth bands: ground < overlays < objects and units (sorted by foot y) < debug. */
 export const DEPTH = {

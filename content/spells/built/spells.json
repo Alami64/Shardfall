@@ -6319,6 +6319,831 @@
       ]
     },
     {
+      "id": "sentry_pike_thrust",
+      "classId": "monster",
+      "name": "Pike Thrust",
+      "unlockLevel": 1,
+      "pairId": "sentry_pike_thrust",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 2,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 14,
+              "max": 17,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 2,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 17,
+              "max": 21,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 2,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 21,
+              "max": 26,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "sentry_rust_spray",
+      "classId": "monster",
+      "name": "Rust Spray",
+      "unlockLevel": 1,
+      "pairId": "sentry_rust_spray",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 1,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 1,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "moth_gilt_spark",
+      "classId": "monster",
+      "name": "Gilt Spark",
+      "unlockLevel": 1,
+      "pairId": "moth_gilt_spark",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 8,
+              "max": 10,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 10,
+              "max": 12,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 12,
+              "max": 15,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "moth_glitter_dust",
+      "classId": "monster",
+      "name": "Glitter Dust",
+      "unlockLevel": 1,
+      "pairId": "moth_glitter_dust",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "debuff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "debuff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "debuff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "stalker_thorn_lash",
+      "classId": "monster",
+      "name": "Thorn Lash",
+      "unlockLevel": 1,
+      "pairId": "stalker_thorn_lash",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 18,
+              "max": 22,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 22,
+              "max": 27,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 27,
+              "max": 33,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "stalker_thorn_venom",
+      "classId": "monster",
+      "name": "Thorn Venom",
+      "unlockLevel": 1,
+      "pairId": "stalker_thorn_venom",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 6,
+              "max": 8,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 8,
+              "max": 10,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 10,
+              "max": 12,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "mirecap_spore_burst",
+      "classId": "monster",
+      "name": "Spore Burst",
+      "unlockLevel": 1,
+      "pairId": "mirecap_spore_burst",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 12,
+              "max": 15,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 15,
+              "max": 18,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 18,
+              "max": 22,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "mirecap_mycelial_mend",
+      "classId": "monster",
+      "name": "Mycelial Mend",
+      "unlockLevel": 1,
+      "pairId": "mirecap_mycelial_mend",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 12,
+              "max": 15,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 15,
+              "max": 18,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 18,
+              "max": 22,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
       "id": "cleave",
       "classId": "vanguard",
       "name": "Cleave",
