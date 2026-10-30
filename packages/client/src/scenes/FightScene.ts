@@ -202,8 +202,9 @@ export class FightScene extends Phaser.Scene {
       if (e.key === 'Escape') this.cancelSpell();
       else if (e.key === 'Enter' && this.state.phase === 'placement') this.ready();
       else if (e.key === ' ' && this.canAct()) this.playerAction((id) => endTurn(this.state, id));
-      else if (/^[1-9]$/.test(e.key)) {
-        const slot = this.active()?.spells[Number(e.key) - 1];
+      else if (/^[0-9]$/.test(e.key)) {
+        // 1-9 are the first nine slots, 0 the tenth.
+        const slot = this.active()?.spells[(Number(e.key) + 9) % 10];
         if (slot) this.toggleSpell(slot.spellId);
       }
     });

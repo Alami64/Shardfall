@@ -101,7 +101,7 @@ export const bar = {
       b.disabled = casting && spell.blocked !== null;
       b.title = casting && spell.blocked ? `${name}: ${spell.blocked}` : `${name} · ${spell.data.apCost} AP`;
       const key = document.createElement('kbd');
-      key.textContent = i < 9 ? String(i + 1) : '';
+      key.textContent = String((i + 1) % 10);
       const label = document.createElement('span');
       label.className = 'slot-name';
       label.textContent = name;
