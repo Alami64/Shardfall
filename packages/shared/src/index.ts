@@ -11,4 +11,5 @@ export * from './fightState.js';
 export * from './fight.js';
 export * from './monster.js';
 export * from './ai.js';
+export * from './character.js';
 // engine.ts is internal: its functions edit states in place.

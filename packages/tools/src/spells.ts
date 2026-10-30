@@ -10,6 +10,7 @@ import {
   ELEMENTS,
   ELEMENT_STATS,
   MAX_LEVEL,
+  PAIR_UNLOCK_LEVELS,
   SCALAR_STATS,
   ZONE_SHAPES,
   isElementStat,
@@ -135,7 +136,13 @@ function checkEffect(e: Effect, where: string): string[] {
   return errors;
 }
 
-/** Rules across fields and spells: ranges, rolls, unique ids, and pairs (two spells, same class and unlock level). */
+const MONSTER_CLASS = 'monster';
+
+/**
+ * Rules across fields and spells: ranges, rolls, unique ids, and pairs (two
+ * spells, same class and unlock level; class pairs unlock at PAIR_UNLOCK_LEVELS,
+ * one pair per level).
+ */
 export function checkSpells(spells: readonly Spell[]): string[] {
   const errors: string[] = [];
   const ids = new Set<string>();
@@ -165,6 +172,18 @@ export function checkSpells(spells: readonly Spell[]): string[] {
         errors.push(`pair ${pairId}: ${first!.id} and ${m.id} differ in class or unlock level`);
       }
     }
+  }
+  const unlocks = new Map<string, Set<number>>();
+  for (const [pairId, [first]] of pairs) {
+    if (!first || first.classId === MONSTER_CLASS) continue;
+    const levels: readonly number[] = PAIR_UNLOCK_LEVELS;
+    if (!levels.includes(first.unlockLevel)) {
+      errors.push(`pair ${pairId}: unlock level ${first.unlockLevel} is not one of ${levels.join(', ')}`);
+    }
+    const taken = unlocks.get(first.classId) ?? new Set<number>();
+    if (taken.has(first.unlockLevel)) errors.push(`pair ${pairId}: ${first.classId} already has a pair at level ${first.unlockLevel}`);
+    taken.add(first.unlockLevel);
+    unlocks.set(first.classId, taken);
   }
   return errors;
 }

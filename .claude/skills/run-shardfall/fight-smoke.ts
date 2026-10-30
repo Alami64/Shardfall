@@ -22,21 +22,11 @@ const world = JSON.parse(readFileSync(`${ROOT}/content/maps/built/world.json`, '
 const { spells } = JSON.parse(readFileSync(`${ROOT}/content/spells/built/spells.json`, 'utf8')) as SpellCatalogue;
 const { monsters } = JSON.parse(readFileSync(`${ROOT}/content/monsters/built/monsters.json`, 'utf8')) as MonsterCatalogue;
 const map = world.maps.find((m) => m.id === 'brightmoor_0_0')!;
-const LEVEL = 6; // all three spell pairs unlocked
-const kit = (cls: string) => spells.filter((s) => s.classId === cls).map((s) => ({ spellId: s.id, grade: 1 }));
-const hp = S.characterMaxHp(LEVEL, 0);
-const hero = (id: string, ai: S.AiProfile, stats: Partial<S.FighterStats>): S.FighterSetup => ({
-  id,
-  name: id,
-  team: 'A',
-  controller: 'player',
-  ai, // the AI stands in for the player
-  spells: kit(id.toLowerCase()),
-  stats: S.fighterStats({ level: LEVEL, maxHp: hp, ...stats }),
-});
-const vanguard = hero('Vanguard', { archetype: 'brute', preferredRange: 1 }, { strength: 30, agility: 10, initiative: 10 });
-const longshot = hero('Longshot', { archetype: 'caster', preferredRange: 5 }, { agility: 30, intelligence: 10 });
-const mender = hero('Mender', { archetype: 'caster', preferredRange: 4 }, { intelligence: 30, chance: 10 });
+const LEVEL = 6; // the client's default party level: pairs 1-3, default loadout
+const hero = (classId: string) => S.heroSetup(classId, spells, { level: LEVEL });
+const vanguard = hero('vanguard');
+const longshot = hero('longshot');
+const mender = hero('mender');
 const monster = (id: string) => monsters.find((m) => m.id === id)!;
 
 const SCENARIOS: Record<string, { setups: S.FighterSetup[]; startCells: Record<S.Team, number[]> }> = {
@@ -70,6 +60,7 @@ function describe(e: FightEvent): string | null {
     case 'spellCast': return `   casts ${e.spellId} on ${g(e.cell)}${e.critical ? ' CRITICAL' : ''}`;
     case 'damaged': return `     ${e.fighterId} takes ${e.amount} -> ${e.hp} HP`;
     case 'healed': return `     ${e.fighterId} heals ${e.amount} -> ${e.hp} HP`;
+    case 'dotTicked': return `     ${e.fighterId} burns (${e.spellId})`;
     case 'shieldHit': return `     ${e.fighterId}'s shield absorbs ${e.absorbed}`;
     case 'displaced': return `     ${e.fighterId} ${e.reason} to ${g(e.path.at(-1)!)}`;
     case 'buffAdded': {

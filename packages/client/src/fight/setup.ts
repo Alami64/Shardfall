@@ -3,10 +3,10 @@
  * group on Brightmoor Meadow. Spells and monsters come from content; what is
  * defined here is who fights where. Monster spawns become data with M3.
  */
-import { characterMaxHp, fighterStats, monsterSetup, type AiProfile, type FighterSetup, type FighterStats } from '@shardfall/shared';
+import { CLASS_BUILDS, heroSetup, monsterSetup, type FighterSetup, type Loadout } from '@shardfall/shared';
 import { monsters, spells } from '../assets';
 
-/** All three spell pairs are unlocked from level 6. */
+/** The party level until the player picks another (the meadow fight is tuned for it). */
 export const PARTY_LEVEL = 6;
 
 export interface Encounter {
@@ -36,28 +36,12 @@ export interface Look {
   hasBack: boolean;
 }
 
-const HEROES: { classId: string; name: string; stats: Partial<FighterStats>; ai: AiProfile }[] = [
-  {
-    classId: 'vanguard',
-    name: 'Vanguard',
-    stats: { strength: 30, agility: 10, initiative: 10 },
-    ai: { archetype: 'brute', preferredRange: 1 },
-  },
-  { classId: 'longshot', name: 'Longshot', stats: { agility: 30, intelligence: 10 }, ai: { archetype: 'caster', preferredRange: 5 } },
-  { classId: 'mender', name: 'Mender', stats: { intelligence: 30, chance: 10 }, ai: { archetype: 'caster', preferredRange: 4 } },
-];
+/** The party's loadouts: classId → (pairId → spellId). Classes left out use their default loadout. */
+export type PartyLoadouts = Record<string, Loadout>;
 
-export function partySetups(): FighterSetup[] {
-  return HEROES.map((h) => ({
-    id: h.classId,
-    name: h.name,
-    team: 'A',
-    controller: 'player',
-    // Kept so the AI could stand in for an idle player later; the player drives these.
-    ai: h.ai,
-    spells: spells.filter((s) => s.classId === h.classId).map((s) => ({ spellId: s.id, grade: 1 })),
-    stats: fighterStats({ level: PARTY_LEVEL, maxHp: characterMaxHp(PARTY_LEVEL, 0), ...h.stats }),
-  }));
+/** The three launch classes at one level, each with its loadout. */
+export function partySetups(level = PARTY_LEVEL, loadouts: PartyLoadouts = {}): FighterSetup[] {
+  return CLASS_BUILDS.map((b) => heroSetup(b.classId, spells, { level, loadout: loadouts[b.classId] }));
 }
 
 export function encounterSetups(encounter: Encounter): FighterSetup[] {
@@ -78,7 +62,7 @@ export const monsterLook = (monsterId: string): Look => ({ key: MONSTER_LOOKS[mo
 
 /** The sprite set for a fighter id (heroes are named after their class, monsters `<monster>_<n>`). */
 export function lookOf(fighterId: string): Look {
-  if (HEROES.some((h) => h.classId === fighterId)) return { key: fighterId, hasBack: true };
+  if (CLASS_BUILDS.some((b) => b.classId === fighterId)) return { key: fighterId, hasBack: true };
   return monsterLook(fighterId.replace(/_\d+$/, ''));
 }
 
