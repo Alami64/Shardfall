@@ -2,7 +2,7 @@
 import type { Buff, FightError, FightEvent, FightState } from '@shardfall/shared';
 import { spells } from '../assets';
 
-const STAT_LABELS: Record<string, string> = {
+export const STAT_LABELS: Record<string, string> = {
   ap: 'AP',
   mp: 'MP',
   range: 'Range',

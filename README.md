@@ -18,6 +18,8 @@ npm run build        # one self-contained file: packages/client/dist/index.html
 
 ### Controls
 
+The status bar along the bottom holds the message log (left), your party and the active hero's life orb with AP and MP (middle), and the menus, spell slots and fight buttons (right).
+
 | Input | Action |
 | --- | --- |
 | Click or tap a tile | Walk there (path preview on hover) |
@@ -26,20 +28,24 @@ npm run build        # one self-contained file: packages/client/dist/index.html
 | `R` | Show the cells reachable with 3 MP (combat movement rules) |
 | `D` | Show the cell grid: ids, unwalkable cells (red), sight blockers (dark outline) |
 | Click the monster group | Walk up to it and start the fight |
+| A hero in the party list | Pick whose life orb, spell slots and windows show |
+| `C` or the Characteristics button | Open the hero's characteristics: HP, AP, MP, characteristics and what they do, combat stats, resistances (live values with buffs in a fight) |
+| `S` or the Spells button, or a spell slot | Open the spell window: cost, range, conditions and every effect of each spell in plain words |
+| `Esc` or × | Close the windows |
 
 In a fight you play all three heroes, one turn each:
 
 | Input | Action |
 | --- | --- |
-| Placement: click a hero, then a blue cell | Move that hero to that start cell (onto an ally: swap) |
+| Placement: click a hero (on the map or in the party list), then a blue cell | Move that hero to that start cell (onto an ally: swap) |
 | `Enter` or **Ready** | Start the fight (it also starts when the 30 s placement timer runs out) |
 | Click a green cell | Walk there (path preview on hover; walking away from an adjacent enemy costs tackle) |
-| `1`–`6` or a spell button | Pick a spell: castable cells light up, the area shows under the cursor |
+| `1`–`6` or a spell slot | Pick a spell: castable cells light up, the area shows under the cursor (a slot on cooldown shows the turns left) |
 | Click a lit cell | Cast the spell there |
 | `Esc` or right-click | Put the spell away |
 | `Space` or **End turn** | End the turn (it also ends when the 30 s turn timer runs out) |
 | **Flee** | The active hero leaves the fight; if all three do, the fight is lost |
-| Hover a fighter | Show its HP, AP, MP, buffs and shield in the card |
+| Hover a fighter | Show its HP, AP, MP, buffs and shield in the card at the top right |
 
 Add `?seed=N` to the URL to replay the same fight, and `?speed=N` to play its animations and timers N times faster.
 ## Layout

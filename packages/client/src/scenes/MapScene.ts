@@ -23,10 +23,13 @@ import {
 } from '@shardfall/shared';
 import { monsters, sprite, world } from '../assets';
 import { DEPTH, ORIGIN_X, ORIGIN_Y, PREVIEW_MP, REGION_NAME, WALK_SPEED } from '../config';
-import { ENCOUNTERS, monsterLook, textureOf, type Encounter } from '../fight/setup';
-import type { FightSceneData } from './FightScene';
+import { ENCOUNTERS, monsterLook, partySetups, textureOf, type Encounter } from '../fight/setup';
+import { SELECTED_HERO, type FightSceneData } from './FightScene';
 import { hud } from '../hud';
 import { cellPos, diamond, drawMap, placeSprite, updateOccluders, type Occluder } from '../render/mapView';
+import { bar } from '../ui/bar';
+import { viewOfSetup } from '../ui/characters';
+import { windows } from '../ui/windows';
 
 const COLORS = {
   path: 0xfff6dc,
@@ -148,6 +151,10 @@ export class MapScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-R', () => this.toggleRange());
     hud.onToggle('btn-debug', () => this.toggleDebug());
     hud.onToggle('btn-range', () => this.toggleRange());
+    bar.on({ select: (id) => this.selectHero(id), slot: (spellId) => windows.showSpell(spellId) });
+    windows.onSelect((id) => this.selectHero(id));
+    bar.hint('Click a tile to walk · click the monsters to fight · the amber edge leads on · S spells, C characteristics');
+    this.renderParty();
 
     this.loadMap(first, data.cell !== undefined && isWalkable(first, data.cell) ? data.cell : this.startCell(first));
     this.cameras.main.fadeIn(300, 15, 26, 20);
@@ -190,6 +197,7 @@ export class MapScene extends Phaser.Scene {
     this.stopWalking();
     this.placePlayer(cell);
     hud.setMap(map.name, REGION_NAME, map.worldX, map.worldY);
+    bar.log(`You are in ${map.name}.`, 'system');
     this.redrawOverlay();
     this.drawDebug();
   }
@@ -241,6 +249,19 @@ export class MapScene extends Phaser.Scene {
   }
 
   // ------------------------------------------------------------------ movement
+
+  /** The party on the bar and in the windows: full health while exploring. */
+  private renderParty() {
+    const party = partySetups().map(viewOfSetup);
+    const selected = (this.registry.get(SELECTED_HERO) as string | undefined) ?? party[0]?.id ?? '';
+    bar.render({ party, selected, focus: party.find((h) => h.id === selected) ?? null, aiming: null, mode: 'explore' });
+    windows.update(party, selected);
+  }
+
+  private selectHero(id: string) {
+    this.registry.set(SELECTED_HERO, id);
+    this.renderParty();
+  }
 
   /** Monsters stand on their group's cells, so those are not walkable while exploring. */
   private walkable = (c: number) => isWalkable(this.map, c) && !this.groupAt.has(c);

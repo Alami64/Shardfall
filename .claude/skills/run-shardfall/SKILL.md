@@ -23,7 +23,8 @@ npm install
 ## Run the client (agent path)
 
 Steps run in order; screenshots go to `$OUT` (default `/tmp/shardfall-run`). If nothing listens on
-`:5173`, the driver starts `npm run dev` and kills it when done.
+`:5173`, the driver starts `npm run dev` and kills it when done. `VIEWPORT=1024x700` (default
+1400x1000) checks other screen sizes; the bar's layout changes below 1100 and 720 px wide.
 
 ```bash
 npx tsx .claude/skills/run-shardfall/driver.ts shot:map key:r shot:range key:r key:d shot:grid key:d hover:426 text:#cell-id click:426 wait:4000 shot:walked text:#map-name
@@ -43,15 +44,26 @@ the map was still fading in.
 | `shot:NAME` | screenshot to `$OUT/NAME.png` |
 | `key:K` | press a key: `r` = 3-MP combat range overlay, `d` = cell grid with ids |
 | `hover:CELL` / `click:CELL` | move to / click a cell by id (0–559); a click walks the hero there |
-| `tap:SELECTOR` | click a page element: `#btn-ready`, `#btn-end-turn`, `#btn-flee`, `#btn-result`, `button.spell >> nth=0` |
+| `tap:SELECTOR` | click a page element: `#btn-ready`, `#btn-end-turn`, `#btn-flee`, `#btn-result`, `#btn-stats`, `#btn-spells`, `#slots .slot >> nth=0`, `#party button >> nth=2`, `#win-spells button[data-show-spell] >> nth=3` |
 | `wait:MS` | wait |
-| `text:SELECTOR` | print text: `#cell-id`, `#cell-status`, `#cell-group`, `#map-name`, `#fight-round`, `#fight-hint`, `#result-title` |
+| `text:SELECTOR` | print text: `#cell-id`, `#cell-status`, `#cell-group`, `#map-name`, `#fight-round`, `#hint`, `#log`, `#orb-hp`, `#result-title` |
 | `eval:EXPR` | print a page expression as JSON |
 | `idle` | wait until the fight stops animating (dev server only) |
 | `until:EXPR` | wait up to 5 minutes for an expression to be truthy |
 
 Cell ids: run `key:d shot:grid` and read them off the grid. On Brightmoor Meadow the hero starts on
 cell 339; 251 is an east exit; 426 is open grass; the monster group stands on 330, 344 and 316.
+
+### The bar and the windows
+
+Open Characteristics, then Spells on the Vanguard's Charge, and print what the window says:
+
+```bash
+npx tsx .claude/skills/run-shardfall/driver.ts key:c shot:stats key:c key:s "tap:#win-spells button[data-show-spell] >> nth=3" shot:spells "eval:[...document.querySelectorAll('#win-spells-body li')].map(l => l.textContent).join(' | ')"
+```
+
+Expect `3 AP | Range 2–4 | Line of sight | In a straight line | Every 2 turns | You dash up to 4 cells
+towards the target | Pushes enemies 1 cell away from you`. `tap:#party button >> nth=2` switches to the Mender.
 
 ### A fight
 
