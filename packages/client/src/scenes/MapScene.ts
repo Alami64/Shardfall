@@ -23,7 +23,8 @@ import {
 } from '@shardfall/shared';
 import { monsters, sprite, world } from '../assets';
 import { DEPTH, ORIGIN_X, ORIGIN_Y, PREVIEW_MP, REGION_NAME, WALK_SPEED } from '../config';
-import { ENCOUNTERS, monsterLook, partySetups, textureOf, type Encounter } from '../fight/setup';
+import { ENCOUNTERS, monsterLook, textureOf, type Encounter } from '../fight/setup';
+import { party } from '../party';
 import { SELECTED_HERO, type FightSceneData } from './FightScene';
 import { hud } from '../hud';
 import { cellPos, diamond, drawMap, placeSprite, updateOccluders, type Occluder } from '../render/mapView';
@@ -153,6 +154,16 @@ export class MapScene extends Phaser.Scene {
     hud.onToggle('btn-range', () => this.toggleRange());
     bar.on({ select: (id) => this.selectHero(id), slot: (spellId) => windows.showSpell(spellId) });
     windows.onSelect((id) => this.selectHero(id));
+    windows.onParty({
+      level: (level) => {
+        party.setLevel(level);
+        this.renderParty();
+      },
+      equip: (heroId, pairId, spellId) => {
+        party.equip(heroId, pairId, spellId);
+        this.renderParty();
+      },
+    });
     bar.hint('Click a tile to walk · click the monsters to fight · the amber edge leads on · S spells, C characteristics');
     this.renderParty();
 
@@ -252,10 +263,10 @@ export class MapScene extends Phaser.Scene {
 
   /** The party on the bar and in the windows: full health while exploring. */
   private renderParty() {
-    const party = partySetups().map(viewOfSetup);
-    const selected = (this.registry.get(SELECTED_HERO) as string | undefined) ?? party[0]?.id ?? '';
-    bar.render({ party, selected, focus: party.find((h) => h.id === selected) ?? null, aiming: null, mode: 'explore' });
-    windows.update(party, selected);
+    const heroes = party.setups().map(viewOfSetup);
+    const selected = (this.registry.get(SELECTED_HERO) as string | undefined) ?? heroes[0]?.id ?? '';
+    bar.render({ party: heroes, selected, focus: heroes.find((h) => h.id === selected) ?? null, aiming: null, mode: 'explore' });
+    windows.update(heroes, selected, party.level());
   }
 
   private selectHero(id: string) {

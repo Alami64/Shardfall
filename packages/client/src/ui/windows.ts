@@ -2,12 +2,14 @@
  * The Characteristics and Spells windows, opened from the bar (or with C and
  * S) and closed with their × or Escape. Both show the hero picked in the
  * party list, or the tab picked in the window, and read live values in a fight.
+ * While exploring they also change the party: its level (Characteristics) and
+ * which spell of each pair is on the bar (Spells).
  */
-import { ELEMENTS } from '@shardfall/shared';
+import { ELEMENTS, MAX_LEVEL } from '@shardfall/shared';
 import { el, onClick } from '../hud';
 import { spellName } from '../fight/describe';
 import { spells } from '../assets';
-import type { CharacterView } from './characters';
+import type { CharacterView, SpellView } from './characters';
 import { effectText, spellFacts } from './spellText';
 
 type WindowId = 'win-stats' | 'win-spells';
@@ -16,6 +18,9 @@ let party: CharacterView[] = [];
 let selected = '';
 let spellShown: string | null = null;
 let selectHandler: ((id: string) => void) | undefined;
+/** The party level while it can be changed (exploring), else null. */
+let partyLevel: number | null = null;
+let partyHandlers: { level: (level: number) => void; equip: (heroId: string, pairId: string, spellId: string) => void } | undefined;
 let wired = false;
 
 const isOpen = (id: WindowId) => !el(id).hidden;
@@ -42,6 +47,11 @@ function wire() {
         spellShown = spell.dataset.showSpell;
         draw();
       }
+      const step = target.closest<HTMLButtonElement>('button[data-level-step]');
+      if (step && partyLevel !== null) partyHandlers?.level(partyLevel + Number(step.dataset.levelStep));
+      const equip = target.closest<HTMLButtonElement>('button[data-equip]');
+      const h = hero();
+      if (equip?.dataset.equip && equip.dataset.pair && h) partyHandlers?.equip(h.id, equip.dataset.pair, equip.dataset.equip);
     });
   }
   document.addEventListener('keydown', (e) => {
@@ -101,11 +111,40 @@ function table(rows: [label: string, cell: HTMLTableCellElement, note?: string][
   return t;
 }
 
+const button = (text: string, data: Record<string, string>, label?: string) => {
+  const b = node('button', text);
+  b.type = 'button';
+  Object.assign(b.dataset, data);
+  if (label) b.setAttribute('aria-label', label);
+  return b;
+};
+
+/** − / + buttons around the party level (exploring only). */
+function levelControl(level: number): HTMLElement {
+  const row = node('div', undefined, 'level-control');
+  const step = (n: number) => {
+    const b = button(n > 0 ? `+${n}` : `−${-n}`, { levelStep: String(n) }, `${n > 0 ? 'Raise' : 'Lower'} the party level by ${Math.abs(n)}`);
+    b.disabled = n < 0 ? level === 1 : level === MAX_LEVEL;
+    return b;
+  };
+  row.append(
+    node('span', 'Party level', 'label'),
+    step(-10),
+    step(-1),
+    node('output', String(level)),
+    step(1),
+    step(10),
+    node('span', 'Prototype: all three heroes share it', 'note'),
+  );
+  return row;
+}
+
 function drawStats(h: CharacterView) {
   const { base: b, stats: s } = h;
   const body = el('win-stats-body');
   const initiative = (x: typeof s) => x.initiative + x.strength + x.intelligence + x.chance + x.agility;
   body.replaceChildren(
+    ...(partyLevel !== null ? [levelControl(partyLevel)] : []),
     node('h3', `${h.name} · level ${h.level}`),
     table([
       ['Health', node('td', `${h.hp} / ${h.maxHp}`)],
@@ -156,20 +195,40 @@ function elementTable(h: CharacterView): HTMLTableElement {
   return t;
 }
 
+function spellButton(s: SpellView, extra: string, className = ''): HTMLButtonElement {
+  const b = button('', { showSpell: s.id });
+  b.className = className;
+  b.setAttribute('aria-pressed', String(s.id === spellShown));
+  b.append(spellName(s.id), node('span', extra));
+  return b;
+}
+
+/** Fights: the spells on the bar. Exploring: every pair, both sides, the equipped one marked. */
+function spellList(h: CharacterView): HTMLElement {
+  const list = node('div', undefined, 'spell-list');
+  if (!h.pairs.length) {
+    for (const s of h.spells) list.append(spellButton(s, `${s.data.apCost} AP · grade ${s.grade}`));
+    return list;
+  }
+  for (const p of h.pairs) {
+    const group = node('div', undefined, p.unlocked ? 'pair' : 'pair locked');
+    group.append(node('p', p.unlocked ? `Level ${p.unlockLevel}` : `Level ${p.unlockLevel} · locked`, 'pair-level'));
+    for (const s of p.options) {
+      const on = s.id === p.equipped && p.unlocked;
+      group.append(spellButton(s, on ? `${s.data.apCost} AP · on the bar` : `${s.data.apCost} AP`, on ? 'equipped' : ''));
+    }
+    list.append(group);
+  }
+  return list;
+}
+
 function drawSpells(h: CharacterView) {
   const body = el('win-spells-body');
-  if (!h.spells.some((s) => s.id === spellShown)) spellShown = h.spells[0]?.id ?? null;
-  const list = node('div', undefined, 'spell-list');
-  for (const s of h.spells) {
-    const b = node('button');
-    b.type = 'button';
-    b.dataset.showSpell = s.id;
-    b.setAttribute('aria-pressed', String(s.id === spellShown));
-    b.append(spellName(s.id), node('span', `${s.data.apCost} AP · grade ${s.grade}`));
-    list.append(b);
-  }
+  const all = h.pairs.length ? h.pairs.flatMap((p) => p.options) : h.spells;
+  if (!all.some((s) => s.id === spellShown)) spellShown = h.spells[0]?.id ?? all[0]?.id ?? null;
   const detail = node('div', undefined, 'spell-detail');
-  const shown = h.spells.find((s) => s.id === spellShown);
+  const shown = all.find((s) => s.id === spellShown);
+  const pair = h.pairs.find((p) => p.options.some((s) => s.id === spellShown));
   if (shown) {
     const spell = spells.find((x) => x.id === shown.id);
     detail.append(
@@ -180,6 +239,19 @@ function drawSpells(h: CharacterView) {
         'sub',
       ),
     );
+    if (pair && !pair.unlocked) {
+      detail.append(node('p', `Unlocks at level ${pair.unlockLevel}. Raise the party level in Characteristics to try it.`, 'state'));
+    } else if (pair && pair.equipped !== shown.id) {
+      const other = pair.options.find((s) => s.id === pair.equipped);
+      const equip = button(`Equip instead of ${other ? spellName(other.id) : 'the other side'}`, {
+        equip: shown.id,
+        pair: pair.pairId,
+      });
+      equip.className = 'equip';
+      detail.append(equip);
+    } else if (pair) {
+      detail.append(node('p', 'On the bar. Its pair partner can replace it out of fights.', 'sub'));
+    }
     const facts = node('ul', undefined, 'facts');
     for (const f of spellFacts(shown.data, h.stats.range)) facts.append(node('li', f));
     detail.append(facts, node('h3', 'Effects'));
@@ -199,7 +271,7 @@ function drawSpells(h: CharacterView) {
     }
   }
   const layout = node('div', undefined, 'spells-layout');
-  layout.append(list, detail);
+  layout.append(spellList(h), detail);
   body.replaceChildren(layout);
 }
 
@@ -223,10 +295,17 @@ export const windows = {
     selectHandler = handler;
   },
 
-  /** New data: redraws whichever windows are open. */
-  update(heroes: CharacterView[], selectedId: string) {
+  /** Where party changes go while exploring: a new level, or a spell equipped from a pair. */
+  onParty(handlers: NonNullable<typeof partyHandlers>) {
+    wire();
+    partyHandlers = handlers;
+  },
+
+  /** New data: redraws whichever windows are open. `level` is the party level when it can be changed (exploring). */
+  update(heroes: CharacterView[], selectedId: string, level: number | null = null) {
     party = heroes;
     selected = selectedId;
+    partyLevel = level;
     draw();
   },
 

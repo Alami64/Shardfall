@@ -35,7 +35,8 @@ import { spells, sprite, world } from '../assets';
 import { DEPTH, ORIGIN_X, ORIGIN_Y, REGION_NAME } from '../config';
 import { buffLabel, describeEvent, errorText, spellName } from '../fight/describe';
 import { fightHud, type FighterCard } from '../fight/fightHud';
-import { ENCOUNTERS, encounterSetups, lookOf, partySetups, textureOf, type Encounter, type Look } from '../fight/setup';
+import { ENCOUNTERS, encounterSetups, lookOf, textureOf, type Encounter, type Look } from '../fight/setup';
+import { party } from '../party';
 import { hud } from '../hud';
 import { cellPos, diamond, drawMap, placeSprite, updateOccluders, type Occluder } from '../render/mapView';
 import { bar, type BarMode } from '../ui/bar';
@@ -140,7 +141,7 @@ export class FightScene extends Phaser.Scene {
     this.occluders = drawMap(this, map).occluders;
     this.overlay = this.add.graphics().setDepth(DEPTH.overlay);
 
-    const created = createFight(map, [...partySetups(), ...encounterSetups(encounter)], this.rng, { spells });
+    const created = createFight(map, [...party.setups(), ...encounterSetups(encounter)], this.rng, { spells });
     if (!created.ok) throw new Error(`cannot start the fight: ${created.error}`);
     this.state = created.state;
     for (const f of this.state.fighters) this.addUnit(f);
@@ -649,12 +650,12 @@ export class FightScene extends Phaser.Scene {
 
     const mine = fighting && !this.busy && shown?.controller === 'player' && shown.id === this.active()?.id;
     const mode: BarMode = placement ? 'placement' : s.phase === 'ended' ? 'ended' : mine ? 'player' : 'waiting';
-    const party = this.heroes().map((h) => this.view(h, mine));
-    const selected = placement ? this.placing : (this.registry.get(SELECTED_HERO) as string | undefined) ?? party[0]?.id ?? '';
+    const heroes = this.heroes().map((h) => this.view(h, mine));
+    const selected = placement ? this.placing : (this.registry.get(SELECTED_HERO) as string | undefined) ?? heroes[0]?.id ?? '';
     // The orb and the slots follow the hero whose turn it is; otherwise the one picked.
     const focusId = fighting && shown?.controller === 'player' ? shown.id : selected;
-    bar.render({ party, selected, focus: party.find((h) => h.id === focusId) ?? null, aiming: this.selectedSpell, mode });
-    windows.update(party, selected);
+    bar.render({ party: heroes, selected, focus: heroes.find((h) => h.id === focusId) ?? null, aiming: this.selectedSpell, mode });
+    windows.update(heroes, selected);
     if (s.phase === 'ended') fightHud.setTimer(null);
     bar.hint(this.hint(mine, shown));
 

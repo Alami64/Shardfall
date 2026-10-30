@@ -403,6 +403,35 @@
   .spell-detail .facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 4px; padding: 0; list-style: none; }
   .spell-detail .facts li { margin: 0; padding: 2px 8px; font: 12.5px/1.4 var(--font-data); background: rgba(239, 230, 207, 0.06); border-radius: 5px; }
   .spell-detail .state { margin: 8px 0 0; font-size: 13px; color: var(--amber); }
+  .spell-list .pair { display: grid; gap: 3px; }
+  .spell-list .pair + .pair { margin-top: 6px; }
+  .spell-list .pair-level { margin: 0; font: 11px/1.2 var(--font-data); letter-spacing: 0.04em; color: var(--moss); }
+  .spell-list .locked button { opacity: 0.5; }
+  .spell-list button.equipped { border-color: rgba(242, 165, 65, 0.55); }
+  .spell-list button.equipped span { color: var(--amber); }
+  .spell-detail .equip {
+    margin: 0 0 8px;
+    padding: 5px 12px;
+    font-weight: 500;
+    background: rgba(242, 165, 65, 0.16);
+    border: 1px solid var(--amber);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .level-control { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+  .level-control .label { font-weight: 500; margin-right: 4px; }
+  .level-control button {
+    min-width: 34px;
+    padding: 3px 6px;
+    font: 13px/1.2 var(--font-data);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .level-control button:disabled { opacity: 0.4; cursor: default; }
+  .level-control output { min-width: 32px; text-align: center; font: 700 18px/1 var(--font-data); color: var(--amber); }
+  .level-control .note { flex-basis: 100%; font-size: 12.5px; color: var(--moss); }
 
   /* ---------------------------------------------------------------- toasts and the result */
   .toast {
