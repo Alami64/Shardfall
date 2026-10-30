@@ -50,7 +50,7 @@ To see a change running, use the `run-shardfall` skill (`.claude/skills/run-shar
 ## M1 (offline combat prototype): built
 
 1. ~~Fight state in `shared`: placement on start cells, initiative order, turns, AP/MP, end conditions.~~ Done (`fight.ts`). Tackle and buff ticks hook into `moveFighter` and `beginTurn`.
-2. ~~Spell data model and engine.~~ Done: cast rules (`fight.ts`), effects (`engine.ts`, rules in `docs/design.md` > Spells > Effects), formulas (`formulas.ts`), tackle in `moveFighter`. Summons, glyphs, traps and damage over time are not supported yet; the content check rejects them.
+2. ~~Spell data model and engine.~~ Done: cast rules (`fight.ts`), effects (`engine.ts`, rules in `docs/design.md` > Spells > Effects), formulas (`formulas.ts`), tackle in `moveFighter`. Damage over time ticks at the start of the target's turns. Summons, glyphs and traps are not supported yet; the content check rejects them.
 3. ~~First kits for Vanguard, Longshot and Mender.~~ Done: 3 pairs per class in `content/spells/`, each spell pinned by `test/kits.test.ts`. Numbers are first-pass; balance comes from playtests in step 5. The other 7 pairs per class come later.
 4. ~~Monster AI by utility scoring (Brute and Caster archetypes first).~~ Done: `ai.ts` (`playAiTurn`, `planAiStep`), monsters in `content/monsters/` (Thornback Boar, Dewdrop Wisp). Rules in `docs/design.md` > Monster AI.
 5. ~~Client fight on Brightmoor Meadow.~~ Done: `FightScene` (placement, timeline, spell bar, previews, AI turns, result), start cells as map properties `startA`/`startB`, class and monster placeholder sprites. `fight-smoke.ts meadow` is the same fight without the client.

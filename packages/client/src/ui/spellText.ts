@@ -64,6 +64,10 @@ export function effectText(e: Effect, selfCast = false): string {
   const base = (() => {
     switch (e.kind) {
       case 'damage':
+        if (d > 0) {
+          const ticks = d === 1 ? 'on their next turn' : `at the start of each of their turns, for ${d} turns`;
+          return `${roll(e)} ${element} damage to ${target}${zone} ${ticks}`;
+        }
         return `${roll(e)} ${element} damage to ${target}${zone}`;
       case 'steal':
         return `${roll(e)} ${element} damage to ${target}${zone}; you heal half of what it takes`;

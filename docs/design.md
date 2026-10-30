@@ -264,6 +264,7 @@ Casting rolls the critical hit first, then applies the grade's effects (or its c
 
 - **Critical hits:** rolled once per cast, only on spells that have critical effects, with chance = the grade's critical chance + the caster's Critical %. A critical hit uses the critical effects and adds Critical Damage to each damage effect.
 - **damage:** rolled once per effect (min–max), shared by every target, through the damage formula, then each target's resistances (players capped at 50%). Shields absorb first.
+- **damage over time:** a damage effect with a `duration`. The roll, the caster's stats and any critical bonus are fixed when it is cast; the damage then lands at the start of each of the target's turns, through the target's resistances at that moment, while the effect lasts (duration *N* = *N* ticks). A fighter killed by a tick loses that turn. Like every buff it ends when its caster leaves the board.
 - **steal:** damage that heals the caster for half the HP it took.
 - **heal:** the heal formula, up to the target's max HP.
 - **shield:** absorbs damage before HP, for `duration` turns: min–max points, or `params.maxHpPercent` of the target's max HP.
@@ -273,7 +274,7 @@ Casting rolls the critical hit first, then applies the grade's effects (or its c
 - **removeAP / removeMP:** each point removed (min–max) is rolled with the removal formula. On the target's own turn the points come off what it has left; otherwise they come off its next turn, as a debuff lasting `duration` turns (at least 1). "Current points" is what the target would start its turn with.
 - **teleport:** moves the caster to the target cell if it is free. **swap:** the caster and the fighter on the target cell trade places.
 - **revive:** on a free target cell, brings back the caster's ally who died most recently (never one who fled) with `params.hpPercent` of its max HP. It keeps its place in the turn order.
-- Not supported yet, and rejected by the content check: **summon**, **glyph**, **trap**, and damage over time (damage with a duration).
+- Not supported yet, and rejected by the content check: **summon**, **glyph**, **trap**, and steal with a duration.
 
 A spell that should be cast only once per fight uses a cooldown longer than any fight (99).
 
@@ -602,7 +603,8 @@ If the offline combat prototype does not make people want another fight, everyth
 - [x] Fight state in `shared`: placement, initiative order, turns, AP/MP, movement, end conditions, seeded RNG
 - [x] Spell data model and casting in `shared`: range shapes, line rules, areas, line of sight, cooldowns, cast limits; spell content validated at build
 - [x] Spell effects in `shared`: damage and criticals, steal, heals, shields, buffs and states, push/pull, AP/MP removal, teleport, swap; tackle on movement
-- [ ] Summons, glyphs, traps and damage over time
+- [x] Damage over time
+- [ ] Summons, glyphs and traps
 - [x] Cut the launch scope: 3 classes, 3 regions, level cap 60, no erosion, no pushback damage
 - [x] First three spell pairs for the three launch classes, played through the engine in tests
 - [x] Monster data and the first two Brightmoor Meadow monsters (Thornback Boar, Dewdrop Wisp), validated at build

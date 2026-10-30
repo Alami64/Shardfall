@@ -604,6 +604,12 @@ export class FightScene extends Phaser.Scene {
         await this.tween({ targets: u.img, alpha: 1, duration: 300 });
         return;
       }
+      case 'dotTicked': {
+        const cell = getFighter(this.state, e.fighterId)?.cell ?? -1;
+        if (cell !== -1) this.flashCell(cell, COLORS.area);
+        await this.wait(160);
+        return;
+      }
       case 'shieldHit':
       case 'buffAdded':
       case 'pointsRemoved':

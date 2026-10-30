@@ -15,6 +15,7 @@ import { neighbors, distance } from './grid.js';
 import { hasLineOfSight } from './lineOfSight.js';
 import { blocksLineOfSight } from './map.js';
 import { castError, castSpell, endTurn, moveFighter, spellError } from './fight.js';
+import { resistedDamage } from './formulas.js';
 import {
   activeFighter,
   effectiveStats,
@@ -70,6 +71,9 @@ const EXPECTED: Rng = () => 0.5;
 /** A winning cast is worth more than anything else on the board. */
 const WIN = 1000;
 
+/** Damage over time is worth a bit less than the same damage now: it arrives later and can be cut short. */
+const DOT_DISCOUNT = 0.75;
+
 /** How many of the best casts get a second look for a follow-up cast. */
 const LOOKAHEAD = 6;
 
@@ -124,6 +128,14 @@ function outcomeValue(before: FightState, events: FightEvent[], me: Fighter, w: 
         break;
       case 'buffAdded': {
         const b = e.buff;
+        if (b.kind === 'dot') {
+          const t = getFighter(before, e.fighterId);
+          if (!t) break;
+          const perTick = resistedDamage(b.value, effectiveStats(t), b.element, t.controller === 'player');
+          const total = Math.min(t.hp, perTick * b.remaining) * DOT_DISCOUNT;
+          value += ally(e.fighterId) ? -w.friendlyFire * total : w.damage * total;
+          break;
+        }
         // Shields and stat bonuses help allies; states and stat maluses hinder enemies.
         const good = b.kind === 'shield' || ((b.kind === 'stat' || b.kind === 'elementStat') && b.value > 0);
         const helps = ally(e.fighterId) === good;

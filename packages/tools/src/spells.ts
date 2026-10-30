@@ -91,7 +91,7 @@ function checkEffect(e: Effect, where: string): string[] {
   }
   if (e.min !== undefined && e.max !== undefined && e.min > e.max) errors.push(`${where}: min ${e.min} > max ${e.max}`);
   if (ELEMENTAL.has(e.kind) && !e.element) errors.push(`${where}: ${e.kind} needs an element`);
-  if (ELEMENTAL.has(e.kind) && (e.duration ?? 0) > 0) errors.push(`${where}: damage over time is not supported yet`);
+  if (e.kind === 'steal' && (e.duration ?? 0) > 0) errors.push(`${where}: steal cannot last; use damage with a duration`);
   if (e.zone.shape === 'single' && e.zone.size !== 0) errors.push(`${where}: a single-cell zone has size 0`);
   switch (e.kind) {
     case 'buff':

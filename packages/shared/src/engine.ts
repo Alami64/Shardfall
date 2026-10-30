@@ -39,12 +39,18 @@ import { castDirection, zoneCells } from './zone.js';
 
 /**
  * Starts the active fighter's turn: buffs it cast count down (and expire at 0),
- * then AP and MP refill with buffs counted, and per-turn cast counts reset.
+ * damage over time on it ticks, then AP and MP refill with buffs counted, and
+ * per-turn cast counts reset. A fighter the ticks kill loses its turn.
  */
 export function beginTurn(state: FightState, events: FightEvent[]): void {
   const f = activeFighter(state)!;
   events.push({ type: 'turnStarted', fighterId: f.id, round: state.round });
   tickBuffs(state, f.id, events);
+  tickDamage(state, f, events);
+  if (f.status !== 'alive') {
+    if (!checkEnd(state, events)) passTurn(state, events);
+    return;
+  }
   const stats = effectiveStats(f);
   f.ap = Math.max(0, stats.ap);
   f.mp = Math.max(0, stats.mp);
@@ -175,6 +181,15 @@ function tickBuffs(state: FightState, casterId: string, events: FightEvent[]): v
   }
 }
 
+/** Damage over time on a fighter starting its turn, each tick through its resistances as they are now. */
+function tickDamage(state: FightState, f: Fighter, events: FightEvent[]): void {
+  for (const b of f.buffs.filter((x) => x.kind === 'dot')) {
+    if (f.status !== 'alive' || b.kind !== 'dot') return;
+    events.push({ type: 'dotTicked', fighterId: f.id, casterId: b.casterId, spellId: b.spellId, element: b.element });
+    hurt(state, f, resistedDamage(b.value, effectiveStats(f), b.element, f.controller === 'player'), events);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Movement
 
@@ -289,6 +304,15 @@ function applyEffect(
     case 'steal': {
       const element = e.element ?? 'neutral';
       const dmg = directDamage(roll(rng, e), effectiveStats(caster), element, critical);
+      if (duration > 0) {
+        // Damage over time: rolled now, dealt at the start of each of the target's turns.
+        if (dmg <= 0) return;
+        for (const t of effectTargets(state, caster, e, cell)) {
+          if (t.status !== 'alive') continue;
+          addBuff(state, t, { kind: 'dot', element, casterId: caster.id, spellId, value: dmg, remaining: duration }, events);
+        }
+        return;
+      }
       for (const t of effectTargets(state, caster, e, cell)) {
         if (t.status !== 'alive') continue;
         const final = resistedDamage(dmg, effectiveStats(t), element, t.controller === 'player');

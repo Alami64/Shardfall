@@ -210,3 +210,19 @@ describe('with the content', () => {
     expect((Date.now() - start) / 10).toBeLessThan(150);
   });
 });
+
+describe('damage over time', () => {
+  it('values a damage over time by its ticks, discounted', () => {
+    // 3 ticks of 4 (12, worth 9 after the discount) beat 7 now; 3 ticks of 2 (4.5) do not.
+    const strong = spell('strong', grade({ apCost: 6, minRange: 1, maxRange: 1, effects: [hit(4, { duration: 3 })] }));
+    const weak = spell('weak', grade({ apCost: 6, minRange: 1, maxRange: 1, effects: [hit(2, { duration: 3 })] }));
+    const jab = spell('jab', grade({ apCost: 6, minRange: 1, maxRange: 1, effects: [hit(7)] }));
+    const plan = (dot: string) => {
+      const m = fighter('m', 'A', 100, { controller: 'ai', ai: BRUTE, spells: [{ spellId: dot, grade: 1 }, { spellId: 'jab', grade: 1 }] });
+      const state = started([m, fighter('p', 'B', 50)], 1, [strong, weak, jab]);
+      return planAiStep(teleport(teleport(state, 'm', cell(10, 5)), 'p', cell(11, 5)), 'm');
+    };
+    expect(plan('strong')).toEqual([{ type: 'cast', spellId: 'strong', cell: cell(11, 5) }]);
+    expect(plan('weak')).toEqual([{ type: 'cast', spellId: 'jab', cell: cell(11, 5) }]);
+  });
+});

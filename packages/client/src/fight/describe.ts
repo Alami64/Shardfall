@@ -28,13 +28,17 @@ export const STAT_LABELS: Record<string, string> = {
 
 export const spellName = (id: string) => spells.find((s) => s.id === id)?.name ?? id;
 
-/** "+20% resistance", "-2 MP", "Shield 15", "Rooted". */
+const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** "+20% resistance", "-2 MP", "Shield 15", "Rooted", "6 Fire per turn". */
 export function buffLabel(b: Buff): string {
   switch (b.kind) {
     case 'shield':
       return `Shield ${b.value}`;
+    case 'dot':
+      return `${b.value} ${capital(b.element)} per turn`;
     case 'state':
-      return b.state.charAt(0).toUpperCase() + b.state.slice(1);
+      return capital(b.state);
     case 'stat':
     case 'elementStat': {
       const sign = b.value > 0 ? '+' : '';
@@ -86,6 +90,8 @@ export function describeEvent(e: FightEvent, state: FightState): EventText {
         log: { line: `${name(e.fighterId)} takes ${e.amount} damage (${e.hp} HP left).`, kind: 'hit' },
         float: { fighterId: e.fighterId, text: `-${e.amount}`, color: FLOAT_COLORS.damage },
       };
+    case 'dotTicked':
+      return { log: { line: `${spellName(e.spellId)} hurts ${name(e.fighterId)}.`, kind: 'hit' } };
     case 'shieldHit':
       return {
         log: { line: `${name(e.fighterId)}'s shield absorbs ${e.absorbed}.`, kind: 'info' },

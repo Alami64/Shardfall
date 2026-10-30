@@ -235,6 +235,74 @@ describe('buffs and durations', () => {
   });
 });
 
+describe('damage over time', () => {
+  const burn = (amount: number, duration: number, overrides: Partial<Effect> = {}) =>
+    fx('damage', { element: 'earth', min: amount, max: amount, duration, ...overrides });
+
+  it('ticks at the start of each of the target turns and counts down on the caster turns', () => {
+    const r = cast(scene([burn(10, 2)]), B_CELL);
+    expect(hp(r.state, 'b')).toBe(100); // nothing yet
+    expect(getFighter(r.state, 'b')!.buffs).toMatchObject([{ kind: 'dot', element: 'earth', value: 10, remaining: 2 }]);
+    let state = pass(r.state, 'a');
+    expect(hp(state, 'b')).toBe(90);
+    state = pass(state, 'b', 'a');
+    expect(hp(state, 'b')).toBe(80);
+    state = pass(state, 'b', 'a'); // expired at the start of the caster's third turn
+    expect(hp(state, 'b')).toBe(80);
+    expect(getFighter(state, 'b')!.buffs).toEqual([]);
+  });
+
+  it('logs the tick before the damage', () => {
+    const state = cast(scene([burn(10, 1)]), B_CELL).state;
+    const r = expectOk(endTurn(state, 'a'));
+    const i = types(r.events).indexOf('dotTicked');
+    expect(r.events[i]).toEqual({ type: 'dotTicked', fighterId: 'b', casterId: 'a', spellId: 's', element: 'earth' });
+    expect(r.events[i + 1]).toMatchObject({ type: 'damaged', fighterId: 'b', amount: 10 });
+  });
+
+  it('uses the caster stats when cast and the target resistances when it ticks', () => {
+    const state = cast(scene([burn(10, 1)], { a: { strength: 100 }, b: { resistPercent: { ...perElement(), earth: 50 } } }), B_CELL).state;
+    expect(getFighter(state, 'b')!.buffs[0]).toMatchObject({ value: 20 });
+    expect(hp(pass(state, 'a'), 'b')).toBe(90);
+  });
+
+  it('adds Critical Damage on a critical hit', () => {
+    const grade = { criticalChance: 10, criticalEffects: [burn(10, 1)] };
+    const state = cast(scene([burn(10, 1)], { grade, a: { criticalDamage: 8 } }), B_CELL, LOW).state;
+    expect(getFighter(state, 'b')!.buffs[0]).toMatchObject({ value: 18 });
+  });
+
+  it('is absorbed by shields', () => {
+    const shield = fx('shield', { min: 4, max: 4, duration: 3 });
+    const state = pass(cast(scene([shield, burn(10, 1)]), B_CELL).state, 'a');
+    expect(hp(state, 'b')).toBe(94);
+  });
+
+  it('ends when its caster leaves the board', () => {
+    let state = cast(scene([burn(10, 2)], { others: [fighter('a2', 'A', 10)] }), B_CELL).state;
+    state = expectOk(applyDamage(state, 'a', 1000)).state; // a dies on its own turn: b plays next
+    expect(activeFighter(state)!.id).toBe('b');
+    expect(hp(state, 'b')).toBe(100);
+  });
+
+  it('can kill at the start of a turn, which then passes to the next fighter', () => {
+    let state = cast(scene([burn(10, 1)], { others: [fighter('b2', 'B', 10, { controller: 'ai' })] }), B_CELL).state;
+    state = expectOk(applyDamage(state, 'b', 95)).state;
+    const r = expectOk(endTurn(state, 'a'));
+    expect(getFighter(r.state, 'b')!.status).toBe('dead');
+    expect(activeFighter(r.state)!.id).toBe('b2');
+    expect(activeFighter(r.state)!.ap).toBeGreaterThan(0);
+  });
+
+  it('can end the fight at the start of a turn', () => {
+    let state = cast(scene([burn(10, 1)]), B_CELL).state;
+    state = expectOk(applyDamage(state, 'b', 95)).state;
+    const r = expectOk(endTurn(state, 'a'));
+    expect(r.state.phase).toBe('ended');
+    expect(r.events.at(-1)).toEqual({ type: 'fightEnded', winner: 'A' });
+  });
+});
+
 describe('states', () => {
   it('gate effects with requiresState and forbidsState', () => {
     const base = { apCost: 1, minRange: 0, maxRange: 6, needsLineOfSight: false };

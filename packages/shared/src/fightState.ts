@@ -42,12 +42,15 @@ export type BuffKind =
   | { kind: 'stat'; stat: ScalarStat }
   | { kind: 'elementStat'; stat: ElementStat; element: Element | 'all' }
   | { kind: 'state'; state: string }
-  | { kind: 'shield' };
+  | { kind: 'shield' }
+  | { kind: 'dot'; element: Element };
 
 /**
  * A timed effect on a fighter: a stat change (negative for debuffs), a state,
- * or a shield. `remaining` counts down at the start of the caster's turns and
- * the buff ends at 0. For a shield, `value` is the HP it still absorbs.
+ * a shield, or damage over time. `remaining` counts down at the start of the
+ * caster's turns and the buff ends at 0. For a shield, `value` is the HP it
+ * still absorbs; for damage over time, the damage each tick deals before the
+ * target's resistances.
  */
 export type Buff = BuffKind & {
   casterId: string;
@@ -131,6 +134,7 @@ export type FightEvent =
   | { type: 'tackled'; fighterId: string; cell: number; apLost: number; mpLost: number }
   | { type: 'spellCast'; fighterId: string; spellId: string; grade: number; cell: number; critical: boolean }
   | { type: 'damaged'; fighterId: string; amount: number; hp: number }
+  | { type: 'dotTicked'; fighterId: string; casterId: string; spellId: string; element: Element }
   | { type: 'shieldHit'; fighterId: string; absorbed: number; remaining: number }
   | { type: 'healed'; fighterId: string; amount: number; hp: number }
   | { type: 'displaced'; fighterId: string; path: number[]; reason: DisplacementReason }
