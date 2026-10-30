@@ -6,6 +6,8 @@
  *
  *   npx tsx .claude/skills/run-shardfall/driver.ts shot:map key:r shot:range click:426 wait:4000 shot:walked
  *
+ * Env: URL (default http://localhost:5173/), OUT (screenshot folder), VIEWPORT (default 1400x1000).
+ *
  * Steps:
  *   shot:NAME        screenshot to $OUT/NAME.png (OUT defaults to /tmp/shardfall-run)
  *   key:K            press a key (r = range overlay, d = cell grid)
@@ -33,6 +35,7 @@ const { chromium } = createRequire(import.meta.url)('playwright');
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const URL = process.env.URL ?? 'http://localhost:5173/';
 const OUT = process.env.OUT ?? '/tmp/shardfall-run';
+const [VW = 1400, VH = 1000] = (process.env.VIEWPORT ?? '1400x1000').split('x').map(Number);
 const steps = process.argv.slice(2);
 if (steps.length === 0) steps.push('shot:map');
 
@@ -58,7 +61,7 @@ async function main() {
   const browser = await chromium.launch();
   const errors: string[] = [];
   try {
-    const page = await browser.newPage({ viewport: { width: 1400, height: 1000 } });
+    const page = await browser.newPage({ viewport: { width: VW, height: VH } });
     page.on('pageerror', (e: Error) => errors.push(String(e)));
     page.on('console', (m: { type(): string; text(): string }) => m.type() === 'error' && errors.push(m.text()));
     await page.goto(URL);

@@ -23,7 +23,6 @@ import {
   shieldOf,
   spellAreaCells,
   spellError,
-  spellGradeOf,
   spellRangeCells,
   startFight,
   type FightEvent,
@@ -35,10 +34,13 @@ import {
 import { spells, sprite, world } from '../assets';
 import { DEPTH, ORIGIN_X, ORIGIN_Y, REGION_NAME } from '../config';
 import { buffLabel, describeEvent, errorText, spellName } from '../fight/describe';
-import { fightHud, type FighterCard, type SpellButton } from '../fight/fightHud';
+import { fightHud, type FighterCard } from '../fight/fightHud';
 import { ENCOUNTERS, encounterSetups, lookOf, partySetups, textureOf, type Encounter, type Look } from '../fight/setup';
 import { hud } from '../hud';
 import { cellPos, diamond, drawMap, placeSprite, updateOccluders, type Occluder } from '../render/mapView';
+import { bar, type BarMode } from '../ui/bar';
+import { viewOfFighter, type CharacterView } from '../ui/characters';
+import { windows } from '../ui/windows';
 
 export interface FightSceneData {
   mapId: string;
@@ -71,6 +73,9 @@ interface Unit {
   hp: number;
   floats: number;
 }
+
+/** Registry key: the hero picked in the party list, shared with exploration. */
+export const SELECTED_HERO = 'selectedHero';
 
 const teamColor = (f: Fighter) => (f.team === 'A' ? COLORS.teamA : COLORS.teamB);
 
@@ -144,8 +149,8 @@ export class FightScene extends Phaser.Scene {
     hud.setMap(map.name, REGION_NAME, map.worldX, map.worldY);
     hud.showExplore(false);
     fightHud.show(true);
-    fightHud.clearLog();
-    fightHud.log(`A monster group attacks! (fight seed ${seed})`, 'turn');
+    bar.clearLog();
+    bar.log(`A monster group attacks! (fight seed ${seed})`, 'turn');
     this.wireInput();
 
     if (import.meta.env.DEV) {
@@ -173,11 +178,12 @@ export class FightScene extends Phaser.Scene {
   // ------------------------------------------------------------------ input
 
   private wireInput() {
-    fightHud.on('btn-ready', () => this.ready());
-    fightHud.on('btn-end-turn', () => this.playerAction((id) => endTurn(this.state, id)));
-    fightHud.on('btn-flee', () => this.playerAction((id) => flee(this.state, id)));
-    fightHud.on('btn-result', () => this.leave());
-    fightHud.onSpell((spellId) => this.toggleSpell(spellId));
+    bar.onButton('btn-ready', () => this.ready());
+    bar.onButton('btn-end-turn', () => this.playerAction((id) => endTurn(this.state, id)));
+    bar.onButton('btn-flee', () => this.playerAction((id) => flee(this.state, id)));
+    fightHud.onResult(() => this.leave());
+    bar.on({ select: (id) => this.selectHero(id), slot: (spellId) => this.clickSlot(spellId) });
+    windows.onSelect((id) => this.selectHero(id));
 
     this.input.mouse?.disableContextMenu();
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.setHover(this.cellAt(p)));
@@ -223,7 +229,7 @@ export class FightScene extends Phaser.Scene {
     if (spellId) {
       const error = castError(this.state, this.active()!.id, spellId, cell);
       if (error) {
-        fightHud.toast(errorText(error));
+        bar.toast(errorText(error));
         return;
       }
       this.selectedSpell = null;
@@ -234,10 +240,24 @@ export class FightScene extends Phaser.Scene {
     if (cell === me.cell || fighterAt(this.state, cell)) return;
     const path = movePath(this.state, me.id, cell);
     if (!path) {
-      fightHud.toast(me.mp > 0 ? 'Out of reach' : 'No MP left');
+      bar.toast(me.mp > 0 ? 'Out of reach' : 'No MP left');
       return;
     }
     this.playerAction((id) => moveFighter(this.state, id, path));
+  }
+
+  /** A party button or a window tab: during placement, the hero to place; later, whose windows show. */
+  private selectHero(id: string) {
+    if (!this.heroes().some((h) => h.id === id)) return;
+    this.registry.set(SELECTED_HERO, id);
+    if (this.state.phase === 'placement') this.placing = id;
+    this.refresh();
+  }
+
+  /** A spell slot: aims the spell on the hero's own turn, otherwise opens its description. */
+  private clickSlot(spellId: string) {
+    if (this.canAct() && this.active()!.spells.some((s) => s.spellId === spellId)) this.toggleSpell(spellId);
+    else windows.showSpell(spellId);
   }
 
   private toggleSpell(spellId: string) {
@@ -248,7 +268,7 @@ export class FightScene extends Phaser.Scene {
     }
     const error = spellError(this.state, this.active()!.id, spellId);
     if (error) {
-      fightHud.toast(errorText(error));
+      bar.toast(errorText(error));
       return;
     }
     this.selectedSpell = spellId;
@@ -287,7 +307,7 @@ export class FightScene extends Phaser.Scene {
   /** Takes an action's result: shows the error, or adopts the new state and plays its events. */
   private apply(result: FightResult) {
     if (!result.ok) {
-      fightHud.toast(errorText(result.error));
+      bar.toast(errorText(result.error));
       return;
     }
     this.state = result.state;
@@ -338,7 +358,7 @@ export class FightScene extends Phaser.Scene {
     if (this.countdown > 0) return;
     if (placement) this.ready();
     else {
-      fightHud.toast('Time is up');
+      bar.toast('Time is up');
       this.selectedSpell = null;
       this.playerAction((id) => endTurn(this.state, id));
     }
@@ -346,7 +366,6 @@ export class FightScene extends Phaser.Scene {
 
   private showEnd() {
     fightHud.setTimer(null);
-    fightHud.setMode('ended');
     this.refresh();
     const won = this.state.winner === 'A';
     const standing = this.heroes().filter((h) => h.status === 'alive').length;
@@ -511,7 +530,7 @@ export class FightScene extends Phaser.Scene {
   private async play(events: FightEvent[]) {
     for (const e of events) {
       const words = describeEvent(e, this.state);
-      if (words.log) fightHud.log(words.log.line, words.log.kind);
+      if (words.log) bar.log(words.log.line, words.log.kind);
       if (words.float) this.floatText(words.float.fighterId, words.float.text, words.float.color);
       await this.animate(e);
     }
@@ -619,15 +638,19 @@ export class FightScene extends Phaser.Scene {
       }),
     );
 
-    // The card follows the hovered fighter, else the one whose turn it is.
     const hovered = this.hover !== -1 ? fighterAt(s, this.hover) : undefined;
-    fightHud.setFighter(hovered ? this.card(hovered) : shown ? this.card(shown) : null);
+    fightHud.setHover(hovered ? this.card(hovered) : null);
 
     const mine = fighting && !this.busy && shown?.controller === 'player' && shown.id === this.active()?.id;
-    fightHud.setSpells(fighting && shown?.controller === 'player' ? this.spellButtons(shown, mine) : null);
-    fightHud.setMode(placement ? 'placement' : s.phase === 'ended' ? 'ended' : mine ? 'player' : 'waiting');
+    const mode: BarMode = placement ? 'placement' : s.phase === 'ended' ? 'ended' : mine ? 'player' : 'waiting';
+    const party = this.heroes().map((h) => this.view(h, mine));
+    const selected = placement ? this.placing : (this.registry.get(SELECTED_HERO) as string | undefined) ?? party[0]?.id ?? '';
+    // The orb and the slots follow the hero whose turn it is; otherwise the one picked.
+    const focusId = fighting && shown?.controller === 'player' ? shown.id : selected;
+    bar.render({ party, selected, focus: party.find((h) => h.id === focusId) ?? null, aiming: this.selectedSpell, mode });
+    windows.update(party, selected);
     if (s.phase === 'ended') fightHud.setTimer(null);
-    fightHud.setHint(this.hint(mine, shown));
+    bar.hint(this.hint(mine, shown));
 
     for (const f of s.fighters) {
       const u = this.units.get(f.id)!;
@@ -635,6 +658,17 @@ export class FightScene extends Phaser.Scene {
       u.ring.setStrokeStyle(isActive ? 3.5 : 2.5, isActive ? COLORS.active : teamColor(f), 0.95);
     }
     this.drawOverlay(mine);
+  }
+
+  /** A hero for the bar and the windows, with its HP as currently drawn (it lags the state while hits animate). */
+  private view(f: Fighter, mine: boolean): CharacterView {
+    const myTurn = mine && f.id === this.active()?.id;
+    const v = viewOfFighter(this.state, f, (spellId) => {
+      if (!myTurn) return 'Not this hero’s turn';
+      const error = spellError(this.state, f.id, spellId);
+      return error ? errorText(error) : null;
+    });
+    return { ...v, hp: this.units.get(f.id)?.hp ?? v.hp };
   }
 
   private card(f: Fighter): FighterCard {
@@ -650,25 +684,15 @@ export class FightScene extends Phaser.Scene {
     };
   }
 
-  private spellButtons(f: Fighter, mine: boolean): SpellButton[] {
-    return f.spells.map(({ spellId }) => {
-      const grade = spellGradeOf(this.state, f, spellId)!;
-      const error = mine ? spellError(this.state, f.id, spellId) : 'not-your-turn';
-      let blocked: string | null = null;
-      if (error === 'on-cooldown') blocked = `ready in ${f.spellUsage[spellId]!.castableFromTurn - f.turns}`;
-      else if (error) blocked = errorText(error);
-      return { id: spellId, name: spellName(spellId), ap: grade.apCost, blocked, selected: spellId === this.selectedSpell };
-    });
-  }
-
   private hint(mine: boolean, shown: Fighter | undefined): string {
     if (this.state.phase === 'placement') {
-      return `Placing ${getFighter(this.state, this.placing)?.name ?? ''}: click a blue cell, or another hero. Ready when set.`;
+      const name = getFighter(this.state, this.placing)?.name ?? '';
+      return `Placing ${name}: click a blue cell (or pick another hero below) · Ready when set`;
     }
     if (this.state.phase === 'ended') return '';
     if (!mine) return shown ? `${shown.name} is playing…` : '';
     if (this.selectedSpell) return `${spellName(this.selectedSpell)}: click a highlighted cell · Esc or right-click to cancel`;
-    return 'Click a green cell to move · pick a spell (1–6) to act · Space ends the turn';
+    return 'Click a green cell to move · pick a spell (1–6) to act · Space ends the turn · S spells, C characteristics';
   }
 
   private fill(cell: number, color: number, alpha: number, stroke = 0) {

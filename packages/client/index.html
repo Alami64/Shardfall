@@ -8,12 +8,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" />
 <style>
-  /* Layout: the map canvas fills the screen; a placard (top left), a tile readout (top right)
-     and a control bar (bottom) float over it like a field guide's margin notes.
-     One deliberate dark look, matched to the canvas, in every theme. */
+  /* Layout: the map fills the screen above a full-width status bar (messages on the left,
+     the hero's life orb in the middle, menus and spell slots on the right). A placard (top
+     left), readouts (top right) and windows float over the map like a field guide's margin
+     notes. One deliberate dark look, matched to the canvas, in every theme. */
   :root {
     --night: #0f1a14;
-    --panel: rgba(14, 25, 19, 0.82);
+    --panel: rgba(14, 25, 19, 0.86);
+    --panel-solid: #142219;
     --line: rgba(239, 230, 207, 0.16);
     --parchment: #efe6cf;
     --moss: #a9b89f;
@@ -23,10 +25,12 @@
     --team-a: #5aa9e6;
     --team-b: #e0533d;
     --heal: #7fd47a;
+    --life: #d8473a;
     --font-display: "Alegreya SC", "Palatino Linotype", Palatino, Georgia, serif;
     --font-body: "Alegreya Sans", "Gill Sans", "Trebuchet MS", system-ui, sans-serif;
     --font-data: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
     --gap: 12px;
+    --bar-h: 132px;
     color-scheme: dark;
   }
   html, body { height: 100%; }
@@ -42,7 +46,8 @@
     -webkit-font-smoothing: antialiased;
   }
   #app { position: relative; height: 100%; overflow: hidden; }
-  #game { position: absolute; inset: 0; }
+  /* The map stops where the bar starts, so the bar never hides a cell. */
+  #game { position: absolute; inset: 0 0 calc(var(--bar-h) + env(safe-area-inset-bottom, 0px)) 0; }
   #game canvas { display: block; touch-action: none; }
 
   .hud {
@@ -54,7 +59,20 @@
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
   }
+  button { font: inherit; color: inherit; }
+  kbd {
+    display: inline-grid;
+    place-items: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 3px;
+    font: 500 11px/1 var(--font-data);
+    color: var(--parchment);
+    background: rgba(239, 230, 207, 0.1);
+    border-radius: 4px;
+  }
 
+  /* ---------------------------------------------------------------- top: placard, readouts */
   .placard {
     top: calc(var(--gap) + env(safe-area-inset-top, 0px));
     left: calc(var(--gap) + env(safe-area-inset-left, 0px));
@@ -82,7 +100,7 @@
     text-wrap: balance;
   }
 
-  .readout {
+  .readout, .hover-card {
     top: calc(var(--gap) + env(safe-area-inset-top, 0px));
     right: calc(var(--gap) + env(safe-area-inset-right, 0px));
     padding: 10px 14px;
@@ -97,51 +115,18 @@
   .readout .exit { margin: 0; font-size: 14px; color: var(--amber); font-weight: 500; }
   .readout .group { margin: 0; font-size: 14px; color: var(--ember); font-weight: 500; }
 
-  .controls {
-    bottom: calc(var(--gap) + env(safe-area-inset-bottom, 0px));
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: calc(100% - 2 * var(--gap));
-  }
-  .controls .hint { margin: 0 8px 0 6px; font-size: 14px; color: var(--moss); }
-  .controls button {
-    pointer-events: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px 6px 6px;
-    font: 500 14px/1 var(--font-body);
-    color: var(--parchment);
-    background: transparent;
-    border: 1px solid var(--line);
-    border-radius: 7px;
-    cursor: pointer;
-    transition: background-color 120ms ease, border-color 120ms ease;
-  }
-  .controls button:hover { background: rgba(239, 230, 207, 0.07); }
-  .controls button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-  .controls button[aria-pressed="true"] { border-color: var(--amber); background: rgba(242, 165, 65, 0.14); }
-  .controls button[aria-pressed="true"] kbd { background: var(--amber); color: var(--night); }
-  kbd {
-    display: inline-grid;
-    place-items: center;
-    min-width: 22px;
-    height: 22px;
-    font: 500 12px/1 var(--font-data);
-    color: var(--parchment);
-    background: rgba(239, 230, 207, 0.1);
-    border-radius: 5px;
-  }
-  .swatch { width: 10px; height: 10px; border-radius: 2px; transform: rotate(45deg); }
-  .swatch.range { background: var(--teal); }
+  .hover-card { top: calc(84px + var(--gap) + env(safe-area-inset-top, 0px)); border-left: 3px solid var(--team-a); }
+  .hover-card.team-B { border-left-color: var(--team-b); }
+  .hc-name { margin: 0; font-family: var(--font-display); font-size: 17px; line-height: 1.1; }
+  .hc-stats { margin: 2px 0 0; font: 13px/1.2 var(--font-data); }
+  .hc-stats b { color: var(--amber); font-weight: 500; }
+  .hc-notes { margin: 0; font-size: 12.5px; color: var(--moss); max-width: 240px; }
+  .hc-notes:empty { display: none; }
+  .hpbar { display: block; height: 4px; border-radius: 2px; background: rgba(239, 230, 207, 0.15); overflow: hidden; }
+  .hpbar span { display: block; height: 100%; background: var(--heal); transition: width 200ms ease; }
+  .hover-card.team-B .hpbar span { background: var(--team-b); }
 
-  /* ---------------------------------------------------------------- fight */
+  /* ---------------------------------------------------------------- top: turn timeline */
   .fight-top {
     top: calc(var(--gap) + env(safe-area-inset-top, 0px));
     left: 50%;
@@ -170,78 +155,260 @@
   .chip.active { border-color: var(--amber); background: rgba(242, 165, 65, 0.16); }
   .chip.down { opacity: 0.35; }
   .chip-name { font-size: 13px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
-  .chip-hp, .hpbar { display: block; height: 4px; border-radius: 2px; background: rgba(239, 230, 207, 0.15); overflow: hidden; }
-  .chip-hp span, .hpbar span { display: block; height: 100%; background: var(--heal); transition: width 200ms ease; }
+  .chip-hp { display: block; height: 4px; border-radius: 2px; background: rgba(239, 230, 207, 0.15); overflow: hidden; }
+  .chip-hp span { display: block; height: 100%; background: var(--heal); transition: width 200ms ease; }
   .chip.team-B .chip-hp span { background: var(--team-b); }
 
-  .fight-log {
-    top: calc(92px + var(--gap) + env(safe-area-inset-top, 0px));
-    right: calc(var(--gap) + env(safe-area-inset-right, 0px));
-    width: 280px;
-    max-height: 40vh;
-    overflow-y: auto;
-    padding: 8px 12px;
-    font-size: 13px;
-    pointer-events: auto;
+  /* ---------------------------------------------------------------- bottom: the status bar */
+  .bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--bar-h);
+    padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto minmax(320px, 1fr);
+    align-items: stretch;
+    background: linear-gradient(to bottom, #1b2c21, var(--panel-solid) 18px);
+    border-top: 1px solid rgba(242, 165, 65, 0.35);
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.35);
   }
-  .fight-log p { margin: 0 0 3px; }
-  .fight-log .log-turn { margin-top: 6px; color: var(--amber); font-family: var(--font-display); font-size: 14px; }
-  .fight-log .log-hit { color: #f2b8a8; }
-  .fight-log .log-heal { color: var(--heal); }
-  .fight-log .log-info { color: var(--moss); }
 
-  .fight-bar {
-    bottom: calc(var(--gap) + env(safe-area-inset-bottom, 0px));
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: max-content;
-    max-width: calc(100% - 2 * var(--gap));
+  .bar-log {
+    margin: 10px 0 10px 12px;
+    padding: 6px 10px;
+    overflow-y: auto;
+    font-size: 13.5px;
+    line-height: 1.35;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid var(--line);
+    border-radius: 7px;
   }
-  .fighter-card { min-width: 170px; padding: 2px 6px; border-left: 3px solid var(--team-a); }
-  .fighter-card.team-B { border-left-color: var(--team-b); }
-  .fc-name { margin: 0 0 4px; font-family: var(--font-display); font-size: 17px; line-height: 1.1; }
-  .fc-stats { margin: 4px 0 0; font: 13px/1.2 var(--font-data); }
-  .fc-stats b { color: var(--amber); font-weight: 500; }
-  .fc-notes { margin: 2px 0 0; font-size: 12.5px; color: var(--moss); max-width: 220px; }
-  .fc-notes:empty { display: none; }
-  .spellbar { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
-  .actions { display: flex; gap: 6px; }
-  .fight-bar button {
-    pointer-events: auto;
+  .bar-log p { margin: 0 0 2px; }
+  .bar-log .log-turn { margin-top: 5px; color: var(--amber); font-family: var(--font-display); font-size: 14px; }
+  .bar-log .log-hit { color: #f2b8a8; }
+  .bar-log .log-heal { color: var(--heal); }
+  .bar-log .log-info { color: var(--moss); }
+  .bar-log .log-system { color: var(--parchment); }
+
+  .bar-center {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    align-items: center;
+    gap: 14px;
+    padding: 0 18px;
+  }
+  .party { display: grid; gap: 4px; }
+  .party button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 104px;
+    padding: 3px 8px 3px 4px;
+    font-size: 13px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .party button:hover { background: rgba(239, 230, 207, 0.07); }
+  .party button[aria-pressed="true"] { border-color: var(--amber); background: rgba(242, 165, 65, 0.14); }
+  .party button.down { opacity: 0.4; }
+  .party .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .party .dot.vanguard { background: #b5532f; }
+  .party .dot.longshot { background: #3f7d3a; }
+  .party .dot.mender { background: #e8dcc0; }
+
+  /* The life orb: a round flask that empties as the hero loses HP. */
+  .orb {
+    --hp: 100%;
+    position: relative;
+    width: 104px;
+    height: 104px;
+    margin-top: -26px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.28), transparent 32%),
+      linear-gradient(to top, var(--life) 0 var(--hp), #2a1a17 var(--hp) 100%);
+    border: 3px solid #e9d8a6;
+    box-shadow: 0 0 0 2px #3b2a14, 0 6px 16px rgba(0, 0, 0, 0.5), inset 0 -8px 16px rgba(0, 0, 0, 0.35);
+    transition: background 300ms ease;
+  }
+  .orb-hp { font: 700 24px/1 var(--font-display); color: #fff; text-shadow: 0 2px 3px rgba(0, 0, 0, 0.7); }
+  .orb-max { position: absolute; bottom: 20px; font: 500 11px/1 var(--font-data); color: rgba(255, 255, 255, 0.8); }
+  .vitals { display: grid; gap: 6px; justify-items: start; }
+  .vitals .name { margin: 0; font-family: var(--font-display); font-size: 17px; line-height: 1; }
+  .vitals .level { margin: 0; font-size: 12px; color: var(--moss); }
+  .points { display: flex; gap: 6px; }
+  .point {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 34px;
+    border-radius: 7px;
+    font: 500 17px/1 var(--font-data);
+  }
+  .point small { font: 500 9.5px/1 var(--font-body); letter-spacing: 0.08em; opacity: 0.8; }
+  .point.ap { background: rgba(63, 193, 176, 0.22); border: 1px solid rgba(63, 193, 176, 0.6); color: #bff1ea; }
+  .point.mp { background: rgba(127, 212, 122, 0.18); border: 1px solid rgba(127, 212, 122, 0.55); color: #d5f5d2; }
+
+  /* Menus, then the spell slots, then the fight buttons stacked in their own column. */
+  .bar-right {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 10px;
+    padding: 10px 12px 10px 0;
+    min-width: 0;
+  }
+  .menu { display: grid; grid-template-columns: repeat(2, 38px); grid-auto-rows: 38px; gap: 5px; align-content: start; }
+  .menu button {
+    display: grid;
+    place-items: center;
+    position: relative;
+    padding: 0;
+    background: rgba(239, 230, 207, 0.05);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .menu button:hover { background: rgba(239, 230, 207, 0.1); }
+  .menu button[aria-pressed="true"] { border-color: var(--amber); background: rgba(242, 165, 65, 0.18); }
+  .menu svg { width: 22px; height: 22px; }
+  .menu kbd { position: absolute; right: -4px; bottom: -4px; min-width: 15px; height: 15px; font-size: 9.5px; background: #263a2d; }
+  .slots { display: grid; grid-template-columns: repeat(5, minmax(56px, 72px)); grid-auto-rows: 44px; gap: 5px; min-width: 0; }
+  .slot {
+    position: relative;
+    display: grid;
+    align-content: space-between;
+    padding: 3px 5px 4px;
+    text-align: left;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  .slot:hover:not(:disabled) { background: rgba(239, 230, 207, 0.08); }
+  .slot:disabled { cursor: not-allowed; }
+  .slot:disabled .slot-name, .slot:disabled .slot-cost { opacity: 0.4; }
+  .slot.empty { cursor: default; background: rgba(0, 0, 0, 0.12); border-style: dashed; }
+  .slot[aria-pressed="true"] { border-color: var(--teal); background: rgba(63, 193, 176, 0.2); }
+  .slot kbd { position: absolute; top: 2px; right: 3px; min-width: 14px; height: 14px; font-size: 9.5px; }
+  .slot-name { font-size: 12px; line-height: 1.1; padding-right: 14px; }
+  .slot-cost { font: 500 11px/1 var(--font-data); color: var(--teal); }
+  .slot .cooldown { position: absolute; inset: 0; display: grid; place-items: center; font: 700 17px/1 var(--font-data); color: var(--amber); background: rgba(0, 0, 0, 0.45); }
+  .actions { display: grid; gap: 5px; }
+  .actions:not(:has(button:not([hidden]))) { display: none; }
+  .actions button {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 10px 6px 6px;
+    padding: 5px 10px 5px 5px;
     font: 500 14px/1 var(--font-body);
-    color: var(--parchment);
     background: transparent;
     border: 1px solid var(--line);
     border-radius: 7px;
     cursor: pointer;
-    transition: background-color 120ms ease, border-color 120ms ease, opacity 120ms ease;
   }
-  .fight-bar button:hover:not(:disabled) { background: rgba(239, 230, 207, 0.07); }
-  .fight-bar button:focus-visible, .result-card button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-  .fight-bar button:disabled { opacity: 0.38; cursor: not-allowed; }
-  .fight-bar button.primary { border-color: rgba(242, 165, 65, 0.6); }
-  .spell { flex-direction: column; align-items: stretch !important; gap: 3px !important; padding: 5px 8px !important; min-width: 92px; text-align: left; }
-  .spell kbd { min-width: 18px; height: 18px; font-size: 11px; }
-  .spell .spell-name { font-size: 13.5px; }
-  .spell .spell-cost { font: 12px/1 var(--font-data); color: var(--teal); }
-  .spell[aria-pressed="true"] { border-color: var(--teal); background: rgba(63, 193, 176, 0.16); }
-  .fight-hint { flex-basis: 100%; margin: 0; text-align: center; font-size: 13.5px; color: var(--moss); }
-  .fight-hint:empty { display: none; }
+  .actions button:hover { background: rgba(239, 230, 207, 0.07); }
+  .actions button.primary { border-color: rgba(242, 165, 65, 0.7); background: rgba(242, 165, 65, 0.12); }
+  .bar button:focus-visible, .window button:focus-visible, .result-card button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 
+  .hint {
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--bar-h) + 8px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 4px 12px;
+    max-width: calc(100% - 2 * var(--gap));
+    font-size: 13.5px;
+    color: var(--moss);
+    text-align: center;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    pointer-events: none;
+  }
+  .hint:empty { display: none; }
+
+  /* ---------------------------------------------------------------- windows */
+  .window {
+    position: absolute;
+    bottom: calc(var(--bar-h) + 48px + env(safe-area-inset-bottom, 0px));
+    width: min(440px, calc(100% - 2 * var(--gap)));
+    max-height: calc(100% - var(--bar-h) - 120px);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    background: var(--panel-solid);
+    border: 1px solid rgba(242, 165, 65, 0.4);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+  }
+  #win-stats { left: calc(var(--gap) + env(safe-area-inset-left, 0px)); }
+  #win-spells { right: calc(var(--gap) + env(safe-area-inset-right, 0px)); width: min(560px, calc(100% - 2 * var(--gap))); }
+  .window header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px 8px 14px;
+    background: rgba(242, 165, 65, 0.1);
+    border-bottom: 1px solid var(--line);
+  }
+  .window h2 { margin: 0; font: 700 18px/1 var(--font-display); }
+  .window .tabs { display: flex; gap: 4px; margin-left: auto; }
+  .window .tabs button, .window .close {
+    padding: 3px 8px;
+    font-size: 13px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .window .tabs button[aria-pressed="true"] { border-color: var(--amber); background: rgba(242, 165, 65, 0.16); }
+  .window .close { font-size: 16px; line-height: 1; padding: 3px 7px; }
+  .window .body { overflow-y: auto; padding: 10px 14px 14px; font-size: 14px; }
+  .window h3 { margin: 12px 0 4px; font: 700 13px/1.2 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--moss); }
+  .window h3:first-child { margin-top: 0; }
+  .stat-table { width: 100%; border-collapse: collapse; }
+  .stat-table th { text-align: left; font-weight: 500; padding: 3px 8px 3px 0; }
+  .stat-table td { font: 13px/1.2 var(--font-data); text-align: right; padding: 3px 0; white-space: nowrap; }
+  .stat-table td.note { font: 12.5px/1.2 var(--font-body); text-align: left; color: var(--moss); padding-left: 10px; white-space: normal; }
+  .stat-table tr + tr th, .stat-table tr + tr td { border-top: 1px solid rgba(239, 230, 207, 0.06); }
+  .bonus { color: var(--heal); }
+  .malus { color: var(--ember); }
+  .spells-layout { display: grid; grid-template-columns: 150px 1fr; gap: 12px; }
+  .spell-list { display: grid; gap: 4px; align-content: start; }
+  .spell-list button {
+    display: grid;
+    text-align: left;
+    padding: 5px 8px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .spell-list button span { font: 11px/1.2 var(--font-data); color: var(--teal); }
+  .spell-list button[aria-pressed="true"] { border-color: var(--teal); background: rgba(63, 193, 176, 0.14); }
+  .spell-detail h4 { margin: 0; font: 700 20px/1.1 var(--font-display); }
+  .spell-detail .sub { margin: 2px 0 8px; font-size: 13px; color: var(--moss); }
+  .spell-detail ul { margin: 0; padding-left: 18px; }
+  .spell-detail li { margin: 2px 0; }
+  .spell-detail .facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 4px; padding: 0; list-style: none; }
+  .spell-detail .facts li { margin: 0; padding: 2px 8px; font: 12.5px/1.4 var(--font-data); background: rgba(239, 230, 207, 0.06); border-radius: 5px; }
+  .spell-detail .state { margin: 8px 0 0; font-size: 13px; color: var(--amber); }
+
+  /* ---------------------------------------------------------------- toasts and the result */
   .toast {
     position: absolute;
     left: 50%;
-    bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(var(--bar-h) + 52px + env(safe-area-inset-bottom, 0px));
     transform: translate(-50%, 8px);
     padding: 6px 14px;
     border-radius: 8px;
@@ -254,24 +421,33 @@
   }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-  .result { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(8, 14, 10, 0.45); }
+  .result { position: absolute; inset: 0 0 var(--bar-h) 0; display: grid; place-items: center; background: rgba(8, 14, 10, 0.45); }
   .result-card { position: static; padding: 22px 28px 24px; text-align: center; max-width: min(380px, calc(100% - 2 * var(--gap))); pointer-events: auto; }
   .result-card h2 { margin: 0 0 6px; font-family: var(--font-display); font-size: 30px; color: var(--amber); }
   .result-card p { margin: 0 0 16px; color: var(--parchment); }
   .result-card button { padding: 8px 16px; font: 500 15px/1 var(--font-body); color: var(--night); background: var(--amber); border: 0; border-radius: 7px; cursor: pointer; }
 
-  @media (max-width: 960px) {
-    .fight-top { left: var(--gap); transform: none; max-width: calc(100% - 2 * var(--gap)); top: calc(78px + var(--gap)); }
-    .fight-log { display: none; }
+  @media (max-width: 1100px) {
+    /* No room for the message log: the party and orb, then menus and slots. */
+    .bar { grid-template-columns: auto minmax(0, 1fr); }
+    .bar-log { display: none; }
+    .fight-top { max-width: calc(100% - 2 * var(--gap)); left: var(--gap); transform: none; top: calc(78px + var(--gap)); }
+    .hover-card { top: calc(150px + var(--gap)); }
   }
-
   @media (max-width: 720px) {
+    :root { --bar-h: 214px; }
     .placard h1 { font-size: 21px; }
-    .readout { top: auto; bottom: calc(64px + var(--gap) + env(safe-area-inset-bottom, 0px)); min-width: 0; }
-    .controls .hint { display: none; }
+    .readout { min-width: 0; }
+    .bar { grid-template-columns: auto 1fr; grid-template-rows: auto 1fr; }
+    .bar-center { padding: 6px 8px 0; gap: 8px; }
+    .orb { width: 76px; height: 76px; margin-top: 0; }
+    .orb-hp { font-size: 19px; }
+    .orb-max { bottom: 12px; }
+    .bar-right { grid-column: 1 / -1; padding: 0 8px 8px; grid-template-columns: auto minmax(0, 1fr) auto; }
+    .slots { grid-template-columns: repeat(5, 1fr); grid-auto-rows: 40px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .controls button, .fight-bar button, .toast, .chip-hp span, .hpbar span { transition: none; }
+    .toast, .chip-hp span, .hpbar span, .orb { transition: none; }
   }
 </style>
 </head>
@@ -284,7 +460,6 @@
     <h1 id="map-name">Brightmoor Meadow</h1>
   </header>
 
-  <div id="explore-hud">
   <aside class="hud readout" id="cell-info" hidden aria-live="polite">
     <dl>
       <dt>Cell</dt><dd id="cell-id">0</dd>
@@ -295,47 +470,95 @@
     <p class="group" id="cell-group" hidden></p>
   </aside>
 
-  <nav class="hud controls" aria-label="Map tools">
-    <p class="hint">Click a tile to walk · click the monsters to fight · the amber edge leads on</p>
-    <button type="button" id="btn-range" aria-pressed="false"><kbd>R</kbd>3 MP range</button>
-    <button type="button" id="btn-debug" aria-pressed="false"><kbd>D</kbd>Cell grid</button>
-  </nav>
-  </div>
-
   <div id="fight-hud" hidden>
     <div class="hud fight-top">
       <p class="fight-status"><span id="fight-round">Placement</span><span class="timer" id="fight-timer"></span></p>
       <ol class="timeline" id="fight-timeline" aria-label="Turn order"></ol>
     </div>
 
-    <aside class="hud fight-log" id="fight-log" aria-live="polite" aria-label="Fight log"></aside>
-
-    <section class="hud fight-bar" aria-label="Fight controls">
-      <div class="fighter-card" id="fighter-card" hidden>
-        <p class="fc-name" id="fc-name"></p>
-        <div class="hpbar"><span id="fc-hp-fill"></span></div>
-        <p class="fc-stats"><span id="fc-hp"></span> HP · <b id="fc-ap"></b> AP · <b id="fc-mp"></b> MP</p>
-        <p class="fc-notes" id="fc-notes"></p>
-      </div>
-      <div class="spellbar" id="spellbar" hidden></div>
-      <div class="actions">
-        <button type="button" id="btn-ready" class="primary"><kbd>↵</kbd>Ready</button>
-        <button type="button" id="btn-end-turn" class="primary" hidden><kbd>␣</kbd>End turn</button>
-        <button type="button" id="btn-flee" hidden>Flee</button>
-      </div>
-      <p class="fight-hint" id="fight-hint"></p>
-    </section>
-
-    <div class="toast" id="fight-toast" role="status"></div>
+    <aside class="hud hover-card" id="hover-card" hidden aria-live="polite">
+      <p class="hc-name" id="hc-name"></p>
+      <div class="hpbar"><span id="hc-hp-fill"></span></div>
+      <p class="hc-stats"><span id="hc-hp"></span> HP · <b id="hc-ap"></b> AP · <b id="hc-mp"></b> MP</p>
+      <p class="hc-notes" id="hc-notes"></p>
+    </aside>
 
     <div class="result" id="fight-result" hidden>
       <div class="hud result-card" role="dialog" aria-labelledby="result-title">
         <h2 id="result-title"></h2>
         <p id="result-text"></p>
-        <button type="button" id="btn-result" class="primary">Back to the meadow</button>
+        <button type="button" id="btn-result">Back to the meadow</button>
       </div>
     </div>
   </div>
+
+  <p class="hint" id="hint"></p>
+  <div class="toast" id="toast" role="status"></div>
+
+  <section class="window" id="win-stats" hidden aria-labelledby="win-stats-title">
+    <header>
+      <h2 id="win-stats-title">Characteristics</h2>
+      <div class="tabs" id="win-stats-tabs" role="group" aria-label="Hero"></div>
+      <button type="button" class="close" data-close="win-stats" aria-label="Close characteristics">×</button>
+    </header>
+    <div class="body" id="win-stats-body"></div>
+  </section>
+
+  <section class="window" id="win-spells" hidden aria-labelledby="win-spells-title">
+    <header>
+      <h2 id="win-spells-title">Spells</h2>
+      <div class="tabs" id="win-spells-tabs" role="group" aria-label="Hero"></div>
+      <button type="button" class="close" data-close="win-spells" aria-label="Close spells">×</button>
+    </header>
+    <div class="body" id="win-spells-body"></div>
+  </section>
+
+  <footer class="bar" id="bar" aria-label="Status bar">
+    <section class="bar-log" id="log" aria-live="polite" aria-label="Messages"></section>
+
+    <section class="bar-center" aria-label="Party">
+      <div class="party" id="party" role="group" aria-label="Choose a hero"></div>
+      <div class="orb" id="orb" role="img" aria-label="Life">
+        <span class="orb-hp" id="orb-hp">0</span>
+        <span class="orb-max" id="orb-max">/ 0</span>
+      </div>
+      <div class="vitals">
+        <p class="name" id="orb-name"></p>
+        <p class="level" id="orb-level"></p>
+        <div class="points">
+          <span class="point ap" title="Action points: spent on spells"><span id="orb-ap">0</span><small>AP</small></span>
+          <span class="point mp" title="Movement points: one per cell in a fight"><span id="orb-mp">0</span><small>MP</small></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="bar-right">
+      <nav class="menu" aria-label="Menus">
+        <button type="button" id="btn-stats" aria-pressed="false" title="Characteristics (C)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="7" r="3.5"/><path d="M5 20c.8-4 3.6-6 7-6s6.2 2 7 6"/></svg>
+          <kbd>C</kbd>
+        </button>
+        <button type="button" id="btn-spells" aria-pressed="false" title="Spells (S)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 4.6L19 9l-4 3.2L16.2 17 12 14.4 7.8 17 9 12.2 5 9l5.1-1.4z"/><path d="M4 21h16"/></svg>
+          <kbd>S</kbd>
+        </button>
+        <button type="button" id="btn-range" aria-pressed="false" title="Show the 3 MP movement range (R)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z"/><path d="M12 8l4 4-4 4-4-4z"/></svg>
+          <kbd>R</kbd>
+        </button>
+        <button type="button" id="btn-debug" aria-pressed="false" title="Show the cell grid (D)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+          <kbd>D</kbd>
+        </button>
+      </nav>
+      <div class="slots" id="slots" aria-label="Spell slots"></div>
+      <div class="actions">
+        <button type="button" id="btn-ready" class="primary" hidden><kbd>↵</kbd>Ready</button>
+        <button type="button" id="btn-end-turn" class="primary" hidden><kbd>␣</kbd>End turn</button>
+        <button type="button" id="btn-flee" hidden>Flee</button>
+      </div>
+    </section>
+  </footer>
 </div>
 <script type="module" src="/src/main.ts"></script>
 </body>

@@ -50,10 +50,10 @@ export const hud = {
     onClick(id, handler);
   },
 
-  /** Shows the exploration HUD (tile readout, map tools) or hides it during a fight. */
+  /** The tile readout belongs to exploring: hidden as a fight starts. The map tools stay on the bar. */
   showExplore(on: boolean) {
-    el('explore-hud').hidden = !on;
     if (!on) el('cell-info').hidden = true;
+    for (const id of ['btn-range', 'btn-debug']) el(id).hidden = !on;
   },
 };
 
