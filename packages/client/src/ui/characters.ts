@@ -1,7 +1,9 @@
 /** What the bar and the windows show about a hero, whether exploring or fighting. */
 import {
   effectiveStats,
+  spellGradeForLevel,
   spellGradeOf,
+  spellPairs,
   type FightState,
   type Fighter,
   type FighterSetup,
@@ -22,6 +24,17 @@ export interface SpellView {
   cooldown: number;
 }
 
+/** A spell pair of a hero's class, with the side on the bar (exploring only). */
+export interface PairView {
+  pairId: string;
+  unlockLevel: number;
+  unlocked: boolean;
+  /** The side on the bar. */
+  equipped: string;
+  /** Both sides, at the grade the hero's level gives (grade 1 while locked). */
+  options: SpellView[];
+}
+
 export interface CharacterView {
   id: string;
   name: string;
@@ -35,7 +48,10 @@ export interface CharacterView {
   stats: FighterStats;
   buffs: string[];
   alive: boolean;
+  /** The spells on the bar, in pair order. */
   spells: SpellView[];
+  /** Every pair of the class, so the loadout can change; empty in a fight. */
+  pairs: PairView[];
 }
 
 const gradeOf = (slot: SpellSlot) => spells.find((s) => s.id === slot.spellId)?.grades[slot.grade - 1];
@@ -58,7 +74,25 @@ export function viewOfSetup(s: FighterSetup): CharacterView {
       const data = gradeOf(slot);
       return data ? [{ id: slot.spellId, grade: slot.grade, data, blocked: null, cooldown: 0 }] : [];
     }),
+    pairs: pairsOf(s),
   };
+}
+
+function pairsOf(s: FighterSetup): PairView[] {
+  const onBar = new Set((s.spells ?? []).map((slot) => slot.spellId));
+  return spellPairs(spells, s.id).map((pair) => {
+    const first = pair[0]!;
+    return {
+      pairId: first.pairId,
+      unlockLevel: first.unlockLevel,
+      unlocked: s.stats.level >= first.unlockLevel,
+      equipped: (pair.find((x) => onBar.has(x.id)) ?? first).id,
+      options: pair.map((x) => {
+        const grade = Math.max(1, spellGradeForLevel(x, s.stats.level));
+        return { id: x.id, grade, data: x.grades[grade - 1]!, blocked: null, cooldown: 0 };
+      }),
+    };
+  });
 }
 
 /** A fighter in a fight; `blocked` says why each spell cannot be cast now (from spellError). */
@@ -83,5 +117,6 @@ export function viewOfFighter(state: FightState, f: Fighter, blocked: (spellId: 
       const cooldown = usage ? Math.max(0, usage.castableFromTurn - Math.max(1, f.turns)) : 0;
       return [{ id: slot.spellId, grade: slot.grade, data, blocked: blocked(slot.spellId), cooldown }];
     }),
+    pairs: [],
   };
 }

@@ -32,10 +32,11 @@ import {
   type Rng,
 } from '@shardfall/shared';
 import { spells, sprite, world } from '../assets';
-import { DEPTH, ORIGIN_X, ORIGIN_Y, REGION_NAME } from '../config';
+import { DEPTH, ORIGIN_X, ORIGIN_Y } from '../config';
 import { buffLabel, describeEvent, errorText, spellName } from '../fight/describe';
 import { fightHud, type FighterCard } from '../fight/fightHud';
-import { ENCOUNTERS, encounterSetups, lookOf, partySetups, textureOf, type Encounter, type Look } from '../fight/setup';
+import { ENCOUNTERS, encounterSetups, lookOf, textureOf, type Encounter, type Look } from '../fight/setup';
+import { party } from '../party';
 import { hud } from '../hud';
 import { cellPos, diamond, drawMap, placeSprite, updateOccluders, type Occluder } from '../render/mapView';
 import { bar, type BarMode } from '../ui/bar';
@@ -140,13 +141,13 @@ export class FightScene extends Phaser.Scene {
     this.occluders = drawMap(this, map).occluders;
     this.overlay = this.add.graphics().setDepth(DEPTH.overlay);
 
-    const created = createFight(map, [...partySetups(), ...encounterSetups(encounter)], this.rng, { spells });
+    const created = createFight(map, [...party.setups(), ...encounterSetups(encounter)], this.rng, { spells });
     if (!created.ok) throw new Error(`cannot start the fight: ${created.error}`);
     this.state = created.state;
     for (const f of this.state.fighters) this.addUnit(f);
     this.placing = this.heroes()[0]?.id ?? '';
 
-    hud.setMap(map.name, REGION_NAME, map.worldX, map.worldY);
+    hud.setMap(map.name, map.region, map.worldX, map.worldY);
     hud.showExplore(false);
     fightHud.show(true);
     bar.clearLog();
@@ -201,8 +202,9 @@ export class FightScene extends Phaser.Scene {
       if (e.key === 'Escape') this.cancelSpell();
       else if (e.key === 'Enter' && this.state.phase === 'placement') this.ready();
       else if (e.key === ' ' && this.canAct()) this.playerAction((id) => endTurn(this.state, id));
-      else if (/^[1-9]$/.test(e.key)) {
-        const slot = this.active()?.spells[Number(e.key) - 1];
+      else if (/^[0-9]$/.test(e.key)) {
+        // 1-9 are the first nine slots, 0 the tenth.
+        const slot = this.active()?.spells[(Number(e.key) + 9) % 10];
         if (slot) this.toggleSpell(slot.spellId);
       }
     });
@@ -604,6 +606,12 @@ export class FightScene extends Phaser.Scene {
         await this.tween({ targets: u.img, alpha: 1, duration: 300 });
         return;
       }
+      case 'dotTicked': {
+        const cell = getFighter(this.state, e.fighterId)?.cell ?? -1;
+        if (cell !== -1) this.flashCell(cell, COLORS.area);
+        await this.wait(160);
+        return;
+      }
       case 'shieldHit':
       case 'buffAdded':
       case 'pointsRemoved':
@@ -643,12 +651,12 @@ export class FightScene extends Phaser.Scene {
 
     const mine = fighting && !this.busy && shown?.controller === 'player' && shown.id === this.active()?.id;
     const mode: BarMode = placement ? 'placement' : s.phase === 'ended' ? 'ended' : mine ? 'player' : 'waiting';
-    const party = this.heroes().map((h) => this.view(h, mine));
-    const selected = placement ? this.placing : (this.registry.get(SELECTED_HERO) as string | undefined) ?? party[0]?.id ?? '';
+    const heroes = this.heroes().map((h) => this.view(h, mine));
+    const selected = placement ? this.placing : (this.registry.get(SELECTED_HERO) as string | undefined) ?? heroes[0]?.id ?? '';
     // The orb and the slots follow the hero whose turn it is; otherwise the one picked.
     const focusId = fighting && shown?.controller === 'player' ? shown.id : selected;
-    bar.render({ party, selected, focus: party.find((h) => h.id === focusId) ?? null, aiming: this.selectedSpell, mode });
-    windows.update(party, selected);
+    bar.render({ party: heroes, selected, focus: heroes.find((h) => h.id === focusId) ?? null, aiming: this.selectedSpell, mode });
+    windows.update(heroes, selected);
     if (s.phase === 'ended') fightHud.setTimer(null);
     bar.hint(this.hint(mine, shown));
 

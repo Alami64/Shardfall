@@ -41,6 +41,7 @@ export function makeMap(): GameMap {
     name: 'Test',
     worldX: 0,
     worldY: 0,
+    region: 'Test',
     width: 14,
     lines: 40,
     ground: new Array<number>(CELL_COUNT).fill(0),

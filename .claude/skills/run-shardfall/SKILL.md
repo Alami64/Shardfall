@@ -5,10 +5,10 @@ description: Run, start, build, test, screenshot and drive the Shardfall game. U
 
 Shardfall has two things to run. The **client** (Phaser on Vite) is driven in headless Chromium by
 `.claude/skills/run-shardfall/driver.ts`, which starts and stops the dev server itself. The **fight
-engine** (`packages/shared`) has no on-screen fights yet (they arrive in M1 step 5), so
+engine** (`packages/shared`) can also be run without the client:
 `.claude/skills/run-shardfall/fight-smoke.ts` plays fights through it, every fighter driven by the
-monster AI, and prints a turn-by-turn log.
-Most changes in M1 touch the engine: run the fight smoke for those, the driver for client changes.
+monster AI, and prints a turn-by-turn log or a win tally.
+Run the fight smoke for engine, content and balance changes, the driver for client changes.
 
 All paths are relative to the repo root.
 
@@ -53,6 +53,8 @@ the map was still fading in.
 
 Cell ids: run `key:d shot:grid` and read them off the grid. On Brightmoor Meadow the hero starts on
 cell 339; 251 is an east exit; 426 is open grass; the monster group stands on 330, 344 and 316.
+`?map=<id>` starts on another map instead of walking there: on `gildhaven_0_0` the groups stand on
+302 (level 18 fight) and 319 (level 28); on `thornwild_0_0` on 246 (level 40) and 263 (level 58).
 
 ### The bar and the windows
 
@@ -64,6 +66,17 @@ npx tsx .claude/skills/run-shardfall/driver.ts key:c shot:stats key:c key:s "tap
 
 Expect `3 AP | Range 2–4 | Line of sight | In a straight line | Every 2 turns | You dash up to 4 cells
 towards the target | Pushes enemies 1 cell away from you`. `tap:#party button >> nth=2` switches to the Mender.
+
+Out of fights the windows change the party. `?level=N` sets the party level for the run (the
+Characteristics buttons are `button[data-level-step='1']`, `-1`, `10`, `-10`); in Spells, pick the
+other side of a pair and press Equip, then read the bar:
+
+```bash
+URL='http://localhost:5173/?level=26' npx tsx .claude/skills/run-shardfall/driver.ts key:c shot:stats "tap:#win-stats button[data-level-step='1']" text:#orb-level key:c key:s "tap:#win-spells button[data-show-spell='bloodletting']" "tap:#win-spells button[data-equip]" "eval:[...document.querySelectorAll('#slots .slot-name')].map(n=>n.textContent).join(', ')"
+```
+
+Expect `#orb-level: Level 27` and Bloodletting in place of Rend on the bar. The level and loadouts
+are saved in the browser's localStorage, but every driver run starts from a fresh profile.
 
 ### A fight
 
@@ -84,19 +97,28 @@ URL='http://localhost:5173/?seed=3&speed=6' npx tsx .claude/skills/run-shardfall
 Expect `#result-title: Victory` and, back on the map, the group gone (`#cell-status: Walkable`).
 Fleeing three times (`tap:#btn-flee idle`, ×3) gives `Defeat` and leaves the group in place.
 
+A Thornwild fight, with damage over time (`Burning Rain hurts …` in the log):
+
+```bash
+URL='http://localhost:5173/?map=thornwild_0_0&level=40&seed=4&speed=6' npx tsx .claude/skills/run-shardfall/driver.ts click:246 wait:6000 tap:#btn-ready idle "eval:window.shardfall.auto()" "until:window.shardfall.fight().phase === 'ended' && !window.shardfall.busy()" text:#result-title "eval:[...document.querySelectorAll('#log p')].map(p=>p.textContent).filter(t=>t.includes('hurts')).join(' | ')"
+```
+
 ## Run the fight engine
 
 ```bash
 npx tsx .claude/skills/run-shardfall/fight-smoke.ts                # meadow: 3 heroes vs 2 boars + a wisp, seed 7, full log
 npx tsx .claude/skills/run-shardfall/fight-smoke.ts 3 duel         # Vanguard vs Longshot, seed 3
 npx tsx .claude/skills/run-shardfall/fight-smoke.ts 1-20 meadow    # 20 fights: winner, length, AI ms per turn; then a tally
+npx tsx .claude/skills/run-shardfall/fight-smoke.ts 1-40 deep 48   # an encounter at another party level
 ```
 
 It reads the built content (`content/maps/built/world.json`, `content/spells/built/spells.json`,
 `content/monsters/built/monsters.json`), so run `npm run spells:build && npm run monsters:build` after
 editing content. Heroes are played by the same AI as monsters (Vanguard as a Brute, Longshot and
-Mender as Casters), so tallies say as much about the AI as about balance. Edit `SCENARIOS` in the
-script to try other line-ups, levels or stats.
+Mender as Casters), so tallies say as much about the AI as about balance. Scenarios mirror the
+client's encounters (`meadow` 6, `patrol` 18, `yard` 28, `hunt` 40, `deep` 58; a third argument
+changes the party level), with every hero on its default loadout. Edit `SCENARIOS` in the script to
+try other line-ups; keep it in step with `packages/client/src/fight/setup.ts`.
 
 ## Run (human path)
 

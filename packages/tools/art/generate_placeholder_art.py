@@ -1,5 +1,5 @@
 """Generate Shardfall placeholder art: ground tiles, map objects, the hero, the class
-fighters and the Brightmoor Meadow monsters.
+fighters and the monsters of Brightmoor, Gildhaven and Thornwild.
 
 Everything is drawn at 4x and downsampled for smooth edges. Output goes to
 assets/tiles/*.png plus assets/tiles/manifest.json, which records each sprite's
@@ -316,6 +316,108 @@ def wisp(frame: int) -> None:
     save(base, f"wisp_{frame}", (w, h), (w / 2, h - 8), "character")
 
 
+def sentry(frame: int) -> None:
+    """Rustpike Sentry: an old clockwork guard of Gildhaven, rust-red plates and a long pike."""
+    w, h = 64, 104
+    img = Image.new("RGBA", (w * S, h * S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    fx, fy = w * S / 2, (h - 8) * S
+    shadow(d, fx, fy, 18 * S)
+    bob = (1 if frame else 0) * S
+    plate, plate_dark, rust = rgb("#8d7a68"), rgb("#5f5247"), rgb("#b4562e")
+    # legs
+    for lx in (-7, 7):
+        d.rounded_rectangle([fx + (lx - 4) * S, fy - 22 * S, fx + (lx + 4) * S, fy - 1 * S], radius=2 * S, fill=plate_dark)
+    # body: a barrel of plates with rust patches
+    d.rounded_rectangle([fx - 15 * S, fy - 54 * S - bob, fx + 15 * S, fy - 20 * S - bob], radius=6 * S, fill=plate)
+    for rx, ry in ((-8, -44), (6, -30), (-2, -26)):
+        blob(d, fx + rx * S, fy + ry * S - bob, 4 * S, 3 * S, rust)
+    d.line([fx - 15 * S, fy - 38 * S - bob, fx + 15 * S, fy - 38 * S - bob], fill=plate_dark, width=2 * S)
+    # head: a helmet with a glowing slit
+    blob(d, fx, fy - 63 * S - bob, 11 * S, 10 * S, plate)
+    d.rectangle([fx - 7 * S, fy - 65 * S - bob, fx + 7 * S, fy - 62 * S - bob], fill=rgb("#f2a541"))
+    # pike, held on the right
+    d.line([fx + 20 * S, fy - 4 * S, fx + 20 * S, fy - 86 * S - bob], fill=rgb("#6b4a2b"), width=3 * S)
+    d.polygon([(fx + 16 * S, fy - 84 * S - bob), (fx + 20 * S, fy - 94 * S - bob), (fx + 24 * S, fy - 84 * S - bob)], fill=rgb("#cfd3d6"))
+    blob(d, fx + 17 * S, fy - 40 * S - bob, 4 * S, 4 * S, plate_dark)  # hand
+    save(img, f"sentry_{frame}", (w, h), (w / 2, h - 8), "character")
+
+
+def moth(frame: int) -> None:
+    """Coinmoth: a fat moth with gilded wings that shed glittering dust."""
+    w, h = 64, 72
+    img = Image.new("RGBA", (w * S, h * S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    fx, fy = w * S / 2, (h - 8) * S
+    shadow(d, fx, fy, 12 * S)
+    lift = (3 if frame else 0) * S
+    cy = fy - 34 * S - lift
+    span = 26 if frame else 22
+    gold, gold_dark = rgb("#e8c35a"), rgb("#b08a2e")
+    for side in (-1, 1):
+        d.polygon([(fx, cy - 4 * S), (fx + side * span * S, cy - 18 * S), (fx + side * (span - 4) * S, cy + 4 * S)], fill=gold, outline=gold_dark)
+        d.polygon([(fx, cy + 2 * S), (fx + side * 16 * S, cy + 8 * S), (fx + side * 8 * S, cy + 16 * S)], fill=gold_dark)
+        blob(d, fx + side * 14 * S, cy - 8 * S, 3.5 * S, 3.5 * S, rgb("#fff3c4"))  # coin spot
+    blob(d, fx, cy + 2 * S, 6 * S, 12 * S, rgb("#6e5a3c"))
+    blob(d, fx, cy - 10 * S, 6 * S, 6 * S, rgb("#7d6846"))
+    blob(d, fx - 2.5 * S, cy - 11 * S, 1.6 * S, 1.6 * S, rgb("#1e1e1e"))
+    blob(d, fx + 2.5 * S, cy - 11 * S, 1.6 * S, 1.6 * S, rgb("#1e1e1e"))
+    for ax in (-1, 1):
+        d.line([fx + ax * 2 * S, cy - 15 * S, fx + ax * 7 * S, cy - 23 * S], fill=rgb("#6e5a3c"), width=S)
+    rnd = random.Random(frame)
+    for _ in range(6):
+        x, y = fx + rnd.uniform(-20, 20) * S, cy + rnd.uniform(10, 26) * S
+        blob(d, x, y, 1.2 * S, 1.2 * S, rgb("#ffe58a"))
+    save(img, f"moth_{frame}", (w, h), (w / 2, h - 8), "character")
+
+
+def stalker(frame: int) -> None:
+    """Bramble Stalker: a lean forest hunter woven of vines and thorns, facing down-right."""
+    w, h = 84, 68
+    img = Image.new("RGBA", (w * S, h * S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    fx, fy = w * S / 2, (h - 10) * S
+    shadow(d, fx, fy, 28 * S)
+    bob = (1 if frame else 0) * S
+    vine, vine_dark, bark = rgb("#4f7a35"), rgb("#2f4f22"), rgb("#6b4a2b")
+    for lx, lean in ((-20, -3), (-10, 2), (10, -2), (20, 3)):
+        d.line([fx + lx * S, fy - 18 * S - bob, fx + (lx + lean) * S, fy - 1 * S], fill=bark, width=4 * S)
+    blob(d, fx - 2 * S, fy - 26 * S - bob, 26 * S, 11 * S, vine)
+    for i, sx in enumerate(range(-22, 18, 5)):
+        d.line([fx + sx * S, fy - 22 * S - bob, fx + (sx + 4) * S, fy - 30 * S - bob], fill=vine_dark, width=2 * S)
+        top = fy - (40 + (i % 2) * 5) * S - bob
+        d.polygon([(fx + (sx - 2) * S, fy - 34 * S - bob), (fx + sx * S, top), (fx + (sx + 2) * S, fy - 34 * S - bob)], fill=rgb("#8a5a35"))
+    # head with a long muzzle
+    blob(d, fx + 24 * S, fy - 30 * S - bob, 10 * S, 8 * S, vine)
+    d.polygon([(fx + 28 * S, fy - 34 * S - bob), (fx + 40 * S, fy - 26 * S - bob), (fx + 28 * S, fy - 23 * S - bob)], fill=vine_dark)
+    blob(d, fx + 26 * S, fy - 33 * S - bob, 2 * S, 2 * S, rgb("#f2d14b"))  # eye
+    d.polygon([(fx + 18 * S, fy - 36 * S - bob), (fx + 21 * S, fy - 46 * S - bob), (fx + 25 * S, fy - 37 * S - bob)], fill=vine_dark)  # ear
+    # tail
+    d.line([fx - 26 * S, fy - 28 * S - bob, fx - 38 * S, fy - 40 * S - bob], fill=vine_dark, width=3 * S)
+    save(img, f"stalker_{frame}", (w, h), (w / 2, h - 10), "character")
+
+
+def mirecap(frame: int) -> None:
+    """Mirecap: a squat swamp mushroom with a dripping cap and sleepy eyes."""
+    w, h = 60, 72
+    img = Image.new("RGBA", (w * S, h * S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    fx, fy = w * S / 2, (h - 8) * S
+    shadow(d, fx, fy, 18 * S)
+    squash = (2 if frame else 0) * S
+    stem, cap, cap_dark = rgb("#e8dcc0"), rgb("#4a8c84"), rgb("#2f5e58")
+    d.rounded_rectangle([fx - 11 * S, fy - 42 * S + squash, fx + 11 * S, fy - 2 * S], radius=8 * S, fill=stem)
+    blob(d, fx - 4 * S, fy - 27 * S + squash, 1.8 * S, 1.2 * S, rgb("#3b3328"))
+    blob(d, fx + 4 * S, fy - 27 * S + squash, 1.8 * S, 1.2 * S, rgb("#3b3328"))
+    d.pieslice([fx - 26 * S, fy - 60 * S + squash, fx + 26 * S, fy - 18 * S + squash], 180, 360, fill=cap)
+    d.rectangle([fx - 26 * S, fy - 40 * S + squash, fx + 26 * S, fy - 37 * S + squash], fill=cap_dark)
+    for sx, sy, r in ((-12, -48, 4), (6, -52, 3), (14, -44, 3.5), (-2, -44, 2.5)):
+        blob(d, fx + sx * S, fy + sy * S + squash, r * S, r * S, rgb("#a9d6c4"))
+    for dx in (-20, 18):
+        blob(d, fx + dx * S, fy - 33 * S + squash + (2 * S if frame else 0), 1.8 * S, 2.6 * S, rgb("#7fc2e0"))  # drips
+    save(img, f"mirecap_{frame}", (w, h), (w / 2, h - 8), "character")
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     ground_tile("grass_1", "#79b456", 1, grass_detail(10))
@@ -336,6 +438,10 @@ def main() -> None:
     for frame in (0, 1):
         boar(frame)
         wisp(frame)
+        sentry(frame)
+        moth(frame)
+        stalker(frame)
+        mirecap(frame)
     (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(f"wrote {len(manifest)} sprites to {OUT}")
 

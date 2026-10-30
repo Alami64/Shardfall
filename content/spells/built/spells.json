@@ -880,6 +880,2103 @@
       ]
     },
     {
+      "id": "firebrand_arrow",
+      "classId": "longshot",
+      "name": "Firebrand Arrow",
+      "unlockLevel": 10,
+      "pairId": "longshot_4",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 3,
+          "maxRange": 8,
+          "rangeBoostable": true,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 6,
+              "max": 8,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 5,
+              "max": 6,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 9,
+              "max": 11,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 8,
+              "max": 9,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 3,
+          "maxRange": 8,
+          "rangeBoostable": true,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 8,
+              "max": 10,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 6,
+              "max": 8,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 11,
+              "max": 13,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 9,
+              "max": 11,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 3,
+          "maxRange": 9,
+          "rangeBoostable": true,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 9,
+              "max": 12,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 8,
+              "max": 9,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 12,
+              "max": 15,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 11,
+              "max": 12,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "twin_shot",
+      "classId": "longshot",
+      "name": "Twin Shot",
+      "unlockLevel": 10,
+      "pairId": "longshot_4",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 8,
+          "rangeBoostable": true,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 8,
+              "max": 10,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 11,
+              "max": 13,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 8,
+          "rangeBoostable": true,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 10,
+              "max": 12,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 13,
+              "max": 15,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 9,
+          "rangeBoostable": true,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 12,
+              "max": 16,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 15,
+              "max": 19,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hunters_mark",
+      "classId": "longshot",
+      "name": "Hunter's Mark",
+      "unlockLevel": 15,
+      "pairId": "longshot_5",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 8,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "debuff",
+              "min": 15,
+              "max": 15,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 8,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "debuff",
+              "min": 18,
+              "max": 18,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 8,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "debuff",
+              "min": 21,
+              "max": 21,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "blinding_shot",
+      "classId": "longshot",
+      "name": "Blinding Shot",
+      "unlockLevel": 15,
+      "pairId": "longshot_5",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 7,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 6,
+              "max": 8,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "debuff",
+              "min": 3,
+              "max": 3,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 9,
+              "max": 11,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "debuff",
+              "min": 3,
+              "max": 3,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 7,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 8,
+              "max": 10,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "debuff",
+              "min": 3,
+              "max": 3,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 11,
+              "max": 13,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "debuff",
+              "min": 3,
+              "max": 3,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 7,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 9,
+              "max": 12,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "debuff",
+              "min": 4,
+              "max": 4,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 12,
+              "max": 15,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "debuff",
+              "min": 4,
+              "max": 4,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sidestep",
+      "classId": "longshot",
+      "name": "Sidestep",
+      "unlockLevel": 20,
+      "pairId": "longshot_6",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": true,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "teleport",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 4,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": true,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "teleport",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 4,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": true,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 1,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "teleport",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "fall_back",
+      "classId": "longshot",
+      "name": "Fall Back",
+      "unlockLevel": 20,
+      "pairId": "longshot_6",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "push",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "caster"
+              ],
+              "params": {
+                "cells": 3
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "push",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "caster"
+              ],
+              "params": {
+                "cells": 4
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 1,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "push",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "caster"
+              ],
+              "params": {
+                "cells": 4
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "longbow_draw",
+      "classId": "longshot",
+      "name": "Longbow Draw",
+      "unlockLevel": 26,
+      "pairId": "longshot_7",
+      "grades": [
+        {
+          "apCost": 5,
+          "minRange": 6,
+          "maxRange": 12,
+          "rangeBoostable": true,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 22,
+              "max": 26,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 28,
+              "max": 32,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 6,
+          "maxRange": 12,
+          "rangeBoostable": true,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 28,
+              "max": 32,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 35,
+              "max": 39,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 6,
+          "maxRange": 12,
+          "rangeBoostable": true,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 34,
+              "max": 41,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 42,
+              "max": 49,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scatter_shot",
+      "classId": "longshot",
+      "name": "Scatter Shot",
+      "unlockLevel": 26,
+      "pairId": "longshot_7",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 12,
+              "max": 15,
+              "zone": {
+                "shape": "cone",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 15,
+              "max": 18,
+              "zone": {
+                "shape": "cone",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 15,
+              "max": 19,
+              "zone": {
+                "shape": "cone",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 19,
+              "max": 23,
+              "zone": {
+                "shape": "cone",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 19,
+              "max": 23,
+              "zone": {
+                "shape": "cone",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 24,
+              "max": 28,
+              "zone": {
+                "shape": "cone",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crippling_arrow",
+      "classId": "longshot",
+      "name": "Crippling Arrow",
+      "unlockLevel": 33,
+      "pairId": "longshot_8",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 7,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 7,
+              "max": 9,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeAP",
+              "min": 1,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 10,
+              "max": 12,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeAP",
+              "min": 1,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 7,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 9,
+              "max": 11,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeAP",
+              "min": 1,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 12,
+              "max": 14,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeAP",
+              "min": 1,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 7,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 11,
+              "max": 14,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeAP",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 14,
+              "max": 17,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeAP",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tar_arrow",
+      "classId": "longshot",
+      "name": "Tar Arrow",
+      "unlockLevel": 33,
+      "pairId": "longshot_8",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 3,
+          "maxRange": 7,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 3,
+          "maxRange": 7,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 3,
+          "maxRange": 7,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 1,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "removeMP",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "burning_rain",
+      "classId": "longshot",
+      "name": "Burning Rain",
+      "unlockLevel": 40,
+      "pairId": "longshot_9",
+      "grades": [
+        {
+          "apCost": 5,
+          "minRange": 4,
+          "maxRange": 9,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 7,
+              "max": 9,
+              "duration": 3,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 5,
+          "minRange": 4,
+          "maxRange": 9,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 9,
+              "max": 11,
+              "duration": 3,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 5,
+          "minRange": 4,
+          "maxRange": 9,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 11,
+              "max": 14,
+              "duration": 3,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "storm_arrow",
+      "classId": "longshot",
+      "name": "Storm Arrow",
+      "unlockLevel": 40,
+      "pairId": "longshot_9",
+      "grades": [
+        {
+          "apCost": 5,
+          "minRange": 3,
+          "maxRange": 10,
+          "rangeBoostable": true,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 16,
+              "max": 19,
+              "zone": {
+                "shape": "line",
+                "size": 4
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 20,
+              "max": 23,
+              "zone": {
+                "shape": "line",
+                "size": 4
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 3,
+          "maxRange": 10,
+          "rangeBoostable": true,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 20,
+              "max": 24,
+              "zone": {
+                "shape": "line",
+                "size": 4
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 25,
+              "max": 29,
+              "zone": {
+                "shape": "line",
+                "size": 4
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 3,
+          "maxRange": 10,
+          "rangeBoostable": true,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 25,
+              "max": 30,
+              "zone": {
+                "shape": "line",
+                "size": 4
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 31,
+              "max": 36,
+              "zone": {
+                "shape": "line",
+                "size": 4
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deadeye",
+      "classId": "longshot",
+      "name": "Deadeye",
+      "unlockLevel": 48,
+      "pairId": "longshot_10",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 30,
+              "max": 30,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "power"
+              }
+            },
+            {
+              "kind": "buff",
+              "min": 15,
+              "max": 15,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "criticalChance"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 40,
+              "max": 40,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "power"
+              }
+            },
+            {
+              "kind": "buff",
+              "min": 15,
+              "max": 15,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "criticalChance"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 4,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 50,
+              "max": 50,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "power"
+              }
+            },
+            {
+              "kind": "buff",
+              "min": 15,
+              "max": 15,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "criticalChance"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "hawks_patience",
+      "classId": "longshot",
+      "name": "Hawk's Patience",
+      "unlockLevel": 48,
+      "pairId": "longshot_10",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            },
+            {
+              "kind": "buff",
+              "min": 20,
+              "max": 20,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            },
+            {
+              "kind": "buff",
+              "min": 25,
+              "max": 25,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 4,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            },
+            {
+              "kind": "buff",
+              "min": 30,
+              "max": 30,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
       "id": "mending_light",
       "classId": "mender",
       "name": "Mending Light",
@@ -1585,6 +3682,2154 @@
       ]
     },
     {
+      "id": "tidal_lance",
+      "classId": "mender",
+      "name": "Tidal Lance",
+      "unlockLevel": 10,
+      "pairId": "mender_4",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 12,
+              "max": 15,
+              "zone": {
+                "shape": "line",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 15,
+              "max": 18,
+              "zone": {
+                "shape": "line",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 15,
+              "max": 19,
+              "zone": {
+                "shape": "line",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 19,
+              "max": 23,
+              "zone": {
+                "shape": "line",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 19,
+              "max": 23,
+              "zone": {
+                "shape": "line",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 24,
+              "max": 28,
+              "zone": {
+                "shape": "line",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "smoulder",
+      "classId": "mender",
+      "name": "Smoulder",
+      "unlockLevel": 10,
+      "pairId": "mender_4",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 6,
+              "max": 7,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 9,
+              "max": 10,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 8,
+              "max": 9,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 11,
+              "max": 12,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 9,
+              "max": 11,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 12,
+              "max": 14,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "renewal",
+      "classId": "mender",
+      "name": "Renewal",
+      "unlockLevel": 15,
+      "pairId": "mender_5",
+      "grades": [
+        {
+          "apCost": 5,
+          "minRange": 0,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 20,
+              "max": 24,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "heal",
+              "min": 25,
+              "max": 29,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 0,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 25,
+              "max": 30,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "heal",
+              "min": 31,
+              "max": 36,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 0,
+          "maxRange": 4,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 31,
+              "max": 38,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "heal",
+              "min": 39,
+              "max": 46,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "soothing_mist",
+      "classId": "mender",
+      "name": "Soothing Mist",
+      "unlockLevel": 15,
+      "pairId": "mender_5",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 7,
+              "max": 9,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "heal",
+              "min": 10,
+              "max": 12,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 9,
+              "max": 11,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "heal",
+              "min": 12,
+              "max": 14,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 11,
+              "max": 14,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "heal",
+              "min": 14,
+              "max": 17,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fleetfoot_blessing",
+      "classId": "mender",
+      "name": "Fleetfoot Blessing",
+      "unlockLevel": 20,
+      "pairId": "mender_6",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 0,
+          "maxRange": 4,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 0,
+          "maxRange": 4,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 0,
+          "maxRange": 4,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "warding_hymn",
+      "classId": "mender",
+      "name": "Warding Hymn",
+      "unlockLevel": 20,
+      "pairId": "mender_6",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 4,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 15,
+              "max": 15,
+              "duration": 2,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 4,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 18,
+              "max": 18,
+              "duration": 2,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 21,
+              "max": 21,
+              "duration": 2,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "leech_tide",
+      "classId": "mender",
+      "name": "Leech Tide",
+      "unlockLevel": 26,
+      "pairId": "mender_7",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "steal",
+              "element": "water",
+              "min": 11,
+              "max": 14,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "steal",
+              "element": "water",
+              "min": 14,
+              "max": 17,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "steal",
+              "element": "water",
+              "min": 14,
+              "max": 18,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "steal",
+              "element": "water",
+              "min": 18,
+              "max": 22,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "steal",
+              "element": "water",
+              "min": 17,
+              "max": 22,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "steal",
+              "element": "water",
+              "min": 21,
+              "max": 26,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cinder_lash",
+      "classId": "mender",
+      "name": "Cinder Lash",
+      "unlockLevel": 26,
+      "pairId": "mender_7",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 4,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 10,
+              "max": 12,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 1,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 13,
+              "max": 15,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 1,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 4,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 12,
+              "max": 15,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 1,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 15,
+              "max": 18,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 1,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 16,
+              "max": 19,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 1,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 20,
+              "max": 23,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 1,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guardian_swap",
+      "classId": "mender",
+      "name": "Guardian Swap",
+      "unlockLevel": 33,
+      "pairId": "mender_8",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "shield",
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "allies"
+              ],
+              "params": {
+                "maxHpPercent": 10
+              }
+            },
+            {
+              "kind": "swap",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "shield",
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "allies"
+              ],
+              "params": {
+                "maxHpPercent": 13
+              }
+            },
+            {
+              "kind": "swap",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "shield",
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "allies"
+              ],
+              "params": {
+                "maxHpPercent": 16
+              }
+            },
+            {
+              "kind": "swap",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "beacon",
+      "classId": "mender",
+      "name": "Beacon",
+      "unlockLevel": 33,
+      "pairId": "mender_8",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": true,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "teleport",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 8,
+              "max": 10,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "teleport",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 11,
+              "max": 13,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": true,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "teleport",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 10,
+              "max": 12,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "teleport",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 13,
+              "max": 15,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": true,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "teleport",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 12,
+              "max": 16,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "teleport",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 15,
+              "max": 19,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spring_tide",
+      "classId": "mender",
+      "name": "Spring Tide",
+      "unlockLevel": 40,
+      "pairId": "mender_9",
+      "grades": [
+        {
+          "apCost": 5,
+          "minRange": 0,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 14,
+              "max": 17,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "heal",
+              "min": 18,
+              "max": 21,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 0,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 18,
+              "max": 21,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "heal",
+              "min": 22,
+              "max": 25,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 0,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 22,
+              "max": 27,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "heal",
+              "min": 28,
+              "max": 33,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cleansing_flame",
+      "classId": "mender",
+      "name": "Cleansing Flame",
+      "unlockLevel": 40,
+      "pairId": "mender_9",
+      "grades": [
+        {
+          "apCost": 5,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 14,
+              "max": 17,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 8,
+              "max": 10,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 18,
+              "max": 21,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 11,
+              "max": 13,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 18,
+              "max": 21,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 10,
+              "max": 12,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 22,
+              "max": 25,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 13,
+              "max": 15,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 22,
+              "max": 27,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 12,
+              "max": 16,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 28,
+              "max": 33,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "heal",
+              "min": 15,
+              "max": 19,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "self",
+                "allies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "second_dawn",
+      "classId": "mender",
+      "name": "Second Dawn",
+      "unlockLevel": 48,
+      "pairId": "mender_10",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 6,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "circle",
+                "size": 3
+              },
+              "targets": [
+                "allies"
+              ],
+              "params": {
+                "stat": "ap"
+              }
+            },
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "circle",
+                "size": 3
+              },
+              "targets": [
+                "allies"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "circle",
+                "size": 3
+              },
+              "targets": [
+                "allies"
+              ],
+              "params": {
+                "stat": "ap"
+              }
+            },
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "circle",
+                "size": 3
+              },
+              "targets": [
+                "allies"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "circle",
+                "size": 4
+              },
+              "targets": [
+                "allies"
+              ],
+              "params": {
+                "stat": "ap"
+              }
+            },
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "circle",
+                "size": 4
+              },
+              "targets": [
+                "allies"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "lifebond",
+      "classId": "mender",
+      "name": "Lifebond",
+      "unlockLevel": 48,
+      "pairId": "mender_10",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 6,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "shield",
+              "duration": 2,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "maxHpPercent": 25
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "shield",
+              "duration": 2,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "maxHpPercent": 28
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "shield",
+              "duration": 2,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "maxHpPercent": 32
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
       "id": "boar_gore",
       "classId": "monster",
       "name": "Gore",
@@ -2060,6 +6305,831 @@
               "kind": "heal",
               "min": 12,
               "max": 15,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "sentry_pike_thrust",
+      "classId": "monster",
+      "name": "Pike Thrust",
+      "unlockLevel": 1,
+      "pairId": "sentry_pike_thrust",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 2,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 14,
+              "max": 17,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 2,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 17,
+              "max": 21,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 2,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 21,
+              "max": 26,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "sentry_rust_spray",
+      "classId": "monster",
+      "name": "Rust Spray",
+      "unlockLevel": 1,
+      "pairId": "sentry_rust_spray",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 1,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 1,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "removeMP",
+              "min": 1,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "moth_gilt_spark",
+      "classId": "monster",
+      "name": "Gilt Spark",
+      "unlockLevel": 1,
+      "pairId": "moth_gilt_spark",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 8,
+              "max": 10,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 10,
+              "max": 12,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "fire",
+              "min": 12,
+              "max": 15,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "moth_glitter_dust",
+      "classId": "monster",
+      "name": "Glitter Dust",
+      "unlockLevel": 1,
+      "pairId": "moth_glitter_dust",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "debuff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "debuff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "debuff",
+              "min": 2,
+              "max": 2,
+              "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "stat": "range"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "stalker_thorn_lash",
+      "classId": "monster",
+      "name": "Thorn Lash",
+      "unlockLevel": 1,
+      "pairId": "stalker_thorn_lash",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 18,
+              "max": 22,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 22,
+              "max": 27,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 27,
+              "max": 33,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "stalker_thorn_venom",
+      "classId": "monster",
+      "name": "Thorn Venom",
+      "unlockLevel": 1,
+      "pairId": "stalker_thorn_venom",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 6,
+              "max": 8,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 8,
+              "max": 10,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 10,
+              "max": 12,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "mirecap_spore_burst",
+      "classId": "monster",
+      "name": "Spore Burst",
+      "unlockLevel": 1,
+      "pairId": "mirecap_spore_burst",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 12,
+              "max": 15,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 15,
+              "max": 18,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 4,
+          "minRange": 2,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "water",
+              "min": 18,
+              "max": 22,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "mirecap_mycelial_mend",
+      "classId": "monster",
+      "name": "Mycelial Mend",
+      "unlockLevel": 1,
+      "pairId": "mirecap_mycelial_mend",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 12,
+              "max": 15,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 15,
+              "max": 18,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "allies"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "heal",
+              "min": 18,
+              "max": 22,
               "zone": {
                 "shape": "single",
                 "size": 0
@@ -2804,6 +7874,1935 @@
               "min": 30,
               "max": 30,
               "duration": 1,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "sunder",
+      "classId": "vanguard",
+      "name": "Sunder",
+      "unlockLevel": 10,
+      "pairId": "vanguard_4",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 18,
+              "max": 22,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 22,
+              "max": 26,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 22,
+              "max": 28,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 28,
+              "max": 34,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 28,
+              "max": 34,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 35,
+              "max": 41,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "whirlwind",
+      "classId": "vanguard",
+      "name": "Whirlwind",
+      "unlockLevel": 10,
+      "pairId": "vanguard_4",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 11,
+              "max": 14,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 14,
+              "max": 17,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 14,
+              "max": 18,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 18,
+              "max": 22,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 17,
+              "max": 22,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 21,
+              "max": 26,
+              "zone": {
+                "shape": "circle",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hook_chain",
+      "classId": "vanguard",
+      "name": "Hook Chain",
+      "unlockLevel": 15,
+      "pairId": "vanguard_5",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "pull",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "cells": 3
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "pull",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "cells": 3
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 2,
+          "maxRange": 6,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 1,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "pull",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "cells": 4
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "shoulder_bash",
+      "classId": "vanguard",
+      "name": "Shoulder Bash",
+      "unlockLevel": 15,
+      "pairId": "vanguard_5",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 7,
+              "max": 9,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "push",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "cells": 2
+              }
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 10,
+              "max": 12,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "push",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "cells": 2
+              }
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 9,
+              "max": 11,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "push",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "cells": 2
+              }
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 12,
+              "max": 14,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "push",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "cells": 2
+              }
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 11,
+              "max": 14,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "push",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "cells": 3
+              }
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 14,
+              "max": 17,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            },
+            {
+              "kind": "push",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ],
+              "params": {
+                "cells": 3
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rend",
+      "classId": "vanguard",
+      "name": "Rend",
+      "unlockLevel": 20,
+      "pairId": "vanguard_6",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 6,
+              "max": 8,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 9,
+              "max": 11,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 8,
+              "max": 10,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 11,
+              "max": 13,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 3,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 1,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 9,
+              "max": 12,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 12,
+              "max": 15,
+              "duration": 3,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bloodletting",
+      "classId": "vanguard",
+      "name": "Bloodletting",
+      "unlockLevel": 20,
+      "pairId": "vanguard_6",
+      "grades": [
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "steal",
+              "element": "air",
+              "min": 10,
+              "max": 13,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "steal",
+              "element": "air",
+              "min": 13,
+              "max": 16,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "steal",
+              "element": "air",
+              "min": 12,
+              "max": 16,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "steal",
+              "element": "air",
+              "min": 15,
+              "max": 19,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 4,
+          "minRange": 1,
+          "maxRange": 1,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 2,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "steal",
+              "element": "air",
+              "min": 16,
+              "max": 20,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "steal",
+              "element": "air",
+              "min": 20,
+              "max": 24,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "war_cry",
+      "classId": "vanguard",
+      "name": "War Cry",
+      "unlockLevel": 26,
+      "pairId": "vanguard_7",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 4,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 25,
+              "max": 25,
+              "duration": 2,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "stat": "power"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 4,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 30,
+              "max": 30,
+              "duration": 2,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "stat": "power"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 35,
+              "max": 35,
+              "duration": 2,
+              "zone": {
+                "shape": "circle",
+                "size": 2
+              },
+              "targets": [
+                "self",
+                "allies"
+              ],
+              "params": {
+                "stat": "power"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "bulwark",
+      "classId": "vanguard",
+      "name": "Bulwark",
+      "unlockLevel": 26,
+      "pairId": "vanguard_7",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 4,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "shield",
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "maxHpPercent": 20
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 4,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "shield",
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "maxHpPercent": 24
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "shield",
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "maxHpPercent": 28
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "vault",
+      "classId": "vanguard",
+      "name": "Vault",
+      "unlockLevel": 33,
+      "pairId": "vanguard_8",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 4,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "swap",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 3,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "swap",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 1,
+          "maxRange": 5,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "swap",
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "cell"
+              ]
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "onslaught",
+      "classId": "vanguard",
+      "name": "Onslaught",
+      "unlockLevel": 33,
+      "pairId": "vanguard_8",
+      "grades": [
+        {
+          "apCost": 1,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 0,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 1,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 2,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 2,
+              "max": 2,
+              "duration": 0,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 1,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 1,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 3,
+              "max": 3,
+              "duration": 0,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "mp"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "earthsplitter",
+      "classId": "vanguard",
+      "name": "Earthsplitter",
+      "unlockLevel": 40,
+      "pairId": "vanguard_9",
+      "grades": [
+        {
+          "apCost": 5,
+          "minRange": 1,
+          "maxRange": 2,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 18,
+              "max": 22,
+              "zone": {
+                "shape": "line",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 22,
+              "max": 26,
+              "zone": {
+                "shape": "line",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 1,
+          "maxRange": 2,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 22,
+              "max": 28,
+              "zone": {
+                "shape": "line",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 28,
+              "max": 34,
+              "zone": {
+                "shape": "line",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 1,
+          "maxRange": 2,
+          "rangeBoostable": false,
+          "castInLine": true,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 10,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 28,
+              "max": 34,
+              "zone": {
+                "shape": "line",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "earth",
+              "min": 35,
+              "max": 41,
+              "zone": {
+                "shape": "line",
+                "size": 2
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tempest_blade",
+      "classId": "vanguard",
+      "name": "Tempest Blade",
+      "unlockLevel": 40,
+      "pairId": "vanguard_9",
+      "grades": [
+        {
+          "apCost": 5,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 15,
+              "max": 18,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 19,
+              "max": 22,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 19,
+              "max": 22,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 24,
+              "max": 27,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        },
+        {
+          "apCost": 5,
+          "minRange": 1,
+          "maxRange": 3,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": true,
+          "needsFreeCell": false,
+          "castsPerTurn": 1,
+          "castsPerTarget": 0,
+          "cooldown": 0,
+          "initialCooldown": 0,
+          "criticalChance": 5,
+          "effects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 23,
+              "max": 28,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ],
+          "criticalEffects": [
+            {
+              "kind": "damage",
+              "element": "air",
+              "min": 29,
+              "max": 34,
+              "zone": {
+                "shape": "cross",
+                "size": 1
+              },
+              "targets": [
+                "enemies"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unbreakable",
+      "classId": "vanguard",
+      "name": "Unbreakable",
+      "unlockLevel": 48,
+      "pairId": "vanguard_10",
+      "grades": [
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 6,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 30,
+              "max": 30,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            },
+            {
+              "kind": "state",
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "state": "rooted"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 35,
+              "max": 35,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            },
+            {
+              "kind": "state",
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "state": "rooted"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 3,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 40,
+              "max": 40,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            },
+            {
+              "kind": "state",
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "state": "rooted"
+              }
+            }
+          ],
+          "criticalEffects": []
+        }
+      ]
+    },
+    {
+      "id": "berserk",
+      "classId": "vanguard",
+      "name": "Berserk",
+      "unlockLevel": 48,
+      "pairId": "vanguard_10",
+      "grades": [
+        {
+          "apCost": 2,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 40,
+              "max": 40,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "power"
+              }
+            },
+            {
+              "kind": "debuff",
+              "min": 10,
+              "max": 10,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 5,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 50,
+              "max": 50,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "power"
+              }
+            },
+            {
+              "kind": "debuff",
+              "min": 10,
+              "max": 10,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "resistPercent"
+              }
+            }
+          ],
+          "criticalEffects": []
+        },
+        {
+          "apCost": 2,
+          "minRange": 0,
+          "maxRange": 0,
+          "rangeBoostable": false,
+          "castInLine": false,
+          "castInDiagonal": false,
+          "needsLineOfSight": false,
+          "needsFreeCell": false,
+          "castsPerTurn": 0,
+          "castsPerTarget": 0,
+          "cooldown": 4,
+          "initialCooldown": 0,
+          "criticalChance": 0,
+          "effects": [
+            {
+              "kind": "buff",
+              "min": 60,
+              "max": 60,
+              "duration": 2,
+              "zone": {
+                "shape": "single",
+                "size": 0
+              },
+              "targets": [
+                "self"
+              ],
+              "params": {
+                "stat": "power"
+              }
+            },
+            {
+              "kind": "debuff",
+              "min": 10,
+              "max": 10,
+              "duration": 2,
               "zone": {
                 "shape": "single",
                 "size": 0

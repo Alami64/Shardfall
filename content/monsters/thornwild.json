@@ -1,0 +1,262 @@
+[
+  {
+    "id": "bramble_stalker",
+    "name": "Bramble Stalker",
+    "ai": {
+      "archetype": "brute",
+      "preferredRange": 1
+    },
+    "grades": [
+      {
+        "level": 32,
+        "stats": {
+          "maxHp": 230,
+          "agility": 70,
+          "strength": 50,
+          "mp": 4,
+          "initiative": 20,
+          "lock": 8,
+          "resistPercent": {
+            "earth": 20,
+            "fire": -15
+          }
+        },
+        "spells": [
+          {
+            "spellId": "stalker_thorn_lash",
+            "grade": 1
+          },
+          {
+            "spellId": "stalker_thorn_venom",
+            "grade": 1
+          }
+        ]
+      },
+      {
+        "level": 39,
+        "stats": {
+          "maxHp": 270,
+          "agility": 85,
+          "strength": 60,
+          "mp": 4,
+          "initiative": 24,
+          "lock": 10,
+          "resistPercent": {
+            "earth": 20,
+            "fire": -15
+          }
+        },
+        "spells": [
+          {
+            "spellId": "stalker_thorn_lash",
+            "grade": 1
+          },
+          {
+            "spellId": "stalker_thorn_venom",
+            "grade": 1
+          }
+        ]
+      },
+      {
+        "level": 46,
+        "stats": {
+          "maxHp": 310,
+          "agility": 100,
+          "strength": 70,
+          "mp": 4,
+          "initiative": 28,
+          "lock": 12,
+          "resistPercent": {
+            "earth": 20,
+            "fire": -15
+          }
+        },
+        "spells": [
+          {
+            "spellId": "stalker_thorn_lash",
+            "grade": 2
+          },
+          {
+            "spellId": "stalker_thorn_venom",
+            "grade": 2
+          }
+        ]
+      },
+      {
+        "level": 53,
+        "stats": {
+          "maxHp": 350,
+          "agility": 115,
+          "strength": 80,
+          "mp": 4,
+          "initiative": 32,
+          "lock": 14,
+          "resistPercent": {
+            "earth": 20,
+            "fire": -15
+          }
+        },
+        "spells": [
+          {
+            "spellId": "stalker_thorn_lash",
+            "grade": 2
+          },
+          {
+            "spellId": "stalker_thorn_venom",
+            "grade": 2
+          }
+        ]
+      },
+      {
+        "level": 60,
+        "stats": {
+          "maxHp": 390,
+          "agility": 130,
+          "strength": 90,
+          "mp": 4,
+          "initiative": 36,
+          "lock": 16,
+          "resistPercent": {
+            "earth": 20,
+            "fire": -15
+          }
+        },
+        "spells": [
+          {
+            "spellId": "stalker_thorn_lash",
+            "grade": 3
+          },
+          {
+            "spellId": "stalker_thorn_venom",
+            "grade": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mirecap",
+    "name": "Mirecap",
+    "ai": {
+      "archetype": "caster",
+      "preferredRange": 4
+    },
+    "grades": [
+      {
+        "level": 32,
+        "stats": {
+          "maxHp": 180,
+          "chance": 70,
+          "intelligence": 40,
+          "initiative": 10,
+          "resistPercent": {
+            "water": 20,
+            "fire": -15
+          }
+        },
+        "spells": [
+          {
+            "spellId": "mirecap_spore_burst",
+            "grade": 1
+          },
+          {
+            "spellId": "mirecap_mycelial_mend",
+            "grade": 1
+          }
+        ]
+      },
+      {
+        "level": 39,
+        "stats": {
+          "maxHp": 210,
+          "chance": 85,
+          "intelligence": 50,
+          "initiative": 12,
+          "resistPercent": {
+            "water": 20,
+            "fire": -15
+          }
+        },
+        "spells": [
+          {
+            "spellId": "mirecap_spore_burst",
+            "grade": 1
+          },
+          {
+            "spellId": "mirecap_mycelial_mend",
+            "grade": 1
+          }
+        ]
+      },
+      {
+        "level": 46,
+        "stats": {
+          "maxHp": 240,
+          "chance": 100,
+          "intelligence": 60,
+          "initiative": 14,
+          "resistPercent": {
+            "water": 20,
+            "fire": -15
+          }
+        },
+        "spells": [
+          {
+            "spellId": "mirecap_spore_burst",
+            "grade": 2
+          },
+          {
+            "spellId": "mirecap_mycelial_mend",
+            "grade": 2
+          }
+        ]
+      },
+      {
+        "level": 53,
+        "stats": {
+          "maxHp": 270,
+          "chance": 115,
+          "intelligence": 70,
+          "initiative": 16,
+          "resistPercent": {
+            "water": 20,
+            "fire": -15
+          }
+        },
+        "spells": [
+          {
+            "spellId": "mirecap_spore_burst",
+            "grade": 2
+          },
+          {
+            "spellId": "mirecap_mycelial_mend",
+            "grade": 2
+          }
+        ]
+      },
+      {
+        "level": 60,
+        "stats": {
+          "maxHp": 300,
+          "chance": 130,
+          "intelligence": 80,
+          "initiative": 18,
+          "resistPercent": {
+            "water": 20,
+            "fire": -15
+          }
+        },
+        "spells": [
+          {
+            "spellId": "mirecap_spore_burst",
+            "grade": 3
+          },
+          {
+            "spellId": "mirecap_mycelial_mend",
+            "grade": 3
+          }
+        ]
+      }
+    ]
+  }
+]
