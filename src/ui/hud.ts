@@ -22,6 +22,8 @@ export interface Actions {
   buy(def: string): void;
   raiseStat(k: BaseStat, n: number): void;
   raiseSpell(id: string): void;
+  resetStats(): void;
+  resetSpells(): void;
   closeResult(): void;
   create(name: string, look: HeroLook): void;
   npc(what: string): void;
@@ -250,18 +252,21 @@ export function fade(on: boolean) { $('fade').classList.toggle('on', on); }
 type Sel = { kind: 'inv'; uid: number } | { kind: 'eq'; slot: Slot } | { kind: 'shop'; def: string } | null;
 let open: { name: string; data?: any } | null = null;
 let sel: Sel = null;
+let confirming: 'stats' | 'spells' | null = null;
 let draft: { name: string; look: HeroLook } = { name: '', look: { tunic: '#3f7fbf', hair: '#5a3a22', skin: '#f0c9a4' } };
 
 export const windowOpen = () => open?.name ?? null;
 export function openWindow(name: string, data?: any) {
   open = { name, data };
   sel = null;
+  confirming = null;
   renderWindow();
 }
 export function closeWindow() {
   if (open?.name === 'create') return;
   const wasResult = open?.name === 'result';
   open = null;
+  confirming = null;
   G.shop = false;
   renderWindow();
   hideTip();
@@ -285,6 +290,15 @@ function itemButton(inst: ItemInst | null, attrs: string, emptyLabel = ''): stri
     `${inst.qty > 1 ? `<span class="q">${inst.qty}</span>` : ''}${isGear(def) ? `<span class="l">${def.level}</span>` : ''}</button>`;
 }
 
+/** A reset button that asks once, in place, before acting. */
+function resetControl(kind: 'stats' | 'spells', label: string, spent: boolean): string {
+  if (confirming === kind) {
+    return `<span class="row"><button class="btn go" data-act="reset-${kind}-yes">Confirm reset</button><button class="btn" data-act="reset-cancel">Cancel</button></span>`;
+  }
+  const why = G.mode === 'fight' ? 'Not during a fight' : spent ? 'Get every spent point back' : 'Nothing spent yet';
+  return `<button class="btn" data-act="reset-${kind}" title="${why}" ${spent && G.mode !== 'fight' ? '' : 'disabled'}>${label}</button>`;
+}
+
 function charWindow(): string {
   const ch = G.ch, d = derived(ch), t = totals(ch);
   let left = `<h4>Characteristics${ch.statPoints ? ` · <span style="color:#7dff9a">${ch.statPoints} points to spend</span>` : ''}</h4>`;
@@ -297,6 +311,7 @@ function charWindow(): string {
       `<button class="btn sm" data-act="stat" data-k="${k}" data-n="1" ${ch.statPoints ? '' : 'disabled'}>+</button>` +
       `<button class="btn sm" data-act="stat" data-k="${k}" data-n="5" ${ch.statPoints >= 5 ? '' : 'disabled'}>+5</button></span></div>`;
   }
+  left += `<div class="row" style="margin-top:10px;justify-content:space-between"><span class="isub">Change your build at any time.</span>${resetControl('stats', 'Reset points', BASE_STATS.some((k) => ch.base[k] > 0))}</div>`;
   const kv = (a: string, b: string | number) => `<div class="kv"><span>${a}</span><b>${b}</b></div>`;
   const right = `<h4>Combat</h4>` +
     kv('Health', `${Math.floor(Math.min(ch.hp, d.maxHp))} / ${d.maxHp}`) + kv('Action points', d.ap) + kv('Movement points', d.mp) +
@@ -357,7 +372,8 @@ function bagWindow(): string {
 function spellsWindow(): string {
   const ch = G.ch;
   const f = playerFighter(ch, 0);
-  let h = `<div style="margin-bottom:6px">Spell points: <b style="color:#7dff9a">${ch.spellPoints}</b> <span class="isub">· 1 per level · each rank adds 15% to damage and healing</span></div>`;
+  let h = `<div class="row" style="margin-bottom:6px;justify-content:space-between;flex-wrap:wrap"><span>Spell points: <b style="color:#7dff9a">${ch.spellPoints}</b> <span class="isub">· 1 per level · each rank adds 15% to damage and healing</span></span>` +
+    `${resetControl('spells', 'Reset ranks', Object.values(ch.ranks).some((r) => r > 1))}</div>`;
   const w = weaponSpell(ch);
   h += `<div class="spell"><img src="${icon(w.icon, w.color)}" alt=""><div class="t">${spellHtml(w, 1, f)}</div></div>`;
   for (const sp of PLAYER_SPELLS) {
@@ -458,6 +474,11 @@ export function initHud() {
       case 'close': closeWindow(); break;
       case 'stat': actions.raiseStat(d.k as BaseStat, Number(d.n)); break;
       case 'rank': actions.raiseSpell(d.id!); break;
+      case 'reset-stats': confirming = 'stats'; renderWindow(); break;
+      case 'reset-spells': confirming = 'spells'; renderWindow(); break;
+      case 'reset-cancel': confirming = null; renderWindow(); break;
+      case 'reset-stats-yes': confirming = null; actions.resetStats(); break;
+      case 'reset-spells-yes': confirming = null; actions.resetSpells(); break;
       case 'pick-inv': sel = { kind: 'inv', uid: Number(d.uid) }; renderWindow(); break;
       case 'pick-eq': sel = { kind: 'eq', slot: d.slot as Slot }; renderWindow(); break;
       case 'pick-shop': sel = { kind: 'shop', def: d.def! }; renderWindow(); break;

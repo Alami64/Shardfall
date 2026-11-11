@@ -105,6 +105,21 @@ if (scenario === 'play') {
   await sf(`shardfall.auto(false); shardfall.speed(1)`);
   check('fight won', (await sf(`shardfall.G.ch.wins`)) === 1);
   check('xp gained', (await sf(`shardfall.G.ch.xp + shardfall.G.ch.level`)) > 1);
+  // Spend points, then take them back.
+  await sf(`shardfall.level(5)`);
+  await page.keyboard.press('c'); await wait(150);
+  await page.click('[data-act=stat][data-k=str][data-n="5"]'); await page.click('[data-act=stat][data-k=vit][data-n="1"]');
+  check('points spent', await sf(`shardfall.G.ch.base.str === 5 && shardfall.G.ch.base.vit === 1 && shardfall.G.ch.statPoints === 14`));
+  await page.click('[data-act=reset-stats]'); await shot('35-reset-stats');
+  await page.click('[data-act=reset-stats-yes]');
+  check('characteristics reset', await sf(`Object.values(shardfall.G.ch.base).every(v => v === 0) && shardfall.G.ch.statPoints === 20`));
+  await page.keyboard.press('Escape'); await page.keyboard.press('s'); await wait(150);
+  await page.click('[data-act=rank][data-id=runeSlash]'); await page.click('[data-act=rank][data-id=runeSlash]');
+  check('spell ranked up', await sf(`shardfall.G.ch.ranks.runeSlash === 3 && shardfall.G.ch.spellPoints === 1`));
+  await page.click('[data-act=reset-spells]'); await shot('36-reset-spells');
+  await page.click('[data-act=reset-spells-yes]');
+  check('spell ranks reset', await sf(`Object.keys(shardfall.G.ch.ranks).length === 0 && shardfall.G.ch.spellPoints === 4`));
+  await page.keyboard.press('Escape');
   // Reload: the save comes back.
   await page.reload(); await wait(500);
   check('save restored', await sf(`shardfall.G.ch.name === 'Tester' && shardfall.G.ch.wins === 1 && shardfall.G.ch.equip.weapon?.def === 'twig_blade' && shardfall.G.map.def.id === 'meadow_w'`));

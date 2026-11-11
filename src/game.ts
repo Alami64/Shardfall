@@ -3,7 +3,8 @@ import {
   ELEMENT_COLOR, ITEMS, MAP_BY_ID, MONSTERS, monsterXp, QUESTS, xpNeed, type MapDef,
 } from './core/content.js';
 import {
-  addItem, buyItem, derived, equipItem, gainXp, newCharacter, playerFighter, raiseSpell, raiseStat, sellItem, unequip, useItem,
+  addItem, buyItem, derived, equipItem, gainXp, newCharacter, playerFighter, raiseSpell, raiseStat, resetSpells, resetStats, sellItem,
+  unequip, useItem,
   weaponSpell, WEAPON_SPELL, type Character, type HeroLook, type ItemInst,
 } from './core/character.js';
 import {
@@ -620,6 +621,14 @@ function wireActions() {
   actions.buy = (def) => { const err = buyItem(G.ch, def, rng); log(err ? err + '.' : `Bought ${ITEMS[def]!.name}.`, err ? 'r' : 'a'); save(); };
   actions.raiseStat = (k, n) => { raiseStat(G.ch, k, n); save(); refresh(); };
   actions.raiseSpell = (id) => { raiseSpell(G.ch, id); save(); refresh(); };
+  actions.resetStats = () => {
+    if (outOfFight()) { const n = resetStats(G.ch); log(`Characteristics reset: ${n} point${n === 1 ? '' : 's'} to spend again.`, 'a'); save(); }
+    refresh();
+  };
+  actions.resetSpells = () => {
+    if (outOfFight()) { const n = resetSpells(G.ch); log(`Spell ranks reset: ${n} spell point${n === 1 ? '' : 's'} to spend again.`, 'a'); save(); }
+    refresh();
+  };
   actions.closeResult = closeResult;
   actions.create = (name: string, look: HeroLook) => {
     G.ch = newCharacter(name, look);

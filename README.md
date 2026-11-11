@@ -32,7 +32,7 @@ Progress is saved in the browser (`localStorage`).
 ## What is in the game
 
 - **One class, the Runeblade**: 10 spells unlocked from level 1 to 24, plus the attack of the equipped weapon. Three elements, each fed by a characteristic: physical (Strength), fire (Intellect), storm (Agility).
-- **Character**: level cap 30; 5 characteristic points and 1 spell point per level; spells have 5 ranks.
+- **Character**: level cap 30; 5 characteristic points and 1 spell point per level; spells have 5 ranks. Both kinds of points can be taken back for free, outside a fight, with the reset buttons in the Stats and Spells windows.
 - **Fights**: start-cell placement, initiative order, AP and MP, range and line of sight, area spells, cooldowns, critical hits, buffs and debuffs, poison, shields, pushback with collision damage, and locking (an adjacent enemy can hold you in place when you try to walk away).
 - **10 maps**: Emberhollow (safe village), three meadows, two forest maps, two marsh maps, the Kessari Ruins and Thornmaw's Hollow. Monster levels run from 1 to 25.
 - **10 monsters** with their own spells and behaviour (melee, ranged, support), in groups of 1 to 4 that wander and respawn.

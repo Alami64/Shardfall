@@ -129,6 +129,24 @@ export function raiseSpell(ch: Character, id: string): boolean {
   return true;
 }
 
+/** Take back every spent characteristic point. Returns how many came back. */
+export function resetStats(ch: Character): number {
+  let refund = 0;
+  for (const k of BASE_STATS) { refund += ch.base[k]; ch.base[k] = 0; }
+  ch.statPoints += refund;
+  clampHp(ch);
+  return refund;
+}
+
+/** Put every spell back to rank 1. Returns how many spell points came back. */
+export function resetSpells(ch: Character): number {
+  let refund = 0;
+  for (const rank of Object.values(ch.ranks)) for (let r = 1; r < rank; r++) refund += rankCost(r);
+  ch.ranks = {};
+  ch.spellPoints += refund;
+  return refund;
+}
+
 // ------------------------------------------------------------ items
 
 export const isGear = (def: ItemDef) => def.type !== 'resource' && def.type !== 'food';
