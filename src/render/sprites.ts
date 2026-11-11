@@ -353,45 +353,246 @@ export function drawObject(c: C, x: number, y: number, o: MapObj, biome: Biome, 
 
 // ------------------------------------------------------------ hero and NPCs
 
-export interface HeroPose { facing: number; walking: boolean; armed: boolean; elder?: boolean }
+/** Every timing (ms), angle (radians) and distance (px) of the hero's motion, in one place. */
+export const HERO_MOTION = {
+  breath: { period: 2600, amp: 0.7 },
+  cloak: { period: 3100, amp: 1.3 },
+  blink: { every: 3600, dur: 130 },
+  walk: { stride: 400, leg: 0.62, arm: 0.5, swordArm: 0.3, bob: 2.2, lean: 0.07 },
+  /** Blade angle measured from the line of the arm: at rest it points up, armed it continues the arm. */
+  sword: { rest: 2.72, armed: 0.2 },
+  attack: { dur: 430, windup: 0.3, strike: 0.6, raise: 3.5, end: 0.7, lean: 0.17 },
+  cast: { dur: 500, raise: 0.45, hold: 0.7, up: 2.75, thrust: 1.6, hop: 3 },
+  hit: { dur: 300, lean: 0.24, squash: 0.08 },
+  die: { dur: 420, fall: 1.35 },
+  cheer: { dur: 900, jump: 9, arm: 2.95 },
+};
+export type AnimKind = 'attack' | 'cast' | 'hit' | 'die' | 'cheer';
+export const animDur = (kind: AnimKind) => HERO_MOTION[kind].dur;
 
-/** A person, drawn with the feet at (0, 0). */
-export function drawHero(c: C, look: HeroLook, t: number, p: HeroPose) {
-  const swing = p.walking ? Math.sin(t * 0.016) : 0;
-  const bob = p.walking ? Math.abs(swing) * 2 : Math.sin(t * 0.003) * 0.8;
-  shadow(c, 0, 1, 13, 5.5);
-  c.save();
-  c.scale(p.facing, 1);
-  c.translate(0, -bob);
-  // Cloak.
-  poly(c, [-7, -31, -13, -8 + swing, -2, -9, 4, -30], shade(look.tunic, -38));
-  // Legs.
-  rr(c, -6 + swing * 3, -13, 5.5, 13 - Math.max(0, swing) * 2, 2, '#3b2f2a');
-  rr(c, 0.5 - swing * 3, -13, 5.5, 13 - Math.max(0, -swing) * 2, 2, '#3b2f2a');
-  // Body.
-  rr(c, -8, -32, 16, 21, 5, look.tunic);
-  rr(c, -8, -18, 16, 3.2, 1, '#5b4326', null);
-  rr(c, -1.5, -18.6, 3.5, 4.4, 1, '#e3bd55', null);
-  line(c, [-3, -30, 3, -22], 'rgba(255,255,255,.25)', 1.6);
-  if (p.armed) {
-    line(c, [9, -15, 19, -37], OUTLINE, 5);
-    line(c, [9, -15, 19, -37], '#e3e9f0', 3);
-    line(c, [6.5, -19, 12.5, -16], '#c9a24a', 3);
-    line(c, [14, -26, 16.5, -31.5], 'rgba(120,220,255,.9)', 1.4);
+export interface HeroState { walking: boolean; anim?: { kind: AnimKind; k: number; color?: string } }
+/** Joint angles are radians, positive towards the front of the figure. */
+export interface HeroPose {
+  bob: number; lean: number; squash: number; legA: number; legB: number; armF: number; armB: number;
+  blade: number; cloak: number; blink: boolean; glow: number; glowColor: string; trail: number; fall: number;
+}
+export interface HeroLookAt { facing: number; back: boolean; armed: boolean; elder?: boolean }
+
+const REDUCED = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ease = (k: number) => k * k * (3 - 2 * k);
+const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
+const seg = (k: number, a: number, b: number) => Math.max(0, Math.min(1, (k - a) / (b - a)));
+
+/** The pose for a moment in time. With t = 0 and no action this is the rest pose. */
+export function heroPose(s: HeroState, t: number, seed = 0): HeroPose {
+  const M = HERO_MOTION;
+  const p: HeroPose = {
+    bob: 0, lean: 0, squash: 1, legA: 0, legB: 0, armF: 0, armB: 0,
+    blade: M.sword.rest, cloak: 0, blink: false, glow: 0, glowColor: '#ffd166', trail: -1, fall: 0,
+  };
+  const live = REDUCED ? 0 : 1;
+  if (s.walking) {
+    const ph = (t / M.walk.stride) * Math.PI * 2;
+    const sw = Math.sin(ph);
+    p.legA = sw * M.walk.leg;
+    p.legB = -sw * M.walk.leg;
+    p.armB = sw * M.walk.arm;
+    p.armF = -sw * M.walk.swordArm;
+    p.bob = Math.abs(Math.cos(ph)) * M.walk.bob;
+    p.lean = M.walk.lean;
+    p.cloak = -2.5 - sw;
+  } else {
+    p.bob = Math.sin(((t + seed) / M.breath.period) * Math.PI * 2) * M.breath.amp * live;
+    p.cloak = Math.sin(((t + seed) / M.cloak.period) * Math.PI * 2) * M.cloak.amp * live;
+    p.blink = live === 1 && t > 0 && (t + seed * 7) % M.blink.every < M.blink.dur;
   }
-  // Front arm.
-  rr(c, 4, -30, 5.5, 14 + swing * 1.5, 2.5, shade(look.tunic, -16));
-  ell(c, 6.8, -15.5 + swing * 1.5, 2.6, 2.6, look.skin, OUTLINE, 1);
-  // Head.
-  ell(c, 0, -39.5, 8, 8.4, look.skin);
-  c.beginPath();
-  c.arc(0, -41, 8.7, Math.PI * 0.92, Math.PI * 2.12);
-  c.quadraticCurveTo(2, -42, -3, -38);
-  c.quadraticCurveTo(-7, -34, -9.5, -32);
-  c.closePath();
-  c.fillStyle = look.hair; c.fill(); c.strokeStyle = OUTLINE; c.lineWidth = 1.2; c.stroke();
-  rr(c, 3.2, -40, 1.9, 3.2, 0.9, '#2a2020', null);
-  if (p.elder) poly(c, [0, -34, 7, -34, 4, -26], look.hair, OUTLINE, 1);
+  const a = s.anim;
+  if (!a) return p;
+  const k = Math.max(0, Math.min(1, a.k));
+  switch (a.kind) {
+    case 'attack': {
+      const A = M.attack;
+      if (k < A.windup) {
+        const e = ease(k / A.windup);
+        p.armF = lerp(p.armF, A.raise, e);
+        p.blade = lerp(M.sword.rest, M.sword.armed + 0.2, e);
+        p.lean = -A.lean * 0.6 * e;
+      } else if (k < A.strike) {
+        const e = ease(seg(k, A.windup, A.strike));
+        p.armF = lerp(A.raise, A.end, e);
+        p.blade = M.sword.armed;
+        p.lean = lerp(-A.lean * 0.6, A.lean, e);
+        p.trail = e;
+        p.legA = 0.35 * e;
+        p.legB = -0.3 * e;
+      } else {
+        const e = ease(seg(k, A.strike, 1));
+        p.armF = lerp(A.end, 0, e);
+        p.blade = lerp(M.sword.armed, M.sword.rest, e);
+        p.lean = A.lean * (1 - e);
+        p.legA = 0.35 * (1 - e);
+        p.legB = -0.3 * (1 - e);
+        if (e < 0.5) p.trail = 1 + e;
+      }
+      break;
+    }
+    case 'cast': {
+      const K = M.cast;
+      p.glowColor = a.color ?? p.glowColor;
+      if (k < K.raise) {
+        const e = ease(k / K.raise);
+        p.armF = lerp(p.armF, K.up, e);
+        p.blade = lerp(M.sword.rest, M.sword.armed, e);
+        p.glow = e;
+        p.bob += K.hop * e;
+      } else if (k < K.hold) {
+        const e = ease(seg(k, K.raise, K.hold));
+        p.armF = lerp(K.up, K.thrust, e);
+        p.blade = M.sword.armed;
+        p.glow = 1;
+        p.bob += K.hop * (1 - e);
+        p.lean = 0.1 * e;
+      } else {
+        const e = ease(seg(k, K.hold, 1));
+        p.armF = lerp(K.thrust, 0, e);
+        p.blade = lerp(M.sword.armed, M.sword.rest, e);
+        p.glow = 1 - e;
+        p.lean = 0.1 * (1 - e);
+      }
+      break;
+    }
+    case 'hit': {
+      const env = Math.sin(Math.PI * k);
+      p.lean = -M.hit.lean * env;
+      p.squash = 1 - M.hit.squash * env;
+      p.armB = -0.7 * env;
+      p.armF = -0.3 * env;
+      break;
+    }
+    case 'die': {
+      const e = ease(k);
+      p.fall = e;
+      p.armF = 1.2 * e;
+      p.armB = -0.8 * e;
+      p.legA = 0.3 * e;
+      break;
+    }
+    case 'cheer': {
+      const hop = Math.abs(Math.sin(k * Math.PI * 2));
+      const r = Math.min(1, k * 6, (1 - k) * 6);
+      p.bob = M.cheer.jump * hop;
+      p.armF = M.cheer.arm * r;
+      p.blade = lerp(M.sword.rest, M.sword.armed, r);
+      p.armB = 2.6 * r;
+      p.legA = 0.25 * hop;
+      p.legB = -0.25 * hop;
+      break;
+    }
+  }
+  return p;
+}
+
+/** A person drawn from jointed parts, feet at (0, 0). Front or back view, mirrored by facing. */
+export function drawHero(c: C, look: HeroLook, p: HeroPose, o: HeroLookAt) {
+  shadow(c, 0, 1, 13 - p.bob * 0.3, 5.5 - p.bob * 0.12);
+  c.save();
+  c.scale(o.facing, 1);
+  if (p.fall) { c.rotate(-p.fall * HERO_MOTION.die.fall); c.translate(0, -p.fall * 3); }
+  c.rotate(p.lean);
+  c.scale(1 + (1 - p.squash) * 0.6, p.squash);
+  c.translate(0, -p.bob);
+  const dark = shade(look.tunic, -38), sleeve = shade(look.tunic, -16);
+
+  const leg = (hx: number, ang: number, col: string) => {
+    c.save();
+    c.translate(hx, -13);
+    c.rotate(-ang);
+    rr(c, -2.75, 0, 5.5, 13, 2, col);
+    rr(c, -3.2, 8.8, 7.6, 4.6, 1.8, '#5b4326', OUTLINE, 1);
+    c.restore();
+  };
+  const arm = (sx: number, ang: number, col: string, sword: boolean) => {
+    c.save();
+    c.translate(sx, -29);
+    c.rotate(-ang);
+    if (sword) {
+      c.save();
+      c.translate(0, 14);
+      c.rotate(-p.blade);
+      line(c, [0, -3, 0, 25], OUTLINE, 5);
+      line(c, [0, -3, 0, 25], '#e3e9f0', 3);
+      line(c, [0, 9, 0, 16], 'rgba(120,220,255,.9)', 1.4);
+      if (p.glow > 0) {
+        c.save();
+        c.globalAlpha *= p.glow;
+        c.shadowColor = p.glowColor;
+        c.shadowBlur = 14;
+        line(c, [0, 3, 0, 25], p.glowColor, 3);
+        ell(c, 0, 26, 2 + 3 * p.glow, 2 + 3 * p.glow, '#fff', null);
+        c.restore();
+      }
+      line(c, [-4, 1, 4, 1], '#c9a24a', 3);
+      c.restore();
+    }
+    rr(c, -2.75, 0, 5.5, 14, 2.5, col);
+    ell(c, 0, 14.5, 2.6, 2.6, look.skin, OUTLINE, 1);
+    c.restore();
+  };
+  const trail = () => {
+    if (p.trail < 0) return;
+    const A = HERO_MOTION.attack;
+    const cur = lerp(A.raise, A.end, Math.min(1, p.trail));
+    const alpha = p.trail <= 1 ? 0.85 : 0.85 * (1 - (p.trail - 1) * 2);
+    c.save();
+    c.lineCap = 'round';
+    c.beginPath();
+    c.arc(6.5, -29, 35, Math.PI / 2 - A.raise, Math.PI / 2 - cur);
+    c.strokeStyle = `rgba(190,235,255,${alpha * 0.55})`;
+    c.lineWidth = 7;
+    c.stroke();
+    c.beginPath();
+    c.arc(6.5, -29, 36, Math.PI / 2 - lerp(A.raise, cur, 0.4), Math.PI / 2 - cur);
+    c.strokeStyle = `rgba(255,255,255,${alpha})`;
+    c.lineWidth = 2.4;
+    c.stroke();
+    c.restore();
+  };
+
+  if (!o.back) {
+    poly(c, [-7, -31, -13 + p.cloak, -8, -2 + p.cloak * 0.5, -9, 4, -30], dark);
+    arm(-6, p.armB, shade(look.tunic, -30), false);
+    leg(-3.2, p.legB, '#33292a');
+    leg(3.2, p.legA, '#3b2f2a');
+    rr(c, -8, -32, 16, 21, 5, look.tunic);
+    rr(c, -8, -18, 16, 3.2, 1, '#5b4326', null);
+    rr(c, -1.5, -18.6, 3.5, 4.4, 1, '#e3bd55', null);
+    line(c, [-3, -30, 3, -22], 'rgba(255,255,255,.25)', 1.6);
+    arm(6.5, p.armF, sleeve, o.armed);
+    trail();
+    ell(c, 0, -39.5, 8, 8.4, look.skin);
+    c.beginPath();
+    c.arc(0, -41, 8.7, Math.PI * 0.92, Math.PI * 2.12);
+    c.quadraticCurveTo(2, -42, -3, -38);
+    c.quadraticCurveTo(-7, -34, -9.5, -32);
+    c.closePath();
+    c.fillStyle = look.hair; c.fill(); c.strokeStyle = OUTLINE; c.lineWidth = 1.2; c.stroke();
+    if (p.blink) line(c, [3, -38.4, 5.4, -38.4], '#2a2020', 1.3);
+    else rr(c, 3.2, -40, 1.9, 3.2, 0.9, '#2a2020', null);
+    if (o.elder) poly(c, [0, -34, 7, -34, 4, -26], look.hair, OUTLINE, 1);
+  } else {
+    arm(-6, p.armB, shade(look.tunic, -30), false);
+    leg(-3.2, p.legB, '#33292a');
+    leg(3.2, p.legA, '#3b2f2a');
+    rr(c, -8, -32, 16, 21, 5, shade(look.tunic, -10));
+    poly(c, [-8.5, -31, -11 + p.cloak, -7, -3 + p.cloak * 0.7, -5, 5 + p.cloak * 0.5, -7, 8.5, -31], dark);
+    line(c, [-1, -29, -2 + p.cloak * 0.6, -8], 'rgba(0,0,0,.22)', 1.2);
+    line(c, [-8, -30.5, 8, -30.5], shade(look.tunic, 12), 2);
+    arm(6.5, p.armF, sleeve, o.armed);
+    trail();
+    ell(c, 0, -39.5, 8.6, 8.9, look.hair);
+    poly(c, [-5, -33, 0, -29.5, 5, -33], look.hair, OUTLINE, 1);
+    line(c, [-3, -44, -1, -38], 'rgba(255,255,255,.18)', 1.4);
+  }
   c.restore();
 }
 

@@ -1,7 +1,7 @@
 // Drives the built game in headless Chromium and takes screenshots.
 //   node tools/drive.mjs [scenario]     scenarios: tour (default), fight, play
 import { createRequire } from 'node:module';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const { chromium } = createRequire(import.meta.url)('playwright');
@@ -54,6 +54,27 @@ if (scenario === 'fight' || scenario === 'tour') {
   await page.keyboard.press('i'); await wait(200); await shot('21-bag'); await page.keyboard.press('Escape');
   await page.keyboard.press('s'); await wait(200); await shot('22-spells'); await page.keyboard.press('Escape');
   await page.keyboard.press('m'); await wait(200); await shot('23-map'); await page.keyboard.press('Escape');
+}
+
+if (scenario === 'poses') {
+  // The hero's poses on one sheet (front row, back row), then live frames in a fight.
+  const url = await sf(`shardfall.poseSheet()`);
+  writeFileSync('shots/poses.png', Buffer.from(url.split(',')[1], 'base64'));
+  await sf(`shardfall.goto('meadow_w'); shardfall.level(3); shardfall.fight(0)`);
+  await wait(400);
+  await page.click('#act');
+  for (let k = 0; k < 40 && (await sf(`shardfall.G.fight.phase`)) !== 'player'; k++) await wait(200);
+  const clip = async (name) => {
+    const [x, y] = await sf(`(() => { const h = shardfall.G.hero, r = document.getElementById('cv').getBoundingClientRect(); return [r.left + h.x * r.width / 960, r.top + h.y * r.height / 560]; })()`);
+    await page.screenshot({ path: `shots/${name}.png`, clip: { x: x - 70, y: y - 95, width: 140, height: 125 } });
+  };
+  for (const kind of ['attack', 'cast', 'hit', 'cheer']) {
+    await sf(`shardfall.pose('${kind}', '#ff8a47')`);
+    await wait(kind === 'cheer' ? 230 : 170);
+    await clip('pose-' + kind);
+    await wait(900);
+  }
+  await sf(`shardfall.G.hero.back = true`); await wait(80); await clip('pose-back');
 }
 
 if (scenario === 'play') {

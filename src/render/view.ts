@@ -4,7 +4,7 @@ import { CELLS, center, rowOf, TH, TW, VIEW_H, VIEW_W } from '../core/grid.js';
 import { createRng } from '../core/rng.js';
 import type { GameMap } from '../core/world.js';
 import { G, type Actor } from '../state.js';
-import { BACKDROP, diamond, drawDecor, drawHero, drawMonster, drawObject, drawTile } from './sprites.js';
+import { BACKDROP, diamond, drawDecor, drawHero, drawMonster, drawObject, drawTile, HERO_MOTION, heroPose, type AnimKind } from './sprites.js';
 
 type C = CanvasRenderingContext2D;
 
@@ -92,6 +92,7 @@ export function updateActors(dt: number) {
       const dx = p.x - a.x, dy = p.y - a.y;
       const d = Math.hypot(dx, dy);
       if (Math.abs(dx) > 0.5) a.facing = dx > 0 ? 1 : -1;
+      if (Math.abs(dy) > 0.5) a.back = dy < 0;
       if (d <= left) {
         a.x = p.x; a.y = p.y;
         left -= d;
@@ -150,11 +151,25 @@ function drawActor(c: C, a: Actor, t: number) {
   c.translate(x, y);
   if (flash) c.filter = 'brightness(1.9) saturate(1.4)';
   c.scale(a.scale, a.scale);
+  let anim: { kind: AnimKind; k: number; color?: string } | undefined;
+  if (a.anim) {
+    const k = (t - a.anim.t0) / a.anim.dur;
+    if (k >= 1 && a.anim.kind !== 'die') a.anim = undefined;
+    else anim = { kind: a.anim.kind, k: Math.min(1, Math.max(0, k)), color: a.anim.color };
+  }
   if (a.kind === 'monster') {
     c.scale(a.facing, 1);
+    if (anim) {
+      // Shared reactions: recoil when hit, a stretch into attacks, tipping over when defeated.
+      const env = Math.sin(Math.PI * anim.k), wave = Math.sin(Math.PI * 2 * anim.k);
+      if (anim.kind === 'hit') { c.rotate(-0.2 * env); c.scale(1 + 0.05 * env, 1 - 0.08 * env); }
+      else if (anim.kind === 'attack') { c.rotate(0.14 * env); c.scale(1 - 0.06 * wave, 1 + 0.08 * wave); }
+      else if (anim.kind === 'cast') c.scale(1 + 0.05 * env, 1 + 0.08 * env);
+      else if (anim.kind === 'die') c.rotate(-1.2 * anim.k * anim.k);
+    }
     drawMonster(c, a.shape!, a.colors!, t + a.cell * 37, a.walking);
   } else {
-    drawHero(c, a.look!, t, { facing: a.facing, walking: a.walking, armed: !!a.armed, elder: a.elder });
+    drawHero(c, a.look!, heroPose({ walking: a.walking, anim }, t, a.cell * 37), { facing: a.facing, back: !!a.back, armed: !!a.armed, elder: a.elder });
   }
   c.restore();
   // Labels and bars.
@@ -302,11 +317,46 @@ export function portrait(a: { kind: string; shape?: string; colors?: [string, st
     drawMonster(c, a.shape!, a.colors!, 0, false);
   } else {
     c.scale(0.92, 0.92);
-    drawHero(c, a.look!, 0, { facing: 1, walking: false, armed: a.kind === 'hero', elder: a.elder });
+    drawHero(c, a.look!, heroPose({ walking: false }, 0), { facing: 1, back: false, armed: a.kind === 'hero', elder: a.elder });
   }
   const url = cv.toDataURL();
   portraits.set(key, url);
   return url;
+}
+
+/** A sheet of the hero's poses, front row and back row, for checking the animation by eye. */
+export function poseSheet(look: NonNullable<Actor['look']>): string {
+  const S = HERO_MOTION.walk.stride;
+  const cols: { label: string; walking: boolean; t: number; anim?: { kind: AnimKind; k: number; color?: string } }[] = [
+    { label: 'idle', walking: false, t: 0 },
+    ...[0.125, 0.375, 0.625, 0.875].map((f) => ({ label: 'walk', walking: true, t: f * S })),
+    ...[0.15, 0.3, 0.42, 0.55, 0.8].map((k) => ({ label: 'attack', walking: false, t: 0, anim: { kind: 'attack' as AnimKind, k } })),
+    ...[0.25, 0.45, 0.65, 0.85].map((k) => ({ label: 'cast', walking: false, t: 0, anim: { kind: 'cast' as AnimKind, k, color: '#ff8a47' } })),
+    { label: 'hit', walking: false, t: 0, anim: { kind: 'hit', k: 0.5 } },
+    ...[0.5, 1].map((k) => ({ label: 'die', walking: false, t: 0, anim: { kind: 'die' as AnimKind, k } })),
+    { label: 'cheer', walking: false, t: 0, anim: { kind: 'cheer', k: 0.25 } },
+  ];
+  const W = 64, H = 84, Z = 2;
+  const cv = document.createElement('canvas');
+  cv.width = cols.length * W * Z;
+  cv.height = 2 * H * Z;
+  const c = cv.getContext('2d')!;
+  c.fillStyle = '#8fc55b';
+  c.fillRect(0, 0, cv.width, cv.height);
+  c.scale(Z, Z);
+  cols.forEach((col, i) => {
+    for (const back of [false, true]) {
+      c.save();
+      c.translate(i * W + W / 2, (back ? H : 0) + H - 14);
+      drawHero(c, look, heroPose({ walking: col.walking, anim: col.anim }, col.t), { facing: 1, back, armed: true });
+      c.restore();
+    }
+    c.fillStyle = '#12301a';
+    c.font = '9px system-ui, sans-serif';
+    c.textAlign = 'center';
+    c.fillText(col.label, i * W + W / 2, 10);
+  });
+  return cv.toDataURL();
 }
 
 export const monsterPortrait = (defId: string) => {

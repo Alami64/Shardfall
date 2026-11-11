@@ -2,6 +2,7 @@
 import type { Character, HeroLook } from './core/character.js';
 import type { FightState } from './core/fight.js';
 import type { GameMap, Group, Npc } from './core/world.js';
+import type { AnimKind } from './render/sprites.js';
 
 export interface Actor {
   key: string;
@@ -17,6 +18,9 @@ export interface Actor {
   y: number;
   cell: number;
   facing: 1 | -1;
+  /** Seen from behind (moving or looking up the map). */
+  back?: boolean;
+  anim?: { kind: AnimKind; t0: number; dur: number; color?: string };
   walking: boolean;
   path: number[];
   speed: number;

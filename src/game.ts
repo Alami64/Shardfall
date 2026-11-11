@@ -18,7 +18,8 @@ import {
   arrivalCell, buildMap, fightCells, monsterFighter, nearestWalkable, neighborMap, populate,
   type Dir, type GameMap, type Group, type Npc,
 } from './core/world.js';
-import { actorAt, burst, floatText, placeActor, portrait, projectile, render, setMap, updateActors } from './render/view.js';
+import { animDur, type AnimKind } from './render/sprites.js';
+import { actorAt, burst, floatText, placeActor, portrait, poseSheet, projectile, render, setMap, updateActors } from './render/view.js';
 import { G, type Actor } from './state.js';
 import {
   actions, banner, barSpells, clearLog, closeWindow, fade, fighterHtml, groupHtml, hideTip, initHud, log, openWindow, refresh,
@@ -59,6 +60,14 @@ function baseActor(key: string, kind: Actor['kind'], name: string, cell: number)
   const p = center(cell);
   return { key, kind, name, scale: 1, x: p.x, y: p.y, cell, facing: 1, walking: false, path: [], speed: 170, alpha: 1, flashUntil: 0 };
 }
+/** Turn an actor towards a cell: left or right, and front or back. */
+function faceTo(a: Actor, cell: number) {
+  const p = center(cell);
+  if (Math.abs(p.x - a.x) > 1) a.facing = p.x > a.x ? 1 : -1;
+  if (Math.abs(p.y - a.y) > 1) a.back = p.y < a.y;
+}
+const startAnim = (a: Actor, kind: AnimKind, color?: string) => { a.anim = { kind, t0: G.now, dur: animDur(kind), color }; };
+
 function heroActor(cell: number): Actor {
   const a = baseActor('hero', 'hero', G.ch.name, cell);
   a.look = G.ch.look;
@@ -123,6 +132,7 @@ async function changeMap(dir: Dir, fromCell: number) {
   await sleep(190);
   enterMap(next.id, arrivalCell(getMap(next.id), fromCell, dir));
   G.hero.facing = dir === 'left' ? -1 : 1;
+  G.hero.back = dir === 'up';
   fade(false);
   banner(next.name);
   refresh();
@@ -200,7 +210,7 @@ function questDialog() {
 
 function talk(npc: Npc) {
   if (G.mode !== 'explore') return;
-  G.hero.facing = center(npc.cell).x >= G.hero.x ? 1 : -1;
+  faceTo(G.hero, npc.cell);
   if (npc.role === 'shop') { G.shop = true; openWindow('bag'); G.shop = true; }
   else if (npc.role === 'heal') {
     openWindow('dialog', {
@@ -227,7 +237,7 @@ function beginFight(group: Group) {
   G.fight = { st, phase: 'placement', startCells: cells.player, group, selected: null, turnId: -1, auto: autoPlay };
   G.actors = fighters.map(fighterActor);
   G.hero = G.actors[0]!;
-  G.hero.facing = center(group.cell).x >= G.hero.x ? 1 : -1;
+  faceTo(G.hero, group.cell);
   targetGroup = null;
   closeWindow();
   hideTip();
@@ -293,11 +303,19 @@ async function play(evs: FEvent[]) {
         const a = actorOf(e.id);
         const to = center(e.cell);
         const dx = to.x - a.x, dy = to.y - a.y, d = Math.hypot(dx, dy);
-        if (Math.abs(dx) > 1) a.facing = dx > 0 ? 1 : -1;
+        if (e.cell !== a.cell) faceTo(a, e.cell);
         log(`${a.name.split(',')[0]} casts ${e.name}${e.crit ? ': critical hit!' : '.'}`, a.team === 0 ? 'a' : 'd');
-        if (d < 1) { burst(a.x, a.y, e.color); await sleep(200); }
-        else if (d < 80) { a.lunge = { dx: dx / d, dy: dy / d, t0: G.now }; await sleep(130); burst(to.x, to.y, e.color, 300); await sleep(70); }
-        else {
+        if (d < 1) { startAnim(a, 'cast', e.color); await sleep(230); burst(a.x, a.y, e.color); await sleep(170); }
+        else if (d < 80) {
+          startAnim(a, 'attack');
+          await sleep(120);
+          a.lunge = { dx: dx / d, dy: dy / d, t0: G.now };
+          await sleep(110);
+          burst(to.x, to.y, e.color, 300);
+          await sleep(70);
+        } else {
+          startAnim(a, 'cast', e.color);
+          await sleep(230);
           const dur = Math.min(420, 150 + d * 0.6) / speed;
           projectile(a.x, a.y - 24, to.x, to.y - 16, e.color, dur);
           await sleep(dur * speed);
@@ -310,6 +328,7 @@ async function play(evs: FEvent[]) {
         const a = actorOf(e.id);
         a.hp = e.hp;
         a.flashUntil = G.now + 260;
+        startAnim(a, 'hit');
         floatText(a.x, a.y - 44 * (a.scale - 1), `-${e.n}`, ELEMENT_COLOR[e.el], e.crit ? 23 : 17);
         log(`${a.name.split(',')[0]} loses ${e.n} HP.`, a.team === 0 ? 'r' : '');
         refreshBar();
@@ -332,6 +351,8 @@ async function play(evs: FEvent[]) {
         const a = actorOf(e.id);
         a.hp = 0;
         log(`${a.name.split(',')[0]} is defeated.`, a.team === 0 ? 'r' : 'g');
+        startAnim(a, 'die');
+        await sleep(160);
         for (let k = 1; k <= 8; k++) { a.alpha = 1 - k / 8; await sleep(35); }
         refreshTimeline();
         break;
@@ -487,6 +508,7 @@ function finishFight() {
   f.phase = 'over';
   G.marks = [];
   const st = f.st, me = hero(), ch = G.ch, map = G.map;
+  let result: object;
   if (st.over === 'win') {
     const foes = st.fighters.filter((x) => x.team === 1);
     const luck = derived(ch).luck;
@@ -522,14 +544,21 @@ function finishFight() {
     if (gi >= 0) map.groups.splice(gi, 1);
     if (f.group.boss) map.bossAt = performance.now() + 180000;
     else map.respawns.push(performance.now() + 40000);
-    openWindow('result', { win: true, xp, gold, items, levels, quest });
+    result = { win: true, xp, gold, items, levels, quest };
+    G.hero.back = false;
+    startAnim(G.hero, 'cheer');
   } else {
     ch.hp = Math.max(1, Math.ceil(derived(ch).maxHp * 0.3));
-    openWindow('result', { win: false });
+    result = { win: false };
   }
   save();
   refresh();
-  if (autoPlay) setTimeout(closeWindow, 50);
+  // The hero celebrates a win for a moment before the result window covers the map.
+  setTimeout(() => {
+    openWindow('result', result);
+    refresh();
+    if (autoPlay) setTimeout(closeWindow, 50);
+  }, st.over === 'win' ? 800 / speed : 0);
 }
 
 function closeResult() {
@@ -733,6 +762,8 @@ export function boot() {
     gold: (n: number) => { G.ch.gold += n; refresh(); },
     goto: (id: string) => { enterMap(id, -1); refresh(); },
     fight: (i = 0) => { const g = G.map.groups[i]; if (g) beginFight(g); },
+    pose: (kind: AnimKind, color?: string) => startAnim(G.hero, kind, color),
+    poseSheet: () => poseSheet(G.ch.look),
     cellXY: (c: number, dy = 0) => {
       const p = center(c), r = cv.getBoundingClientRect();
       return [r.left + (p.x * r.width) / VIEW_W, r.top + ((p.y + dy) * r.height) / VIEW_H];
