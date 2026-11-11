@@ -23,6 +23,7 @@ export interface Actions {
   raiseStat(k: BaseStat, n: number): void;
   raiseSpell(id: string): void;
   resetStats(): void;
+  setBody(body: 'sprout' | 'classic'): void;
   resetSpells(): void;
   closeResult(): void;
   create(name: string, look: HeroLook): void;
@@ -253,7 +254,7 @@ type Sel = { kind: 'inv'; uid: number } | { kind: 'eq'; slot: Slot } | { kind: '
 let open: { name: string; data?: any } | null = null;
 let sel: Sel = null;
 let confirming: 'stats' | 'spells' | null = null;
-let draft: { name: string; look: HeroLook } = { name: '', look: { tunic: '#3f7fbf', hair: '#5a3a22', skin: '#f0c9a4' } };
+let draft: { name: string; look: HeroLook } = { name: '', look: { tunic: '#3f7fbf', hair: '#5a3a22', skin: '#f0c9a4', body: 'sprout' } };
 
 export const windowOpen = () => open?.name ?? null;
 export function openWindow(name: string, data?: any) {
@@ -318,7 +319,8 @@ function charWindow(): string {
     kv('Initiative', d.init) + kv('Critical hit', d.crit + '%') + kv('Power', '+' + d.power + '%') + kv('Damage', '+' + d.dmg) +
     kv('Physical resist', d.resPhysical + '%') + kv('Fire resist', d.resFire + '%') + kv('Storm resist', d.resStorm + '%') +
     `<h4>Progress</h4>` + kv('Level', ch.level) + kv('Experience', ch.level >= LEVEL_CAP ? 'max' : `${ch.xp} / ${xpNeed(ch.level)}`) + kv('Fights won', ch.wins) +
-    `<div style="margin-top:10px"><button class="btn" data-act="reset">New character…</button></div>`;
+    `<div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn" data-act="look-switch">${(ch.look.body ?? 'sprout') === 'sprout' ? 'Switch to classic look' : 'Switch to sprout look'}</button>` +
+    `<button class="btn" data-act="reset">New character…</button></div>`;
   return panel(`${esc(ch.name)} · Runeblade level ${ch.level}`, `<div class="grid2"><div>${left}</div><div>${right}</div></div>`, true, 'width:620px');
 }
 
@@ -430,7 +432,9 @@ function createWindow(): string {
   const body = `<p style="margin-top:0;max-width:420px">You are a <b style="color:#ffb347">Runeblade</b>: a wandering fighter who cuts with steel and with the storm and fire bound in its runes. The village of Emberhollow needs one.</p>` +
     `<div class="row" style="align-items:flex-start;gap:16px"><img src="${portrait({ kind: 'hero', look: draft.look })}" width="96" height="96" style="background:#151a21;border-radius:12px;border:1px solid #3a4554" alt="">` +
     `<div style="flex:1"><h4>Name</h4><input id="cname" type="text" maxlength="16" placeholder="Your name" value="${esc(draft.name)}">` +
-    `<h4>Tunic</h4><div class="row">${sw(TUNICS, 'tunic')}</div><h4>Hair</h4><div class="row">${sw(HAIRS, 'hair')}</div><h4>Skin</h4><div class="row">${sw(SKINS, 'skin')}</div></div></div>` +
+    `<h4>Look</h4><div class="row">${(['sprout', 'classic'] as const).map((b) => `<button class="btn${(draft.look.body ?? 'sprout') === b ? ' go' : ''}" data-act="body" data-v="${b}">${b === 'sprout' ? 'Sprout' : 'Classic'}</button>`).join('')}</div>` +
+    (draft.look.body === 'classic' ? `<h4>Tunic</h4><div class="row">${sw(TUNICS, 'tunic')}</div><h4>Hair</h4><div class="row">${sw(HAIRS, 'hair')}</div><h4>Skin</h4><div class="row">${sw(SKINS, 'skin')}</div>` : '') +
+    `</div></div>` +
     `<div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn go" data-act="create">Begin</button></div>`;
   return panel('Shardfall · new character', body, false);
 }
@@ -496,6 +500,8 @@ export function initHud() {
         });
         break;
       case 'look': draft.look = { ...draft.look, [d.k!]: d.v! }; renderWindow(); break;
+      case 'body': draft.look = { ...draft.look, body: d.v as 'sprout' | 'classic' }; renderWindow(); break;
+      case 'look-switch': actions.setBody((G.ch.look.body ?? 'sprout') === 'sprout' ? 'classic' : 'sprout'); break;
       case 'create': {
         const name = ($('cname') as HTMLInputElement).value.trim() || 'Wanderer';
         open = null;

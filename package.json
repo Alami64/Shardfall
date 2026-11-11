@@ -7,7 +7,8 @@
     "dev": "vite",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit && vite build",
-    "sim": "tsx tools/sim.ts"
+    "sim": "tsx tools/sim.ts",
+    "hero": "python3 tools/hero_sprites.py"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

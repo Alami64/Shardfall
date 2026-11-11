@@ -66,7 +66,7 @@ if (scenario === 'poses') {
   for (let k = 0; k < 40 && (await sf(`shardfall.G.fight.phase`)) !== 'player'; k++) await wait(200);
   const clip = async (name) => {
     const [x, y] = await sf(`(() => { const h = shardfall.G.hero, r = document.getElementById('cv').getBoundingClientRect(); return [r.left + h.x * r.width / 960, r.top + h.y * r.height / 560]; })()`);
-    await page.screenshot({ path: `shots/${name}.png`, clip: { x: x - 70, y: y - 95, width: 140, height: 125 } });
+    await page.screenshot({ path: `shots/${name}.png`, clip: { x: x - 70, y: y - 110, width: 140, height: 140 } });
   };
   for (const kind of ['attack', 'cast', 'hit', 'cheer']) {
     await sf(`shardfall.pose('${kind}', '#ff8a47')`);
@@ -141,9 +141,17 @@ if (scenario === 'play') {
   await page.click('[data-act=reset-spells-yes]');
   check('spell ranks reset', await sf(`Object.keys(shardfall.G.ch.ranks).length === 0 && shardfall.G.ch.spellPoints === 4`));
   await page.keyboard.press('Escape');
+  // Switch between the sprite hero and the classic one.
+  check('sprite hero by default', await sf(`(shardfall.G.ch.look.body ?? 'sprout') === 'sprout'`));
+  await page.keyboard.press('c'); await wait(150);
+  await page.click('[data-act=look-switch]');
+  check('classic look', await sf(`shardfall.G.ch.look.body === 'classic' && shardfall.G.hero.look.body === 'classic'`));
+  await page.click('[data-act=look-switch]');
+  check('sprite look again', await sf(`shardfall.G.ch.look.body === 'sprout'`));
+  await page.keyboard.press('Escape');
   // Reload: the save comes back.
   await page.reload(); await wait(500);
-  check('save restored', await sf(`shardfall.G.ch.name === 'Tester' && shardfall.G.ch.wins === 1 && shardfall.G.ch.equip.weapon?.def === 'twig_blade' && shardfall.G.map.def.id === 'meadow_w'`));
+  check('save restored', await sf(`shardfall.G.ch.name === 'Tester' && shardfall.G.ch.wins === 1 && shardfall.G.ch.equip.weapon?.def === 'twig_blade' && shardfall.G.map.def.id === 'meadow_w' && shardfall.G.ch.look.body === 'sprout'`));
   // Lose against the boss at low level.
   await sf(`shardfall.goto('hollow'); shardfall.speed(6); shardfall.auto(true); shardfall.fight(shardfall.G.map.groups.findIndex(g => g.boss))`);
   for (let k = 0; k < 300 && (await sf(`shardfall.G.mode`)) === 'fight'; k++) await wait(200);

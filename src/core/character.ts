@@ -6,7 +6,9 @@ import {
 import type { Fighter } from './fight.js';
 import { rint, type Rng } from './rng.js';
 
-export interface HeroLook { tunic: string; hair: string; skin: string }
+/** body: 'sprout' is the sprite hero from assets/hero, 'classic' the code-drawn one. Colours apply to classic. */
+export interface HeroLook { tunic: string; hair: string; skin: string; body?: 'sprout' | 'classic' }
+export type HeroBody = 'sprout' | 'classic';
 export interface ItemInst { uid: number; def: string; qty: number; stats?: Partial<Record<StatKey, number>> }
 export const SLOTS = ['weapon', 'helm', 'cloak', 'amulet', 'ring1', 'ring2', 'belt', 'boots'] as const;
 export type Slot = (typeof SLOTS)[number];

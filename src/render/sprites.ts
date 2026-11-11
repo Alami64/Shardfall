@@ -366,6 +366,10 @@ export const HERO_MOTION = {
   hit: { dur: 300, lean: 0.24, squash: 0.08 },
   die: { dur: 420, fall: 1.35 },
   cheer: { dur: 900, jump: 9, arm: 2.95 },
+  /** Follow-through of the head and the sprout (sprite hero), and how its short legs move. */
+  head: { lag: 90, follow: 0.7, tilt: 0.04 },
+  sprout: { period: 2300, sway: 0.14, walk: 0.3, lag: 170 },
+  sprite: { leg: 0.55, lift: 3 },
 };
 export type AnimKind = 'attack' | 'cast' | 'hit' | 'die' | 'cheer';
 export const animDur = (kind: AnimKind) => HERO_MOTION[kind].dur;
@@ -375,6 +379,8 @@ export interface HeroState { walking: boolean; anim?: { kind: AnimKind; k: numbe
 export interface HeroPose {
   bob: number; lean: number; squash: number; legA: number; legB: number; armF: number; armB: number;
   blade: number; cloak: number; blink: boolean; glow: number; glowColor: string; trail: number; fall: number;
+  /** Extra head offset (px) and tilt, and sprout tilt: parts that follow the body a beat late. */
+  headDy: number; headRot: number; sprout: number;
 }
 export interface HeroLookAt { facing: number; back: boolean; armed: boolean; elder?: boolean }
 
@@ -389,6 +395,7 @@ export function heroPose(s: HeroState, t: number, seed = 0): HeroPose {
   const p: HeroPose = {
     bob: 0, lean: 0, squash: 1, legA: 0, legB: 0, armF: 0, armB: 0,
     blade: M.sword.rest, cloak: 0, blink: false, glow: 0, glowColor: '#ffd166', trail: -1, fall: 0,
+    headDy: 0, headRot: 0, sprout: 0,
   };
   const live = REDUCED ? 0 : 1;
   if (s.walking) {
@@ -401,10 +408,17 @@ export function heroPose(s: HeroState, t: number, seed = 0): HeroPose {
     p.bob = Math.abs(Math.cos(ph)) * M.walk.bob;
     p.lean = M.walk.lean;
     p.cloak = -2.5 - sw;
+    const late = ph - (M.head.lag / M.walk.stride) * Math.PI * 2;
+    p.headDy = (p.bob - Math.abs(Math.cos(late)) * M.walk.bob) * M.head.follow;
+    p.headRot = Math.sin(late) * M.head.tilt;
+    p.sprout = -Math.sin(ph - (M.sprout.lag / M.walk.stride) * Math.PI * 2) * M.sprout.walk;
   } else {
     p.bob = Math.sin(((t + seed) / M.breath.period) * Math.PI * 2) * M.breath.amp * live;
     p.cloak = Math.sin(((t + seed) / M.cloak.period) * Math.PI * 2) * M.cloak.amp * live;
     p.blink = live === 1 && t > 0 && (t + seed * 7) % M.blink.every < M.blink.dur;
+    const lateBob = Math.sin(((t + seed - M.head.lag * 3) / M.breath.period) * Math.PI * 2) * M.breath.amp * live;
+    p.headDy = (p.bob - lateBob) * M.head.follow;
+    p.sprout = Math.sin(((t + seed) / M.sprout.period) * Math.PI * 2) * M.sprout.sway * live;
   }
   const a = s.anim;
   if (!a) return p;
@@ -422,6 +436,8 @@ export function heroPose(s: HeroState, t: number, seed = 0): HeroPose {
         p.armF = lerp(A.raise, A.end, e);
         p.blade = M.sword.armed;
         p.lean = lerp(-A.lean * 0.6, A.lean, e);
+        p.headRot = 0.08 * e;
+        p.sprout = -0.5 * e;
         p.trail = e;
         p.legA = 0.35 * e;
         p.legB = -0.3 * e;
@@ -467,6 +483,9 @@ export function heroPose(s: HeroState, t: number, seed = 0): HeroPose {
       p.squash = 1 - M.hit.squash * env;
       p.armB = -0.7 * env;
       p.armF = -0.3 * env;
+      p.headRot = -0.12 * env;
+      p.headDy = -1.2 * env;
+      p.sprout = 0.6 * env;
       break;
     }
     case 'die': {
@@ -486,6 +505,8 @@ export function heroPose(s: HeroState, t: number, seed = 0): HeroPose {
       p.armB = 2.6 * r;
       p.legA = 0.25 * hop;
       p.legB = -0.25 * hop;
+      p.sprout = Math.sin(k * Math.PI * 6) * 0.45 * r;
+      p.headDy = -hop * 1.2;
       break;
     }
   }

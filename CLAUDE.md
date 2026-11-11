@@ -1,6 +1,6 @@
 # Shardfall
 
-Browser-based, turn-based tactical RPG on an isometric grid. Vite + TypeScript, Canvas 2D, DOM HUD, no game framework. One class (Runeblade), 10 maps, level cap 30. Original world, names and art; all art is drawn in code.
+Browser-based, turn-based tactical RPG on an isometric grid. Vite + TypeScript, Canvas 2D, DOM HUD, no game framework. One class (Runeblade), 10 maps, level cap 30. Original world, names and art. The hero is a sprite from the owner's own design (`assets/hero`); everything else is drawn in code.
 
 ## Commands
 
@@ -10,6 +10,7 @@ npm run dev         # Vite dev server on :5173
 npm run typecheck   # tsc
 npm run build       # typecheck, then dist/index.html (single self-contained file)
 npm run sim         # fights through the engine, win rates per map (tools/sim.ts)
+npm run hero        # rebuild assets/hero/hero.png and src/render/heroFrames.ts from assets/hero/source.webp (Python 3 + Pillow)
 node tools/drive.mjs play   # needs a build: plays in headless Chromium, prints PASS/FAIL checks
 node tools/drive.mjs tour   # screenshots of maps, a fight and the windows into shots/
 node tools/drive.mjs poses  # shots/poses.png: every hero pose, front and back
@@ -20,7 +21,7 @@ Before finishing a change: `npm run build && node tools/drive.mjs play` must pas
 ## Layout
 
 - `src/core` — rules with no rendering or I/O: `grid.ts` (cells, diamond coordinates, areas), `path.ts` (BFS paths, reachable cells, line of sight), `content.ts` (spells, monsters, items, sets, maps, shop, quests as data), `character.ts` (stats, XP, inventory, equipment), `fight.ts` (fight state, move/cast/end turn, effects, AI), `world.ts` (map generation, village, exits, monster groups), `rng.ts`.
-- `src/render` — `sprites.ts` (tiles, scenery, hero, monsters; the hero is jointed parts posed by `heroPose`, with every timing and angle in `HERO_MOTION`), `icons.ts`, `view.ts` (frame drawing, depth sort, effects, actor movement).
+- `src/render` — `sprites.ts` (tiles, scenery, hero, monsters; the hero is jointed parts posed by `heroPose`, with every timing and angle in `HERO_MOTION`), `heroSprite.ts` (the sprite hero: each of the four views is cut into sprout, head, body and two legs along the lines in the generated `heroFrames.ts`, and posed by the same `heroPose`), `icons.ts`, `view.ts` (frame drawing, depth sort, effects, actor movement). `look.body` picks the sprite (`'sprout'`, the default) or the code-drawn hero (`'classic'`); villagers are always code-drawn.
 - `src/ui/hud.ts` — bar, timeline, log, tooltips, windows. `src/state.ts` — shared client state `G`. `src/game.ts` — controller (input, exploring, fight flow, rewards, NPCs, save). In the browser `window.shardfall` exposes test hooks (`auto`, `speed`, `level`, `give`, `goto`, `fight`).
 
 ## Rules of the codebase

@@ -658,6 +658,12 @@ function wireActions() {
     if (outOfFight()) { const n = resetSpells(G.ch); log(`Spell ranks reset: ${n} spell point${n === 1 ? '' : 's'} to spend again.`, 'a'); save(); }
     refresh();
   };
+  actions.setBody = (body) => {
+    G.ch.look = { ...G.ch.look, body };
+    G.hero.look = G.ch.look;
+    save();
+    refresh();
+  };
   actions.closeResult = closeResult;
   actions.create = (name: string, look: HeroLook) => {
     G.ch = newCharacter(name, look);

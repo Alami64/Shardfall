@@ -4,6 +4,7 @@ import { CELLS, center, rowOf, TH, TW, VIEW_H, VIEW_W } from '../core/grid.js';
 import { createRng } from '../core/rng.js';
 import type { GameMap } from '../core/world.js';
 import { G, type Actor } from '../state.js';
+import { drawSpriteHero, heroSpriteReady } from './heroSprite.js';
 import { BACKDROP, diamond, drawDecor, drawHero, drawMonster, drawObject, drawTile, HERO_MOTION, heroPose, type AnimKind } from './sprites.js';
 
 type C = CanvasRenderingContext2D;
@@ -49,6 +50,9 @@ export function setMap(map: GameMap) {
   c.fillStyle = g;
   c.fillRect(0, 0, VIEW_W, VIEW_H);
 }
+
+/** The hero uses the sprite unless the classic look was chosen; villagers are always code-drawn. */
+const usesSprite = (kind: string, look: Actor['look']) => kind === 'hero' && (look?.body ?? 'sprout') === 'sprout' && heroSpriteReady();
 
 // ------------------------------------------------------------ effects
 
@@ -169,11 +173,14 @@ function drawActor(c: C, a: Actor, t: number) {
     }
     drawMonster(c, a.shape!, a.colors!, t + a.cell * 37, a.walking);
   } else {
-    drawHero(c, a.look!, heroPose({ walking: a.walking, anim }, t, a.cell * 37), { facing: a.facing, back: !!a.back, armed: !!a.armed, elder: a.elder });
+    const pose = heroPose({ walking: a.walking, anim }, t, a.cell * 37);
+    const at = { facing: a.facing, back: !!a.back, armed: !!a.armed, elder: a.elder };
+    if (usesSprite(a.kind, a.look)) drawSpriteHero(c, pose, at);
+    else drawHero(c, a.look!, pose, at);
   }
   c.restore();
   // Labels and bars.
-  const top = y - 52 * a.scale;
+  const top = y - (usesSprite(a.kind, a.look) ? 66 : 52) * a.scale;
   c.textAlign = 'center';
   if (a.kind === 'npc') label(c, a.name, x, top - 4, '#ffe9b0');
   if (a.group && G.mode === 'explore') {
@@ -308,10 +315,16 @@ export function portrait(a: { kind: string; shape?: string; colors?: [string, st
   const hit = portraits.get(key);
   if (hit) return hit;
   const cv = document.createElement('canvas');
-  cv.width = cv.height = 48;
+  cv.width = cv.height = 96;
   const c = cv.getContext('2d')!;
+  c.scale(2, 2);
   c.translate(24, 45);
-  if (a.kind === 'monster') {
+  if (usesSprite(a.kind, a.look)) {
+    // Head and shoulders: the figure is taller than the frame.
+    c.translate(0, 43);
+    c.scale(1.45, 1.45);
+    drawSpriteHero(c, heroPose({ walking: false }, 0), { facing: 1, back: false, armed: false });
+  } else if (a.kind === 'monster') {
     const s = a.shape === 'treant' ? 0.62 : a.shape === 'golem' || a.shape === 'acolyte' || a.shape === 'briar' ? 0.82 : 1;
     c.scale(s, s);
     drawMonster(c, a.shape!, a.colors!, 0, false);
@@ -336,7 +349,7 @@ export function poseSheet(look: NonNullable<Actor['look']>): string {
     ...[0.5, 1].map((k) => ({ label: 'die', walking: false, t: 0, anim: { kind: 'die' as AnimKind, k } })),
     { label: 'cheer', walking: false, t: 0, anim: { kind: 'cheer', k: 0.25 } },
   ];
-  const W = 64, H = 84, Z = 2;
+  const W = 72, H = 96, Z = 2;
   const cv = document.createElement('canvas');
   cv.width = cols.length * W * Z;
   cv.height = 2 * H * Z;
@@ -348,7 +361,10 @@ export function poseSheet(look: NonNullable<Actor['look']>): string {
     for (const back of [false, true]) {
       c.save();
       c.translate(i * W + W / 2, (back ? H : 0) + H - 14);
-      drawHero(c, look, heroPose({ walking: col.walking, anim: col.anim }, col.t), { facing: 1, back, armed: true });
+      const pose = heroPose({ walking: col.walking, anim: col.anim }, col.t);
+      const facing = i % 2 === 1 && col.label !== 'idle' ? -1 : 1;
+      if (usesSprite('hero', look)) drawSpriteHero(c, pose, { facing, back, armed: true });
+      else drawHero(c, look, pose, { facing, back, armed: true });
       c.restore();
     }
     c.fillStyle = '#12301a';
