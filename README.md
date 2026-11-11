@@ -54,6 +54,7 @@ npm run typecheck
 npm run sim              # plays fights through the engine and prints win rates per map
 node tools/drive.mjs play   # after a build: plays the game in headless Chromium and checks it
 node tools/drive.mjs tour   # screenshots of every map and window into shots/
+node tools/artifact.mjs      # dist/shardfall.html: the page without <html>/<head>/<body>, for hosts that add their own
 ```
 
 `npm run sim` plays the hero with the same simple AI the monsters use, so a person does better than these numbers. With that AI, a group of three monsters at the low end of each map's level range is won almost every time in the meadows and forest and at least 80% of the time in the marsh (40–75% health left), and about half the time in the ruins at level 17; the boss falls about half the time at level 25.

@@ -4,16 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Shardfall</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <style>
 :root {
+  color-scheme: dark;
   --bg: #12151a; --panel: #1c222b; --panel2: #262e3a; --line: #3a4554; --text: #e8e4da; --dim: #9aa3ad;
   --amber: #ffb347; --amber2: #e08a1e; --hp: #e5534b; --xp: #c78bff; --ap: #5aa0ff; --mp: #5fd08a; --good: #7dff9a; --bad: #ff7a6b;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.35 system-ui, -apple-system, 'Segoe UI', sans-serif; }
-body { display: flex; justify-content: center; overflow: hidden; user-select: none; -webkit-user-select: none; }
+body {
+  display: flex; justify-content: center; align-items: flex-start; overflow-x: hidden; overflow-y: auto; container-type: size;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  user-select: none; -webkit-user-select: none;
+}
 button { font: inherit; color: inherit; cursor: pointer; }
-#app { width: min(100vw, calc((100vh - 86px) * 960 / 560)); min-width: 320px; display: flex; flex-direction: column; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+#app { width: min(100%, calc((100cqh - 86px) * 960 / 560)); min-width: 288px; display: flex; flex-direction: column; }
 #stage { position: relative; width: 100%; aspect-ratio: 960 / 560; background: #000; overflow: hidden; }
 #cv { width: 100%; height: 100%; display: block; }
 .chip { position: absolute; background: rgba(18,21,26,.82); border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; pointer-events: none; }
@@ -72,9 +79,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #act:disabled { filter: grayscale(1) brightness(.6); cursor: default; }
 #act.hide { display: none; }
 
-#win { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(8,10,13,.45); z-index: 20; padding: 10px; }
+#win { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(8,10,13,.45); z-index: 20;
+  padding: max(10px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-right, 0px)) max(10px, env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px)); }
 #win.on { display: flex; }
-.panel { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--amber2); border-radius: 12px; box-shadow: 0 16px 50px rgba(0,0,0,.6); max-width: 100%; max-height: 92vh; display: flex; flex-direction: column; min-width: 300px; }
+.panel { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--amber2); border-radius: 12px; box-shadow: 0 16px 50px rgba(0,0,0,.6); max-width: 100%; max-height: 92vh; display: flex; flex-direction: column; }
 .panel header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--line); }
 .panel header b { font-size: 16px; color: var(--amber); }
 .panel header button { background: none; border: none; font-size: 20px; color: var(--dim); line-height: 1; }
@@ -124,6 +132,8 @@ input[type=text] { background: #0f1318; border: 1px solid var(--line); border-ra
 #tip .iname { font-size: 14px; }
 @media (max-width: 720px) {
   #bar { gap: 6px; padding: 6px; }
+  #banner { font-size: 16px; }
+  #mapinfo small, #log { font-size: 10px; }
   #gauges { width: 120px; }
   .bag { grid-template-columns: repeat(5, 50px); }
   .grid2 { grid-template-columns: 1fr; }

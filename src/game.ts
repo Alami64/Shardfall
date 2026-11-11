@@ -641,6 +641,7 @@ function wireActions() {
     openWindow('create');
   };
   actions.npc = (what) => {
+    if (what === 'resetYes') { closeWindow(); actions.reset(); return; }
     const ch = G.ch;
     if (what === 'rest') {
       ch.hp = derived(ch).maxHp;

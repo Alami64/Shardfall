@@ -467,7 +467,13 @@ export function initHud() {
       case 'sell': actions.sell(Number(d.uid)); if (!G.ch.inv.some((i) => i.uid === Number(d.uid))) sel = null; refresh(); break;
       case 'buy': actions.buy(d.def!); refresh(); break;
       case 'npc': actions.npc(d.what!); break;
-      case 'reset': if (confirm('Start over with a new character? Your current one is deleted.')) actions.reset(); break;
+      case 'reset':
+        openWindow('dialog', {
+          name: 'New character', title: 'this cannot be undone', img: portrait({ kind: 'hero', look: G.ch.look }),
+          text: `Start over with a new character? <b>${esc(G.ch.name)}</b> (level ${G.ch.level}) is deleted.`,
+          buttons: [{ label: 'Keep playing', act: 'bye' }, { label: 'Delete and start over', act: 'resetYes', go: true }],
+        });
+        break;
       case 'look': draft.look = { ...draft.look, [d.k!]: d.v! }; renderWindow(); break;
       case 'create': {
         const name = ($('cname') as HTMLInputElement).value.trim() || 'Wanderer';
