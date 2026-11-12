@@ -16,6 +16,10 @@ export interface MapObj {
   roof?: string;
   door?: 'L' | 'R';
   window?: boolean;
+  /** A building drawn as one sprite over several cells; every cell of it carries the same values. */
+  asset?: 'shop' | 'market-stall';
+  /** Footprint of that building in diamond coordinates: u0..u0+w-1, v0..v0+h-1. */
+  foot?: { u0: number; v0: number; w: number; h: number };
 }
 export interface Npc { id: string; name: string; title: string; cell: number; role: 'shop' | 'quest' | 'heal'; look: HeroLook }
 export interface GroupMember { def: string; level: number }
@@ -39,7 +43,7 @@ export interface GameMap {
 }
 
 /** Scenery that blocks line of sight. Everything listed in a map's obj blocks walking. */
-const OPAQUE = new Set(['tree', 'pine', 'deadtree', 'rock', 'pillar', 'block', 'shroom', 'stone']);
+const OPAQUE = new Set(['tree', 'pine', 'deadtree', 'rock', 'pillar', 'block', 'shroom', 'stone', 'building']);
 
 export const DIR_DELTA: Record<Dir, [number, number]> = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 export const neighborMap = (def: MapDef, dir: Dir) => mapAt(def.gx + DIR_DELTA[dir][0], def.gy + DIR_DELTA[dir][1]);
@@ -121,12 +125,24 @@ function addHouse(map: GameMap, u0: number, v0: number, w: number, h: number, wa
   }
 }
 
+/** A building that is one sprite over a block of cells (see MapObj.asset). */
+function addBuilding(map: GameMap, asset: NonNullable<MapObj['asset']>, u0: number, v0: number, w: number, h: number) {
+  const foot = { u0, v0, w, h };
+  for (let u = u0; u < u0 + w; u++) {
+    for (let v = v0; v < v0 + h; v++) {
+      const cell = fromUV(u, v);
+      if (cell >= 0) map.obj[cell] = { kind: 'building', variant: 0, asset, foot };
+    }
+  }
+}
+
 function buildVillage(map: GameMap, rng: Rng) {
   for (let i = 0; i < CELLS; i++) {
     const c = colOf(i), r = rowOf(i);
     if ((r >= 13 && r <= 17) || ((c === 6 || c === 7) && r >= 15)) map.road[i] = true;
   }
-  addHouse(map, 6, 0, 3, 2, '#e8d8b8', '#b5533c');
+  addBuilding(map, 'shop', 6, 0, 3, 2);
+  addBuilding(map, 'market-stall', 10, -1, 1, 2);
   addHouse(map, 13, -7, 2, 3, '#e3d2c0', '#4f7a9c');
   addHouse(map, 13, 8, 3, 2, '#dcd0b0', '#6b8f4a');
   addHouse(map, 21, -1, 2, 3, '#e8d8b8', '#8a5a9c');
@@ -142,7 +158,9 @@ function buildVillage(map: GameMap, rng: Rng) {
   for (let i = 0; i < CELLS; i++) {
     if (map.obj[i] || map.road[i]) continue;
     const r = rng();
-    if (r < 0.035) map.obj[i] = { kind: 'tree', variant: rint(rng, 0, 3) };
+    // Trees keep a cell of space around houses and stalls so they don't hide them.
+    const nearHouse = neighbors(i).some((n) => map.obj[n]?.kind === 'block' || map.obj[n]?.kind === 'building');
+    if (r < 0.035 && !nearHouse) map.obj[i] = { kind: 'tree', variant: rint(rng, 0, 3) };
     else if (r < 0.06) map.obj[i] = { kind: 'bush', variant: rint(rng, 0, 3) };
   }
   const npc = (id: string, name: string, title: string, role: Npc['role'], u: number, v: number, look: HeroLook) => {
@@ -234,7 +252,7 @@ export function buildMap(def: MapDef): GameMap {
       }
     }
     if (open && !closed.some((b) => b.depth === 0)) {
-      if (map.obj[i]?.kind !== 'block' || def.biome !== 'village') map.obj[i] = null;
+      if ((map.obj[i]?.kind !== 'block' && map.obj[i]?.kind !== 'building') || def.biome !== 'village') map.obj[i] = null;
       map.water[i] = false;
       const dir = exitOf(i);
       if (dir && neighborMap(def, dir)) map.exits[i] = dir;
@@ -262,7 +280,7 @@ export function buildMap(def: MapDef): GameMap {
     let lost = -1;
     for (let i = 0; i < CELLS && lost < 0; i++) if (map.walkable[i] && !seen[i]) lost = i;
     if (lost < 0) break;
-    const path = findPath(lost, (i) => !!seen[i], (i) => map.obj[i]?.kind !== 'block' && !map.npcs.some((n) => n.cell === i));
+    const path = findPath(lost, (i) => !!seen[i], (i) => map.obj[i]?.kind !== 'block' && map.obj[i]?.kind !== 'building' && !map.npcs.some((n) => n.cell === i));
     if (!path) { map.obj[lost] = { kind: 'rock', variant: 0 }; refresh(); continue; }
     for (const c of path) { map.obj[c] = null; map.water[c] = false; }
     refresh();

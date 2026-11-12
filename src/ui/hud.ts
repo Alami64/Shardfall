@@ -411,7 +411,7 @@ function dialogWindow(d: { name: string; title: string; text: string; buttons: {
 
 function resultWindow(d: { win: boolean; xp: number; gold: number; items: ItemInst[]; levels: number; quest?: string }): string {
   if (!d.win) {
-    return panel('Defeated', `<div class="big" style="color:#ff7a6b">You fall…</div><p>You wake at the waystone in Emberhollow, shaken but alive.</p><div class="row" style="justify-content:flex-end"><button class="btn go" data-act="close">Continue</button></div>`, false);
+    return panel('Defeated', `<div class="big" style="color:#ff7a6b">You fall…</div><p>You wake by the portal in Emberhollow, shaken but alive.</p><div class="row" style="justify-content:flex-end"><button class="btn go" data-act="close">Continue</button></div>`, false);
   }
   let h = `<div class="big" style="color:#7dff9a">Victory</div><div style="margin:6px 0">+<b style="color:#c78bff">${d.xp} XP</b> · +<span class="gold">${d.gold} g</span></div>`;
   if (d.levels) h += `<div style="color:#ffb347;font-weight:700">Level up! You are now level ${G.ch.level}. +${d.levels * 5} characteristic points, +${d.levels} spell point${d.levels > 1 ? 's' : ''}.</div>`;

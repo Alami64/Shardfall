@@ -19,7 +19,9 @@ import {
   type Dir, type GameMap, type Group, type Npc,
 } from './core/world.js';
 import { animDur, type AnimKind } from './render/sprites.js';
-import { actorAt, burst, floatText, placeActor, portrait, poseSheet, projectile, render, setMap, updateActors } from './render/view.js';
+import {
+  actorAt, burst, floatText, getPixelScale, placeActor, portrait, poseSheet, projectile, render, setMap, setPixelScale, updateActors,
+} from './render/view.js';
 import { G, type Actor } from './state.js';
 import {
   actions, banner, barSpells, clearLog, closeWindow, fade, fighterHtml, groupHtml, hideTip, initHud, log, openWindow, refresh,
@@ -672,7 +674,7 @@ function wireActions() {
     enterMap('village', -1);
     refresh();
     banner('Emberhollow', 1800);
-    log(`Welcome, ${name}. Speak to Old Tobin by the waystone.`, 'a');
+    log(`Welcome, ${name}. Speak to Old Tobin by the portal.`, 'a');
     log('Click the ground to walk. Click a monster to fight.', 'd');
   };
   actions.reset = () => {
@@ -713,9 +715,22 @@ function wireActions() {
   };
 }
 
+/** Match the canvas to the pixels it covers on screen, so nothing is stretched. */
+function fitCanvas() {
+  const r = cv.getBoundingClientRect();
+  if (!r.width) return;
+  const k = Math.min(3, Math.max(1, (r.width * (window.devicePixelRatio || 1)) / VIEW_W));
+  const w = Math.round(VIEW_W * k), h = Math.round(VIEW_H * k);
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  setPixelScale(w / VIEW_W);
+}
+
 export function boot() {
   cv = document.getElementById('cv') as HTMLCanvasElement;
   ctx = cv.getContext('2d')!;
+  fitCanvas();
+  new ResizeObserver(fitCanvas).observe(cv);
+  window.addEventListener('resize', fitCanvas);
   initHud();
   wireActions();
   cv.addEventListener('mousemove', onMove);
@@ -748,6 +763,10 @@ export function boot() {
     G.now = t;
     if (G.mode === 'explore' && G.ready) exploreTick(dt, t);
     updateActors(dt);
+    const k = getPixelScale();
+    ctx.setTransform(k, 0, 0, k, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     render(ctx, t);
     requestAnimationFrame(frame);
   };

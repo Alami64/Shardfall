@@ -77,6 +77,32 @@ if (scenario === 'poses') {
   await sf(`shardfall.G.hero.back = true`); await wait(80); await clip('pose-back');
 }
 
+if (scenario === 'village') {
+  // Depth around the shop and the stall: the hero on each side, close up.
+  const around = { 'shop-north': [7, -1], 'shop-east': [9, 0], 'shop-south': [9, 2], 'shop-front': [8, 2], 'shop-west': [5, 0],
+    'stall-north': [9, -1], 'stall-east': [11, 0], 'stall-south': [10, 1], 'stall-west': [11, -2] };
+  for (const [name, [u, v]] of Object.entries(around)) {
+    const ok = await sf(`(() => { const r = ${u} + ${v}, c = (${u} - ${v} - (r & 1)) / 2, cell = r * 14 + c;
+      if (!shardfall.G.map.walkable[cell]) return false;
+      const h = shardfall.G.hero; h.path = []; h.cell = cell; const x = 48 + 32 * (${u} - ${v}), y = 60 + 16 * (r);
+      h.x = x; h.y = y; return true; })()`);
+    if (!ok) { console.log('not walkable', name); continue; }
+    await wait(120);
+    const [x, y] = await sf(`(() => { const h = shardfall.G.hero, r = document.getElementById('cv').getBoundingClientRect(); return [r.left + h.x * r.width / 960, r.top + h.y * r.height / 560]; })()`);
+    await page.screenshot({ path: `shots/depth-${name}.png`, clip: { x: x - 90, y: y - 110, width: 180, height: 140 } });
+  }
+  await sf(`(() => { const h = shardfall.G.hero; h.alpha = 1; })()`);
+  await shot('40-village');
+  const hi = await browser.newPage({ viewport: { width: 1100, height: 760 }, deviceScaleFactor: 2 });
+  await hi.goto('file://' + resolve('dist/index.html'));
+  await hi.fill('#cname', 'Tester'); await hi.click('[data-act=create]'); await hi.waitForTimeout(500);
+  await hi.screenshot({ path: 'shots/41-village-2x.png', clip: { x: 200, y: 60, width: 420, height: 300 } });
+  await page.screenshot({ path: 'shots/41-village-1x.png', clip: { x: 200, y: 60, width: 420, height: 300 } });
+  await hi.evaluate(() => shardfall.goto('meadow_s')); await hi.waitForTimeout(400);
+  await hi.screenshot({ path: 'shots/42-meadow-2x.png' });
+  await hi.close();
+}
+
 if (scenario === 'play') {
   const check = (name, ok) => { console.log((ok ? 'PASS ' : 'FAIL ') + name); if (!ok) errors.push('check failed: ' + name); };
   const clickCell = async (cell, dy = 0) => { const [x, y] = await sf(`shardfall.cellXY(${cell}, ${dy})`); await page.mouse.move(x, y); await page.mouse.click(x, y); };

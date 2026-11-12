@@ -1,5 +1,6 @@
 import { boot } from './game.js';
+import { loadEnvSprites } from './render/envSprites.js';
 import { loadHeroSprite } from './render/heroSprite.js';
 
-// The sprite sheet is loaded first so that portraits are never drawn blank.
-void loadHeroSprite().then(boot);
+// Images are loaded first so that portraits and the first frame are never drawn blank.
+void Promise.all([loadHeroSprite(), loadEnvSprites()]).then(boot);

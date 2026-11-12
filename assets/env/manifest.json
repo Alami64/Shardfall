@@ -1,0 +1,245 @@
+{
+  "version": 2,
+  "reference": {
+    "canvas": [
+      960,
+      560
+    ],
+    "cell": [
+      64,
+      32
+    ],
+    "heroHeight": 60,
+    "mapColumns": 14,
+    "mapStaggeredRows": 31,
+    "cellCenter": {
+      "x": "48 + 64*column + 32*(row % 2)",
+      "y": "60 + 16*row"
+    }
+  },
+  "units": "all world positions, collision polygons, target sizes and anchor1x values use native 960x560 canvas pixels",
+  "placement": "drawTopLeft = worldGroundAnchor - anchor; use anchor3x and render at scale 1/3 for the 3x textures",
+  "projectionStatus": "Grid and collision polygons are exact 2:1. Painted silhouettes are approximate; their internal edges are not mathematically certified.",
+  "assets": {
+    "tree": {
+      "texture3x": "sprites-3x/tree.png",
+      "texture1x": "sprites-1x/tree.png",
+      "canvas3x": [
+        270,
+        330
+      ],
+      "canvas1x": [
+        90,
+        110
+      ],
+      "renderScale3x": 0.3333333333333333,
+      "anchor1x": [
+        45.0,
+        108.35
+      ],
+      "anchor3x": [
+        135.0,
+        325.05
+      ],
+      "originNormalized": [
+        0.5,
+        0.985
+      ],
+      "nominalFootprintCells": [
+        1,
+        1
+      ],
+      "collisionPolygon1x": [
+        [
+          0,
+          -10.0
+        ],
+        [
+          14.0,
+          -3
+        ],
+        [
+          0,
+          4.0
+        ],
+        [
+          -14.0,
+          -3
+        ]
+      ],
+      "collisionStatus": "suggested conservative polygon; confirm against map pathfinding",
+      "visibleArtBounds1x": [
+        1,
+        0,
+        89,
+        110
+      ],
+      "anchorStatus": "suggested contact point, visually reviewed on the supplied grid preview"
+    },
+    "market-stall": {
+      "texture3x": "sprites-3x/market-stall.png",
+      "texture1x": "sprites-1x/market-stall.png",
+      "canvas3x": [
+        288,
+        315
+      ],
+      "canvas1x": [
+        96,
+        105
+      ],
+      "renderScale3x": 0.3333333333333333,
+      "anchor1x": [
+        49.92,
+        103.44
+      ],
+      "anchor3x": [
+        149.76,
+        310.32
+      ],
+      "originNormalized": [
+        0.52,
+        0.985143
+      ],
+      "nominalFootprintCells": [
+        2,
+        1
+      ],
+      "collisionPolygon1x": [
+        [
+          -16,
+          16
+        ],
+        [
+          -48,
+          0
+        ],
+        [
+          16,
+          -32
+        ],
+        [
+          48,
+          -16
+        ]
+      ],
+      "collisionStatus": "suggested conservative polygon; confirm against map pathfinding",
+      "visibleArtBounds1x": [
+        0,
+        1,
+        96,
+        105
+      ],
+      "anchorStatus": "suggested contact point, visually reviewed on the supplied grid preview"
+    },
+    "portal": {
+      "texture3x": "sprites-3x/portal.png",
+      "texture1x": "sprites-1x/portal.png",
+      "canvas3x": [
+        192,
+        270
+      ],
+      "canvas1x": [
+        64,
+        90
+      ],
+      "renderScale3x": 0.3333333333333333,
+      "anchor1x": [
+        32.0,
+        83.947
+      ],
+      "anchor3x": [
+        96.0,
+        251.84
+      ],
+      "originNormalized": [
+        0.5,
+        0.932741
+      ],
+      "nominalFootprintCells": [
+        1,
+        1
+      ],
+      "collisionPolygon1x": [
+        [
+          0,
+          -12.0
+        ],
+        [
+          26.0,
+          -2
+        ],
+        [
+          0,
+          8.0
+        ],
+        [
+          -26.0,
+          -2
+        ]
+      ],
+      "collisionStatus": "suggested conservative polygon; confirm against map pathfinding",
+      "visibleArtBounds1x": [
+        0,
+        15,
+        64,
+        90
+      ],
+      "anchorStatus": "suggested contact point, visually reviewed on the supplied grid preview"
+    },
+    "shop": {
+      "texture3x": "sprites-3x/shop.png",
+      "texture1x": "sprites-1x/shop.png",
+      "canvas3x": [
+        480,
+        450
+      ],
+      "canvas1x": [
+        160,
+        150
+      ],
+      "renderScale3x": 0.3333333333333333,
+      "anchor1x": [
+        91.8,
+        148.5
+      ],
+      "anchor3x": [
+        275.4,
+        445.5
+      ],
+      "originNormalized": [
+        0.57375,
+        0.99
+      ],
+      "nominalFootprintCells": [
+        3,
+        2
+      ],
+      "collisionPolygon1x": [
+        [
+          0,
+          0
+        ],
+        [
+          -96,
+          -48
+        ],
+        [
+          -32,
+          -80
+        ],
+        [
+          64,
+          -32
+        ]
+      ],
+      "collisionStatus": "suggested conservative polygon; confirm against map pathfinding",
+      "visibleArtBounds1x": [
+        2,
+        0,
+        158,
+        150
+      ],
+      "anchorStatus": "suggested contact point, visually reviewed on the supplied grid preview"
+    }
+  }
+}

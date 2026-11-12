@@ -2,7 +2,7 @@
 
 A browser-based, turn-based tactical RPG on an isometric grid. You play a Runeblade who sets out from the village of Emberhollow, fights monster groups across ten maps, levels up, collects equipment and finally faces Thornmaw, the Rootbound King.
 
-The world, names and art are original. The hero is a sprite made from the owner's own character design (`assets/hero`); everything else is drawn in code.
+The world, names and art are original. The hero (`assets/hero`) and the village and meadow scenery (tree, portal, shop and market stall in `assets/env`) are sprites made from the owner's own art; everything else is drawn in code. The game draws at the screen's real resolution, so the art stays sharp on large and high-density screens.
 
 ## Play
 
@@ -54,6 +54,7 @@ Not in the game: multiplayer, crafting, summons, traps, sound.
 npm run typecheck
 npm run sim              # plays fights through the engine and prints win rates per map
 npm run hero             # rebuilds the hero sprite sheet from assets/hero/source.webp (needs Python 3 and Pillow)
+python3 tools/env_sprites.py <pack>   # copies an art pack (sprites-3x/, assets.json, sources/) into assets/env
 node tools/drive.mjs play   # after a build: plays the game in headless Chromium and checks it
 node tools/drive.mjs tour   # screenshots of every map and window into shots/
 node tools/drive.mjs poses  # shots/poses.png: every hero pose, front and back, plus live frames from a fight

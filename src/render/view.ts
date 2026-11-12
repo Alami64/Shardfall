@@ -4,18 +4,32 @@ import { CELLS, center, rowOf, TH, TW, VIEW_H, VIEW_W } from '../core/grid.js';
 import { createRng } from '../core/rng.js';
 import type { GameMap } from '../core/world.js';
 import { G, type Actor } from '../state.js';
+import { buildingItems, drawEnvPortal, drawEnvTree, ENV_BIOMES, envReady, type DrawItem } from './envSprites.js';
 import { drawSpriteHero, heroSpriteReady } from './heroSprite.js';
 import { BACKDROP, diamond, drawDecor, drawHero, drawMonster, drawObject, drawTile, HERO_MOTION, heroPose, type AnimKind } from './sprites.js';
 
 type C = CanvasRenderingContext2D;
 
 let ground: HTMLCanvasElement | null = null;
+let groundMap: GameMap | null = null;
+/** Device pixels per game pixel. The game is laid out in 960 x 560 game pixels at any size. */
+let pixelScale = 1;
+
+/** Set the canvas resolution; the cached ground is redrawn at the new scale. */
+export function setPixelScale(k: number) {
+  if (Math.abs(k - pixelScale) < 0.001) return;
+  pixelScale = k;
+  if (groundMap) setMap(groundMap);
+}
+export const getPixelScale = () => pixelScale;
 
 export function setMap(map: GameMap) {
+  groundMap = map;
   ground = document.createElement('canvas');
-  ground.width = VIEW_W;
-  ground.height = VIEW_H;
+  ground.width = Math.round(VIEW_W * pixelScale);
+  ground.height = Math.round(VIEW_H * pixelScale);
   const c = ground.getContext('2d')!;
+  c.scale(pixelScale, pixelScale);
   const biome = map.def.biome;
   c.fillStyle = BACKDROP[biome];
   c.fillRect(0, 0, VIEW_W, VIEW_H);
@@ -211,7 +225,7 @@ function label(c: C, text: string, x: number, y: number, color: string) {
 export function render(c: C, t: number) {
   const map = G.map;
   if (!ground || !map) return;
-  c.drawImage(ground, 0, 0);
+  c.drawImage(ground, 0, 0, VIEW_W, VIEW_H);
   const inFight = G.mode === 'fight';
 
   if (inFight) {
@@ -240,12 +254,19 @@ export function render(c: C, t: number) {
   }
 
   // Scenery and actors, back to front.
-  const items: { y: number; x: number; draw: () => void }[] = [];
+  const items: DrawItem[] = [];
+  const env = ENV_BIOMES.includes(map.def.biome);
+  const drawn = new Set<object>();
   for (let i = 0; i < CELLS; i++) {
     const o = map.obj[i];
     if (!o) continue;
     const p = center(i);
-    items.push({ y: p.y, x: p.x, draw: () => drawObject(c, p.x, p.y, o, map.def.biome, t) });
+    if (o.kind === 'building') {
+      // Every cell of a building shares one foot object; draw the sprite once.
+      if (o.foot && !drawn.has(o.foot)) { drawn.add(o.foot); items.push(...buildingItems(c, o, pixelScale)); }
+    } else if (o.kind === 'tree' && env && envReady('tree')) items.push({ y: p.y, x: p.x, draw: () => drawEnvTree(c, p.x, p.y, i) });
+    else if (o.kind === 'stone' && env && envReady('portal')) items.push({ y: p.y, x: p.x, draw: () => drawEnvPortal(c, p.x, p.y) });
+    else items.push({ y: p.y, x: p.x, draw: () => drawObject(c, p.x, p.y, o, map.def.biome, t) });
   }
   for (const a of G.actors) {
     if (a.alpha <= 0) continue;
