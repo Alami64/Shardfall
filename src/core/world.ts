@@ -330,6 +330,34 @@ export function spawnGroup(map: GameMap, rng: Rng, avoid = -1, boss = false): Gr
   return g;
 }
 
+/** GM: a group of chosen monsters on a free cell 3 to 6 steps from a given cell. */
+export function spawnCustomGroup(map: GameMap, members: GroupMember[], near: number, rng: Rng): Group | null {
+  if (!members.length) return null;
+  const free = (c: number) => map.walkable[c] && !map.exits[c] && !map.groups.some((g) => g.cell === c);
+  const options: number[] = [];
+  for (let c = 0; c < CELLS; c++) if (free(c) && dist(c, near) >= 3 && dist(c, near) <= 6) options.push(c);
+  if (!options.length) for (let c = 0; c < CELLS; c++) if (free(c) && c !== near) options.push(c);
+  if (!options.length) return null;
+  const g: Group = { id: groupSeq++, cell: options[Math.floor(rng() * options.length)]!, members: members.map((m) => ({ ...m })) };
+  map.groups.push(g);
+  return g;
+}
+
+/** GM: remove every monster group; they stay away until the given time (ms, same clock as populate). */
+export function clearGroups(map: GameMap, until: number) {
+  map.groups = [];
+  map.respawns = new Array(map.def.groups ?? 0).fill(until);
+  if (map.def.boss) map.bossAt = until;
+}
+
+/** GM: replace every monster group on the map with fresh ones, the boss included. */
+export function respawnAll(map: GameMap, rng: Rng, avoid: number): Group[] {
+  map.groups = [];
+  map.respawns = [];
+  map.bossAt = 0;
+  return populate(map, rng, avoid);
+}
+
 /** Fill the map with monster groups. Groups whose respawn time has not come yet stay away. */
 export function populate(map: GameMap, rng: Rng, avoid = -1, now = Infinity): Group[] {
   const added: Group[] = [];

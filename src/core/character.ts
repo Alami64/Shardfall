@@ -3,7 +3,7 @@ import {
   ITEMS, LEVEL_CAP, MAX_RANK, PLAYER_SPELLS, rankCost, sellPrice, SETS, xpNeed,
   type ItemDef, type SpellDef, type StatKey,
 } from './content.js';
-import type { Fighter } from './fight.js';
+import type { Cheats, Fighter } from './fight.js';
 import { rint, type Rng } from './rng.js';
 
 /** body: 'sprout' is the sprite hero from assets/hero, 'classic' the code-drawn one. Colours apply to classic. */
@@ -16,6 +16,12 @@ export const SLOT_LABEL: Record<Slot, string> = {
   weapon: 'Weapon', helm: 'Helm', cloak: 'Cloak', amulet: 'Amulet', ring1: 'Ring', ring2: 'Ring', belt: 'Belt', boots: 'Boots',
 };
 export type BaseStat = 'vit' | 'str' | 'int' | 'agi' | 'luck';
+/** GM mode: on shows the GM tools; the rest are cheats. All off when missing. */
+export interface GmFlags extends Cheats { on: boolean; ignoreLevel: boolean; allSpells: boolean }
+export const GM_DEFAULT: GmFlags = {
+  on: false, ignoreLevel: false, allSpells: false, invulnerable: false, oneHit: false, freeCast: false, infiniteMp: false,
+};
+export type RollMode = 'random' | 'min' | 'max' | 'custom';
 export const BASE_STATS: BaseStat[] = ['vit', 'str', 'int', 'agi', 'luck'];
 
 export interface Character {
@@ -38,6 +44,7 @@ export interface Character {
   questTaken: boolean;
   uidSeq: number;
   wins: number;
+  gm?: GmFlags;
 }
 
 export function newCharacter(name: string, look: HeroLook): Character {
@@ -110,7 +117,9 @@ export function gainXp(ch: Character, n: number): number {
   return gained;
 }
 
-export const knownSpells = (ch: Character): SpellDef[] => PLAYER_SPELLS.filter((s) => s.level <= ch.level);
+export const gmOf = (ch: Character): GmFlags => ({ ...GM_DEFAULT, ...ch.gm });
+export const knownSpells = (ch: Character): SpellDef[] =>
+  PLAYER_SPELLS.filter((s) => s.level <= ch.level || (gmOf(ch).on && gmOf(ch).allSpells));
 export const rankOf = (ch: Character, id: string) => ch.ranks[id] ?? 1;
 
 export function raiseStat(ch: Character, k: BaseStat, n = 1): boolean {
@@ -125,7 +134,7 @@ export function raiseStat(ch: Character, k: BaseStat, n = 1): boolean {
 export function raiseSpell(ch: Character, id: string): boolean {
   const r = rankOf(ch, id);
   const sp = PLAYER_SPELLS.find((s) => s.id === id);
-  if (!sp || sp.level > ch.level || r >= MAX_RANK || ch.spellPoints < rankCost(r)) return false;
+  if (!sp || !knownSpells(ch).includes(sp) || r >= MAX_RANK || ch.spellPoints < rankCost(r)) return false;
   ch.spellPoints -= rankCost(r);
   ch.ranks[id] = r + 1;
   return true;
@@ -149,6 +158,24 @@ export function resetSpells(ch: Character): number {
   return refund;
 }
 
+/** GM: set the level directly, up or down. Spent points are refunded, then points match the new level. */
+export function setLevel(ch: Character, n: number) {
+  n = Math.max(1, Math.min(LEVEL_CAP, Math.round(n)));
+  resetStats(ch);
+  resetSpells(ch);
+  ch.level = n;
+  ch.xp = 0;
+  ch.statPoints = (n - 1) * 5;
+  ch.spellPoints = n - 1;
+  ch.hp = derived(ch).maxHp;
+}
+
+/** GM: set a spell's rank without spending points. */
+export function setRank(ch: Character, id: string, rank: number) {
+  rank = Math.max(1, Math.min(MAX_RANK, Math.round(rank)));
+  if (rank === 1) delete ch.ranks[id]; else ch.ranks[id] = rank;
+}
+
 // ------------------------------------------------------------ items
 
 export const isGear = (def: ItemDef) => def.type !== 'resource' && def.type !== 'food';
@@ -163,14 +190,48 @@ export function addItem(ch: Character, defId: string, qty: number, rng: Rng): It
     ch.inv.push(inst);
     return inst;
   }
+  return addItemWith(ch, defId, qty, 'random', rng);
+}
+
+/** Add an item with its stats rolled at random, at the minimum, at the maximum, or set to given values. */
+export function addItemWith(
+  ch: Character, defId: string, qty: number, mode: RollMode, rng: Rng, custom: Partial<Record<StatKey, number>> = {},
+): ItemInst {
+  const def = ITEMS[defId]!;
+  if (!isGear(def)) return addItem(ch, defId, qty, rng);
   let inst!: ItemInst;
   for (let k = 0; k < qty; k++) {
     const stats: Partial<Record<StatKey, number>> = {};
-    for (const [key, range] of Object.entries(def.stats ?? {})) stats[key as StatKey] = rint(rng, range![0], range![1]);
+    for (const [key, range] of Object.entries(def.stats ?? {})) {
+      const [lo, hi] = range!;
+      stats[key as StatKey] = mode === 'min' ? lo : mode === 'max' ? hi : mode === 'custom' && custom[key as StatKey] !== undefined
+        ? custom[key as StatKey]! : rint(rng, lo, hi);
+    }
     inst = { uid: ch.uidSeq++, def: defId, qty: 1, stats };
     ch.inv.push(inst);
   }
   return inst;
+}
+
+/** Find an item in the bag or equipped. */
+export function findItem(ch: Character, uid: number): ItemInst | null {
+  return ch.inv.find((i) => i.uid === uid) ?? SLOTS.map((s) => ch.equip[s]).find((i) => i?.uid === uid) ?? null;
+}
+
+/** GM: overwrite an item's stats, in the bag or equipped. */
+export function setItemStats(ch: Character, uid: number, stats: Partial<Record<StatKey, number>>) {
+  const it = findItem(ch, uid);
+  if (!it) return;
+  it.stats = { ...it.stats, ...stats };
+  clampHp(ch);
+}
+
+/** GM: remove an item (a whole stack), from the bag or from where it is worn. */
+export function removeItem(ch: Character, uid: number) {
+  const i = ch.inv.findIndex((x) => x.uid === uid);
+  if (i >= 0) ch.inv.splice(i, 1);
+  for (const s of SLOTS) if (ch.equip[s]?.uid === uid) ch.equip[s] = null;
+  clampHp(ch);
 }
 
 function removeOne(ch: Character, uid: number): ItemInst | null {
@@ -185,12 +246,12 @@ function removeOne(ch: Character, uid: number): ItemInst | null {
 function clampHp(ch: Character) { ch.hp = Math.max(1, Math.min(ch.hp, derived(ch).maxHp)); }
 
 /** Equip an item from the bag. Returns an error text or null. */
-export function equipItem(ch: Character, uid: number): string | null {
+export function equipItem(ch: Character, uid: number, ignoreLevel = gmOf(ch).on && gmOf(ch).ignoreLevel): string | null {
   const it = ch.inv.find((x) => x.uid === uid);
   if (!it) return 'No such item';
   const def = ITEMS[it.def]!;
   if (!isGear(def)) return 'Cannot be equipped';
-  if (def.level > ch.level) return `Requires level ${def.level}`;
+  if (def.level > ch.level && !ignoreLevel) return `Requires level ${def.level}`;
   let slot: Slot;
   if (def.type === 'ring') slot = !ch.equip.ring1 ? 'ring1' : !ch.equip.ring2 ? 'ring2' : 'ring1';
   else slot = def.type as Slot;
@@ -266,5 +327,13 @@ export function playerFighter(ch: Character, cell: number): Fighter {
       ...knownSpells(ch).map((s) => ({ id: s.id, rank: rankOf(ch, s.id), cd: 0, used: 0 })),
     ],
     buffs: [], alive: true, ai: 'melee',
+    cheats: cheatsOf(ch),
   };
+}
+
+/** The fight cheats in force for this character (none unless GM mode is on). */
+export function cheatsOf(ch: Character): Cheats | undefined {
+  const g = gmOf(ch);
+  if (!g.on) return undefined;
+  return { invulnerable: g.invulnerable, oneHit: g.oneHit, freeCast: g.freeCast, infiniteMp: g.infiniteMp };
 }

@@ -175,9 +175,44 @@ if (scenario === 'play') {
   await page.click('[data-act=look-switch]');
   check('sprite look again', await sf(`shardfall.G.ch.look.body === 'sprout'`));
   await page.keyboard.press('Escape');
+  // GM mode: switch on, edit the level, spawn a max-rolled item, win a fight instantly, switch off.
+  const setInput = async (sel, value) => { await page.fill(sel, String(value)); await page.press(sel, 'Enter'); await page.$eval(sel, (e) => e.dispatchEvent(new Event('change', { bubbles: true }))); await wait(80); };
+  await page.keyboard.press('c'); await wait(150);
+  await page.click('[data-act=gm][data-op=toggle]');
+  check('GM on', await sf(`shardfall.G.ch.gm.on === true && !document.getElementById('gmbtn').hidden`));
+  await page.keyboard.press('Escape'); await page.keyboard.press('g'); await wait(150);
+  check('GM window opens', (await page.$('.gmtabs')) !== null);
+  await setInput('[data-gm=level]', 20);
+  check('GM level 20', await sf(`shardfall.G.ch.level === 20 && shardfall.G.ch.statPoints === 95 && shardfall.G.ch.spellPoints === 19`));
+  await shot('50-gm-char');
+  await page.click('[data-act=gm-tab][data-v=items]');
+  await page.fill('#gm-search', 'tusk'); await wait(80);
+  await page.click('[data-act=gm-pick][data-def=tusk_cleaver]');
+  await page.click('[data-act=gm-roll][data-v=max]');
+  await page.click('[data-act=gm][data-op=spawn]');
+  check('GM max-rolled item', await sf(`(() => { const it = shardfall.G.ch.inv.filter(i => i.def === 'tusk_cleaver').pop(); return !!it && it.stats.str === 7; })()`));
+  await shot('51-gm-items');
+  await page.click('[data-act=gm-tab][data-v=world]'); await wait(80); await shot('52-gm-world');
+  await page.click('[data-act=gm-tab][data-v=fight]');
+  await page.check('[data-gm=flag][data-k=invulnerable]'); await wait(80);
+  check('GM invulnerable flag', await sf(`shardfall.G.ch.gm.invulnerable === true`));
+  await shot('53-gm-fight');
+  await page.keyboard.press('Escape');
+  const winsBefore = await sf(`shardfall.G.ch.wins`);
+  await sf(`shardfall.fight(0)`); await wait(400);
+  await page.keyboard.press('g'); await wait(150);
+  await page.click('[data-act=gm-tab][data-v=fight]');
+  await page.click('[data-act=gm][data-op=win]');
+  for (let k = 0; k < 40 && !(await page.$('#win.on [data-act=close]')); k++) await wait(150);
+  await page.click('#win.on [data-act=close]'); await wait(300);
+  check('GM instant win', (await sf(`shardfall.G.ch.wins`)) === winsBefore + 1 && (await sf(`shardfall.G.mode`)) === 'explore');
+  await page.keyboard.press('c'); await wait(150);
+  await page.click('[data-act=gm][data-op=toggle]');
+  check('GM off', await sf(`shardfall.G.ch.gm.on === false && document.getElementById('gmbtn').hidden`));
+  await page.keyboard.press('Escape');
   // Reload: the save comes back.
   await page.reload(); await wait(500);
-  check('save restored', await sf(`shardfall.G.ch.name === 'Tester' && shardfall.G.ch.wins === 1 && shardfall.G.ch.equip.weapon?.def === 'twig_blade' && shardfall.G.map.def.id === 'meadow_w' && shardfall.G.ch.look.body === 'sprout'`));
+  check('save restored', await sf(`shardfall.G.ch.name === 'Tester' && shardfall.G.ch.wins >= 1 && shardfall.G.ch.equip.weapon?.def === 'twig_blade' && shardfall.G.map.def.id === 'meadow_w' && shardfall.G.ch.look.body === 'sprout'`));
   // Lose against the boss at low level.
   await sf(`shardfall.goto('hollow'); shardfall.speed(6); shardfall.auto(true); shardfall.fight(shardfall.G.map.groups.findIndex(g => g.boss))`);
   for (let k = 0; k < 300 && (await sf(`shardfall.G.mode`)) === 'fight'; k++) await wait(200);

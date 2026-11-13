@@ -4,13 +4,14 @@ import {
   SHOP_STOCK, STAT_LABEL, STAT_ORDER, xpNeed, type ItemDef, type SpellDef, type StatKey,
 } from '../core/content.js';
 import {
-  BASE_STATS, derived, isGear, knownSpells, playerFighter, rankOf, setCounts, SLOT_LABEL, SLOTS, totals, weaponSpell, WEAPON_SPELL,
+  BASE_STATS, derived, gmOf, isGear, knownSpells, playerFighter, rankOf, setCounts, SLOT_LABEL, SLOTS, totals, weaponSpell, WEAPON_SPELL,
   type BaseStat, type HeroLook, type ItemInst, type Slot,
 } from '../core/character.js';
 import { castError, current, damageRange, healRange, powerOf, spellOf, type Fighter } from '../core/fight.js';
 import { icon, ITEM_ICON } from '../render/icons.js';
 import { monsterPortrait, portrait } from '../render/view.js';
 import { G } from '../state.js';
+import { gm, gmItemList, gmWindow } from './gm.js';
 
 export interface Actions {
   selectSpell(id: string | null): void;
@@ -23,6 +24,8 @@ export interface Actions {
   raiseStat(k: BaseStat, n: number): void;
   raiseSpell(id: string): void;
   resetStats(): void;
+  /** GM tools: op names the change, args carries its values. */
+  gm(op: string, args?: Record<string, string | number | boolean>): void;
   setBody(body: 'sprout' | 'classic'): void;
   resetSpells(): void;
   closeResult(): void;
@@ -33,7 +36,7 @@ export interface Actions {
 export const actions = {} as Actions;
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
-const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]!);
+export const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]!);
 
 // ------------------------------------------------------------ tooltips
 
@@ -158,7 +161,9 @@ export function refreshBar() {
   const hp = me ? G.hero.hp ?? me.hp : Math.min(ch.hp, d.maxHp);
   const max = me ? me.maxHp : d.maxHp;
   $('name').textContent = ch.name;
-  $('lvl').textContent = `Runeblade · Lv ${ch.level}`;
+  const gmOn = gmOf(ch).on;
+  $('lvl').innerHTML = `Runeblade · Lv ${ch.level}${gmOn ? ' <span class="gmtag">GM</span>' : ''}`;
+  ($('gmbtn') as HTMLButtonElement).hidden = !gmOn;
   $<HTMLImageElement>('face').src = portrait({ kind: 'hero', look: ch.look });
   $('hpfill').style.width = `${(100 * hp) / max}%`;
   $('hptext').textContent = `${Math.floor(hp)} / ${max}`;
@@ -278,7 +283,7 @@ export function toggleWindow(name: string) {
   if (open?.name === name) closeWindow(); else openWindow(name);
 }
 
-function panel(title: string, body: string, closable = true, width = ''): string {
+export function panel(title: string, body: string, closable = true, width = ''): string {
   return `<div class="panel" style="${width}"><header><b>${title}</b>${closable ? '<button data-act="close" title="Close (Esc)">×</button>' : ''}</header><div class="body">${body}</div></div>`;
 }
 
@@ -320,7 +325,8 @@ function charWindow(): string {
     kv('Physical resist', d.resPhysical + '%') + kv('Fire resist', d.resFire + '%') + kv('Storm resist', d.resStorm + '%') +
     `<h4>Progress</h4>` + kv('Level', ch.level) + kv('Experience', ch.level >= LEVEL_CAP ? 'max' : `${ch.xp} / ${xpNeed(ch.level)}`) + kv('Fights won', ch.wins) +
     `<div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn" data-act="look-switch">${(ch.look.body ?? 'sprout') === 'sprout' ? 'Switch to classic look' : 'Switch to sprout look'}</button>` +
-    `<button class="btn" data-act="reset">New character…</button></div>`;
+    `<button class="btn" data-act="reset">New character…</button>` +
+    `<button class="btn${gmOf(ch).on ? ' gmon' : ''}" data-act="gm" data-op="toggle" title="Game-master tools for editing anything">GM mode: ${gmOf(ch).on ? 'on' : 'off'}</button></div>`;
   return panel(`${esc(ch.name)} · Runeblade level ${ch.level}`, `<div class="grid2"><div>${left}</div><div>${right}</div></div>`, true, 'width:620px');
 }
 
@@ -453,6 +459,7 @@ export function renderWindow() {
     case 'dialog': h = dialogWindow(open.data); break;
     case 'result': h = resultWindow(open.data); break;
     case 'create': h = createWindow(); break;
+    case 'gm': h = gmOf(G.ch).on ? gmWindow() : ''; break;
   }
   el.innerHTML = h;
   el.classList.add('on');
@@ -476,6 +483,20 @@ export function initHud() {
     const d = t.dataset;
     switch (d.act) {
       case 'close': closeWindow(); break;
+      case 'gm': {
+        const args: Record<string, string> = {};
+        for (const [k, v] of Object.entries(d)) if (k !== 'act' && k !== 'op' && v !== undefined) args[k] = v;
+        actions.gm(d.op!, args);
+        break;
+      }
+      case 'gm-tab': gm.tab = d.v as typeof gm.tab; renderWindow(); break;
+      case 'gm-pick': gm.pick = d.def!; gm.custom = {}; renderWindow(); break;
+      case 'gm-roll': gm.roll = d.v as typeof gm.roll; renderWindow(); break;
+      case 'gm-edit': gm.edit = Number(d.uid); renderWindow(); break;
+      case 'gm-clear': gm.confirmClear = true; renderWindow(); break;
+      case 'gm-clear-cancel': gm.confirmClear = false; renderWindow(); break;
+      case 'gm-member-add': gm.group.push({ ...gm.group[gm.group.length - 1]! }); renderWindow(); break;
+      case 'gm-member-del': gm.group.splice(Number(d.i), 1); renderWindow(); break;
       case 'stat': actions.raiseStat(d.k as BaseStat, Number(d.n)); break;
       case 'rank': actions.raiseSpell(d.id!); break;
       case 'reset-stats': confirming = 'stats'; renderWindow(); break;
@@ -511,6 +532,24 @@ export function initHud() {
       }
     }
     hideTip();
+  });
+  // GM inputs apply when their value is committed (Enter, leaving the field, or a pick in a list).
+  $('win').addEventListener('change', (ev) => {
+    const t = ev.target as HTMLInputElement | HTMLSelectElement;
+    if (t.id === 'gm-type') { gm.type = t.value; $('gm-list').innerHTML = gmItemList(); return; }
+    const op = t.dataset.gm;
+    if (!op) return;
+    const d = t.dataset;
+    if (op === 'qty') { gm.qty = Math.max(1, Math.round(Number(t.value) || 1)); return; }
+    if (op === 'custom') { gm.custom[d.k as StatKey] = Math.round(Number(t.value) || 0); return; }
+    if (op === 'member') { gm.group[Number(d.i)]!.def = t.value; return; }
+    if (op === 'memberLevel') { gm.group[Number(d.i)]!.level = Math.max(1, Math.min(50, Math.round(Number(t.value) || 1))); return; }
+    const value = t instanceof HTMLInputElement && t.type === 'checkbox' ? t.checked : t instanceof HTMLInputElement && t.type === 'number' ? Number(t.value) : t.value;
+    actions.gm(op, { ...d, value } as Record<string, string | number | boolean>);
+  });
+  $('win').addEventListener('input', (ev) => {
+    const t = ev.target as HTMLInputElement;
+    if (t.id === 'gm-search') { gm.search = t.value; $('gm-list').innerHTML = gmItemList(); }
   });
   $('win').addEventListener('dblclick', (ev) => {
     const t = (ev.target as HTMLElement).closest<HTMLElement>('[data-act=pick-inv]');

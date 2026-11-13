@@ -3,19 +3,19 @@ import {
   ELEMENT_COLOR, ITEMS, MAP_BY_ID, MONSTERS, monsterXp, QUESTS, xpNeed, type MapDef,
 } from './core/content.js';
 import {
-  addItem, buyItem, derived, equipItem, gainXp, newCharacter, playerFighter, raiseSpell, raiseStat, resetSpells, resetStats, sellItem,
-  unequip, useItem,
+  addItem, addItemWith, buyItem, cheatsOf, derived, equipItem, findItem, gainXp, gmOf, GM_DEFAULT, newCharacter, playerFighter, raiseSpell,
+  raiseStat, removeItem, resetSpells, resetStats, sellItem, setItemStats, setLevel, setRank, unequip, useItem, type BaseStat, type GmFlags,
   weaponSpell, WEAPON_SPELL, type Character, type HeroLook, type ItemInst,
 } from './core/character.js';
 import {
-  aiTurn, cast, castError, createFight, current, endTurn, move, moveCells, spellArea, spellCells, spellOf, startFight,
+  aiTurn, cast, castError, createFight, current, endTurn, forceEnd, move, moveCells, spellArea, spellCells, spellOf, startFight,
   type FEvent, type Fighter,
 } from './core/fight.js';
 import { center, colOf, COLS, dist, neighbors, pickCell, rowOf, ROWS, VIEW_H, VIEW_W } from './core/grid.js';
 import { findPath, reachable } from './core/path.js';
 import { createRng, pick, rint } from './core/rng.js';
 import {
-  arrivalCell, buildMap, fightCells, monsterFighter, nearestWalkable, neighborMap, populate,
+  arrivalCell, buildMap, clearGroups, fightCells, monsterFighter, nearestWalkable, neighborMap, populate, respawnAll, spawnCustomGroup,
   type Dir, type GameMap, type Group, type Npc,
 } from './core/world.js';
 import { animDur, type AnimKind } from './render/sprites.js';
@@ -27,6 +27,7 @@ import {
   actions, banner, barSpells, clearLog, closeWindow, fade, fighterHtml, groupHtml, hideTip, initHud, log, openWindow, refresh,
   refreshBar, refreshTimeline, setMapInfo, showTip, toggleWindow, windowOpen,
 } from './ui/hud.js';
+import { gm as gmUi } from './ui/gm.js';
 
 const SAVE_KEY = 'shardfall-save-v1';
 const rng = createRng((Date.now() ^ 0x9e3779b9) >>> 0);
@@ -504,6 +505,122 @@ function selectSpell(id: string | null) {
   refreshBar();
 }
 
+// ------------------------------------------------------------ GM tools
+
+/** Bring the player's fighter in line with the character after a GM edit during a fight. */
+function syncFighter(hpFromCharacter = false) {
+  const f = G.fight;
+  if (!f || f.st.over) return;
+  const me = hero(), fresh = playerFighter(G.ch, me.cell);
+  const ratio = me.hp / me.maxHp;
+  Object.assign(me, {
+    name: fresh.name, level: fresh.level, maxHp: fresh.maxHp, baseAp: fresh.baseAp, baseMp: fresh.baseMp,
+    str: fresh.str, int: fresh.int, agi: fresh.agi, luck: fresh.luck, power: fresh.power, dmg: fresh.dmg,
+    crit: fresh.crit, init: fresh.init, res: fresh.res, cheats: fresh.cheats,
+  });
+  me.hp = Math.max(1, Math.min(me.maxHp, hpFromCharacter ? G.ch.hp : Math.round(ratio * me.maxHp)));
+  // Keep cooldowns of spells already in the bar; add newly known ones.
+  me.spells = fresh.spells.map((s) => {
+    const old = me.spells.find((o) => o.id === s.id);
+    return old ? { ...old, rank: s.rank } : s;
+  });
+  const a = actorOf(me.id);
+  a.hp = me.hp;
+  a.maxHp = me.maxHp;
+  a.name = me.name;
+}
+
+function gmAction(op: string, a: Record<string, string | number | boolean> = {}) {
+  const ch = G.ch;
+  const flags = (): GmFlags => (ch.gm = { ...GM_DEFAULT, ...ch.gm });
+  const n = (v: unknown, lo = 0, hi = 1e9) => Math.max(lo, Math.min(hi, Math.round(Number(v) || 0)));
+  const inFight = G.mode === 'fight' && !!G.fight;
+  let hpFromCharacter = false;
+  switch (op) {
+    case 'toggle': {
+      const on = !gmOf(ch).on;
+      flags().on = on;
+      log(on ? 'GM mode on. Press G or the GM button to open the tools.' : 'GM mode off. Cheats are off too.', 'a');
+      if (!on && windowOpen() === 'gm') closeWindow();
+      break;
+    }
+    case 'flag': flags()[a.k as keyof Omit<GmFlags, 'on'>] = !!a.value; break;
+    case 'name': ch.name = String(a.value).trim().slice(0, 16) || ch.name; G.hero.name = ch.name; break;
+    case 'level': setLevel(ch, n(a.value, 1, 30)); hpFromCharacter = true; log(`Level set to ${ch.level}. Points refunded.`, 'a'); break;
+    case 'xp': ch.xp = n(a.value); gainXp(ch, 0); break;
+    case 'gold': ch.gold = n(a.value); break;
+    case 'hp': ch.hp = n(a.value, 1, derived(ch).maxHp); hpFromCharacter = true; break;
+    case 'heal': ch.hp = derived(ch).maxHp; hpFromCharacter = true; break;
+    case 'base': ch.base[a.k as BaseStat] = n(a.value, 0, 99999); break;
+    case 'statPoints': ch.statPoints = n(a.value, 0, 99999); break;
+    case 'spellPoints': ch.spellPoints = n(a.value, 0, 99999); break;
+    case 'rank': setRank(ch, String(a.id), n(a.value, 1, 5)); break;
+    case 'quest': ch.quest = n(a.value, 0, QUESTS.length); ch.questTaken = false; ch.questProg = 0; break;
+    case 'questDone': {
+      const q = QUESTS[ch.quest];
+      if (q) { ch.questTaken = true; ch.questProg = q.count; log(`Quest ready to hand in: ${q.name}.`, 'a'); }
+      break;
+    }
+    case 'spawn': {
+      if (!gmUi.pick) break;
+      addItemWith(ch, gmUi.pick, gmUi.qty, gmUi.roll, rng, gmUi.custom);
+      log(`Added ${gmUi.qty} × ${ITEMS[gmUi.pick]!.name}.`, 'a');
+      break;
+    }
+    case 'itemstat': setItemStats(ch, Number(a.uid), { [String(a.k)]: Math.round(Number(a.value) || 0) }); break;
+    case 'itemqty': { const it = findItem(ch, Number(a.uid)); if (it) it.qty = n(a.value, 1, 9999); break; }
+    case 'delete': removeItem(ch, Number(a.uid)); gmUi.edit = null; break;
+    case 'clearBag': ch.inv = []; gmUi.confirmClear = false; gmUi.edit = null; log('Bag emptied.', 'a'); break;
+    case 'goto': if (!inFight) { closeWindow(); enterMap(String(a.v), -1); banner(G.map.def.name); } break;
+    case 'respawn':
+      if (!inFight) {
+        respawnAll(G.map, rng, G.hero.cell);
+        rebuildExploreActors();
+        log('Monsters respawned.', 'a');
+      }
+      break;
+    case 'clearGroups':
+      if (!inFight) {
+        clearGroups(G.map, performance.now() + 300000);
+        rebuildExploreActors();
+        log('Monsters removed for 5 minutes.', 'a');
+      }
+      break;
+    case 'customFight': {
+      if (inFight) break;
+      const g = spawnCustomGroup(G.map, gmUi.group, G.hero.cell, rng);
+      if (!g) { log('No room for a group here.', 'r'); break; }
+      closeWindow();
+      G.actors.push(groupActor(g));
+      beginFight(g);
+      return;
+    }
+    case 'win': case 'lose': {
+      const f = G.fight;
+      if (!f || f.st.over) break;
+      closeWindow();
+      const ev = forceEnd(f.st, op);
+      const idle = f.phase === 'player' || f.phase === 'placement';
+      void play(ev).then(() => { if (idle) finishFight(); });
+      return;
+    }
+    case 'refill': {
+      if (!G.fight) break;
+      const me = hero();
+      me.ap = me.baseAp;
+      me.mp = me.baseMp;
+      for (const s of me.spells) { s.cd = 0; s.used = 0; }
+      updateMarks();
+      break;
+    }
+    case 'speed': speed = n(a.v, 1, 5); gmUi.speed = speed; break;
+  }
+  if (inFight) syncFighter(hpFromCharacter);
+  if (G.hero) { G.hero.name = ch.name; }
+  save();
+  refresh();
+}
+
 function finishFight() {
   const f = G.fight;
   if (!f || f.phase === 'over') return;
@@ -623,6 +740,7 @@ function onKey(ev: KeyboardEvent) {
   else if (k === 'i' || k === 'b') toggleWindow('bag');
   else if (k === 's') toggleWindow('spells');
   else if (k === 'm') toggleWindow('map');
+  else if (k === 'g' && gmOf(G.ch).on) toggleWindow('gm');
   else if (G.fight && !windowOpen()) {
     const idx = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-'].indexOf(ev.key);
     const s = idx >= 0 ? barSpells()[idx] : undefined;
@@ -666,6 +784,7 @@ function wireActions() {
     save();
     refresh();
   };
+  actions.gm = gmAction;
   actions.closeResult = closeResult;
   actions.create = (name: string, look: HeroLook) => {
     G.ch = newCharacter(name, look);

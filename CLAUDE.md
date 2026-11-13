@@ -24,7 +24,7 @@ Before finishing a change: `npm run build && node tools/drive.mjs play` must pas
 
 - `src/core` — rules with no rendering or I/O: `grid.ts` (cells, diamond coordinates, areas), `path.ts` (BFS paths, reachable cells, line of sight), `content.ts` (spells, monsters, items, sets, maps, shop, quests as data), `character.ts` (stats, XP, inventory, equipment), `fight.ts` (fight state, move/cast/end turn, effects, AI), `world.ts` (map generation, village, exits, monster groups), `rng.ts`.
 - `src/render` — `sprites.ts` (tiles, scenery, hero, monsters; the hero is jointed parts posed by `heroPose`, with every timing and angle in `HERO_MOTION`), `heroSprite.ts` (the sprite hero: each of the four views is cut into sprout, head, body and two legs along the lines in the generated `heroFrames.ts`, and posed by the same `heroPose`), `envSprites.ts` (trees and the portal in village and meadow maps; one-sprite buildings drawn in 32 px strips that each sort by the footprint's front edge), `icons.ts`, `view.ts` (frame drawing, depth sort, effects, actor movement). `look.body` picks the sprite (`'sprout'`, the default) or the code-drawn hero (`'classic'`); villagers are always code-drawn.
-- `src/ui/hud.ts` — bar, timeline, log, tooltips, windows. `src/state.ts` — shared client state `G`. `src/game.ts` — controller (input, exploring, fight flow, rewards, NPCs, save). In the browser `window.shardfall` exposes test hooks (`auto`, `speed`, `level`, `give`, `goto`, `fight`).
+- `src/ui/hud.ts` — bar, timeline, log, tooltips, windows. `src/ui/gm.ts` — the GM window (character, items, world, fight tabs); its actions are `gmAction` in `game.ts`. `src/state.ts` — shared client state `G`. `src/game.ts` — controller (input, exploring, fight flow, rewards, NPCs, save). In the browser `window.shardfall` exposes test hooks (`auto`, `speed`, `level`, `give`, `goto`, `fight`).
 
 ## Rules of the codebase
 
@@ -33,6 +33,7 @@ Before finishing a change: `npm run build && node tools/drive.mjs play` must pas
 - Fight movement is orthogonal; diagonal steps are for exploring.
 - The canvas draws at the screen's real resolution: `view.ts` keeps a pixel scale (device pixels per game pixel), the frame sets it as a transform, and game code works in 960 x 560 game pixels. Draw images from 3x sources and never enlarge them.
 - A building that is one sprite (`MapObj.asset`, `kind: 'building'`) shares one `foot` object across its cells; place it with `addBuilding` in `world.ts`.
+- GM mode lives on `Character.gm` (`gmOf()` fills in defaults). Fight cheats reach the rules only through `Fighter.cheats`, set by `playerFighter` from `cheatsOf()` while GM mode is on; with no cheats, fights and `npm run sim` behave as before.
 - Content is data in `content.ts`. Balance changes go there and are checked with `npm run sim`.
 - Original IP only: no names, characters, art, interface layout or text copied from any existing game.
 - Keep `README.md` accurate when commands or controls change.

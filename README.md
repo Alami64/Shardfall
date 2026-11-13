@@ -28,6 +28,7 @@ Progress is saved in the browser (`localStorage`).
 | Fight | Space or **End turn** | End your turn |
 | Fight | Esc or right-click | Put the spell away |
 | Anywhere | `C` `I` `S` `M` | Characteristics, inventory, spells, world map |
+| Anywhere, GM mode on | `G` | Game-master tools |
 
 ## What is in the game
 
@@ -39,6 +40,14 @@ Progress is saved in the browser (`localStorage`).
 - **10 monsters** with their own spells and behaviour (melee, ranged, support), in groups of 1 to 4 that wander and respawn.
 - **Items**: 35 pieces of equipment in 8 slots with rolled stats, 4 sets with bonuses, 9 resources and 3 foods. A shop to buy and sell.
 - **8 quests** from Old Tobin, ending with the boss.
+
+- **GM mode**: switch it on at the bottom of the Stats window. The GM window (`G`, or the red GM button) can:
+  - set the level up or down, XP, gold, health, every characteristic, free points and spell ranks; rename; jump between quests;
+  - spawn any item with random, minimum, maximum or hand-typed stats, edit or delete items, clear the bag;
+  - travel to any map, respawn or remove monsters, build a custom fight of up to 8 monsters;
+  - turn on cheats (invulnerable, one-hit kills, free casting, unlimited MP), win or lose a fight instantly, change play speed.
+
+  Switching GM mode off turns the cheats off. It is saved with the character.
 
 Not in the game: multiplayer, crafting, summons, traps, sound.
 

@@ -15,6 +15,9 @@ export interface Buff {
 
 export interface SpellSlot { id: string; rank: number; cd: number; used: number }
 
+/** GM cheats on a fighter (the player only). Missing means none. */
+export interface Cheats { invulnerable: boolean; oneHit: boolean; freeCast: boolean; infiniteMp: boolean }
+
 export interface Fighter {
   id: number;
   team: 0 | 1;
@@ -42,6 +45,7 @@ export interface Fighter {
   buffs: Buff[];
   alive: boolean;
   ai: 'melee' | 'ranged' | 'support';
+  cheats?: Cheats;
 }
 
 export interface FightState {
@@ -106,9 +110,10 @@ export function castError(st: FightState, f: Fighter, spellId: string, cell: num
   const slot = f.spells.find((s) => s.id === spellId);
   if (!slot) return 'Unknown spell';
   const sp = spellOf(st, spellId);
-  if (f.ap < sp.ap) return 'Not enough AP';
-  if (slot.cd > 0) return `Ready in ${slot.cd} turn${slot.cd > 1 ? 's' : ''}`;
-  if (sp.perTurn && slot.used >= sp.perTurn) return 'No more casts this turn';
+  const free = !!f.cheats?.freeCast;
+  if (!free && f.ap < sp.ap) return 'Not enough AP';
+  if (!free && slot.cd > 0) return `Ready in ${slot.cd} turn${slot.cd > 1 ? 's' : ''}`;
+  if (!free && sp.perTurn && slot.used >= sp.perTurn) return 'No more casts this turn';
   if (cell < 0) return 'Out of the map';
   const d = dist(from, cell);
   if (d < sp.range[0] || d > sp.range[1]) return 'Out of range';
@@ -177,10 +182,12 @@ function checkOver(st: FightState, ev: FEvent[]) {
   if (st.over) ev.push({ t: 'end', result: st.over });
 }
 
-function hurt(st: FightState, tgt: Fighter, raw: number, el: Element, ev: FEvent[], crit = false): number {
+function hurt(st: FightState, tgt: Fighter, raw: number, el: Element, ev: FEvent[], crit = false, lethal = false): number {
   if (!tgt.alive) return 0;
   let n = Math.max(0, raw - sumBuff(tgt, 'shield'));
   n = Math.max(0, Math.floor((n * (100 - tgt.res[el])) / 100));
+  if (lethal) n = tgt.hp;
+  if (tgt.cheats?.invulnerable) n = 0;
   n = Math.min(n, tgt.hp);
   tgt.hp -= n;
   ev.push({ t: 'dmg', id: tgt.id, n, el, hp: tgt.hp, crit });
@@ -230,7 +237,7 @@ function applyEffect(st: FightState, f: Fighter, e: Effect, rank: number, cell: 
   switch (e.k) {
     case 'damage':
       for (const t of foes) {
-        const n = hurt(st, t, rawDamage(f, e, rank, crit, rng), e.el, ev, crit);
+        const n = hurt(st, t, rawDamage(f, e, rank, crit, rng), e.el, ev, crit, !!f.cheats?.oneHit);
         if (e.steal && n > 0) mend(f, Math.floor(n / 2), ev);
       }
       break;
@@ -282,9 +289,11 @@ export function cast(st: FightState, f: Fighter, spellId: string, cell: number, 
   if (st.over || castError(st, f, spellId, cell)) return [];
   const sp = spellOf(st, spellId);
   const slot = f.spells.find((s) => s.id === spellId)!;
-  f.ap -= sp.ap;
-  slot.used++;
-  if (sp.cooldown) slot.cd = sp.cooldown;
+  if (!f.cheats?.freeCast) {
+    f.ap -= sp.ap;
+    slot.used++;
+    if (sp.cooldown) slot.cd = sp.cooldown;
+  }
   const cells = spellArea(sp, cell);
   const crit = rng() * 100 < f.crit && sp.effects.some((e) => e.k === 'damage' || e.k === 'heal');
   const ev: FEvent[] = [{ t: 'cast', id: f.id, spell: sp.id, name: sp.name, color: sp.color, cell, cells, crit }];
@@ -305,6 +314,11 @@ export function move(st: FightState, f: Fighter, path: number[], rng: Rng): FEve
   const walked: number[] = [];
   for (const next of path) {
     if (f.mp <= 0 || dist(f.cell, next) !== 1 || !free(st, next)) break;
+    if (f.cheats?.infiniteMp) {
+      f.cell = next;
+      walked.push(next);
+      continue;
+    }
     const held = lockers(st, f).find((o) => rng() > dodgeChance(f, o));
     if (held) {
       f.mp = 0;
@@ -339,6 +353,21 @@ function beginTurn(st: FightState, ev: FEvent[]) {
   }
 }
 
+/** GM: end the fight now. A win defeats every enemy, a loss defeats the player's side. */
+export function forceEnd(st: FightState, result: 'win' | 'lose'): FEvent[] {
+  const ev: FEvent[] = [];
+  if (st.over) return ev;
+  for (const f of st.fighters) {
+    if (!f.alive || f.team !== (result === 'win' ? 1 : 0)) continue;
+    f.hp = 0;
+    f.alive = false;
+    f.buffs = [];
+    ev.push({ t: 'dmg', id: f.id, n: 0, el: 'physical', hp: 0 }, { t: 'death', id: f.id });
+  }
+  checkOver(st, ev);
+  return ev;
+}
+
 /** Start the fight: the first fighter's turn begins. */
 export function startFight(st: FightState): FEvent[] {
   const ev: FEvent[] = [];
@@ -370,7 +399,8 @@ interface CastPlan { spell: string; cell: number; score: number }
 
 const usable = (st: FightState, f: Fighter, s: SpellSlot) => {
   const sp = spellOf(st, s.id);
-  return f.ap >= sp.ap && s.cd === 0 && !(sp.perTurn && s.used >= sp.perTurn) && !sp.effects.some((e) => e.k === 'teleport');
+  if (sp.effects.some((e) => e.k === 'teleport')) return false;
+  return !!f.cheats?.freeCast || (f.ap >= sp.ap && s.cd === 0 && !(sp.perTurn && s.used >= sp.perTurn));
 };
 
 /** Rough value of casting a spell on a cell from a given standing cell. */

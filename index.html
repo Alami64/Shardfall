@@ -89,6 +89,30 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--amber); out
 .panel .body { padding: 12px 14px; overflow: auto; }
 .row { display: flex; align-items: center; gap: 8px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.gmtag { display: inline-block; background: #c23b3b; color: #fff; font-size: 10px; font-weight: 800; letter-spacing: .6px; border-radius: 4px; padding: 0 5px; vertical-align: 1px; }
+#menu .gmbtn { border-color: #c23b3b; color: #ffb3a8; }
+#menu .gmbtn[hidden] { display: none; }
+.btn.gmon { border-color: #c23b3b; color: #ffb3a8; }
+.gmtabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: -4px 0 10px; flex-wrap: wrap; }
+.gmtab { background: none; border: none; border-bottom: 3px solid transparent; padding: 6px 12px; color: var(--dim); font-weight: 600; }
+.gmtab.on { color: var(--text); border-bottom-color: #c23b3b; }
+.gmnum { width: 70px; background: #0f1318; border: 1px solid var(--line); border-radius: 6px; color: var(--text); padding: 3px 6px; font: inherit; font-variant-numeric: tabular-nums; user-select: text; -webkit-user-select: text; }
+.gmtext { background: #0f1318; border: 1px solid var(--line); border-radius: 6px; color: var(--text); padding: 4px 8px; font: inherit; min-width: 0; flex: 1; user-select: text; -webkit-user-select: text; }
+.gmsel { background: #0f1318; border: 1px solid var(--line); border-radius: 6px; color: var(--text); padding: 3px 6px; font: inherit; max-width: 100%; }
+.gmcheck { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; cursor: pointer; }
+.gmcheck input { margin-top: 3px; accent-color: #c23b3b; }
+.gmcheck small { color: var(--dim); }
+.gmlist { display: flex; flex-direction: column; gap: 3px; max-height: 210px; overflow: auto; margin-top: 6px; padding-right: 4px; }
+.gmitem { display: flex; align-items: center; gap: 8px; background: var(--panel2); border: 1px solid transparent; border-radius: 6px; padding: 2px 8px 2px 2px; text-align: left; }
+.gmitem img { width: 26px; height: 26px; }
+.gmitem span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gmitem small { color: var(--dim); }
+.gmitem.sel, .gmitem:hover { border-color: var(--amber); }
+.gmmaps { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 4px; }
+.gmmaps .btn { white-space: normal; text-align: left; font-size: 12px; }
+.gmmaps small { color: var(--dim); }
+.gmmaps .btn.go small { color: #5a3a10; }
+.gmmember { margin-bottom: 4px; } .gmmember .gmsel { flex: 1; min-width: 0; }
 .kv { display: flex; justify-content: space-between; gap: 18px; padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,.07); }
 .kv span { color: var(--dim); } .kv b.up { color: var(--good); }
 .btn { background: var(--panel2); border: 1px solid var(--line); border-radius: 7px; padding: 5px 10px; white-space: nowrap; }
@@ -169,6 +193,7 @@ input[type=text] { background: #0f1318; border: 1px solid var(--line); border-ra
       <button data-win="bag" title="Inventory (I)">Bag<i class="dot"></i></button>
       <button data-win="spells" title="Spells (S)">Spells<i class="dot"></i></button>
       <button data-win="map" title="World map (M)">Map</button>
+      <button data-win="gm" id="gmbtn" class="gmbtn" title="Game master (G)" hidden>GM</button>
     </div>
     <button id="act" class="hide">End turn</button>
   </div>
